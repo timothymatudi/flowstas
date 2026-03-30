@@ -1,1 +1,53 @@
-{"data":"ZXhwb3J0IGludGVyZmFjZSBTdWJzY3JpcHRpb25Qcm9kdWN0IHsKICBpZDogc3RyaW5nCiAgbmFtZTogc3RyaW5nCiAgZGVzY3JpcHRpb246IHN0cmluZwogIHByaWNlSW5DZW50czogbnVtYmVyCiAgaW50ZXJ2YWw6ICdtb250aCcgfCAneWVhcicKICBmZWF0dXJlczogc3RyaW5nW10KfQoKLy8gVGhpcyBpcyB0aGUgc291cmNlIG9mIHRydXRoIGZvciBhbGwgc3Vic2NyaXB0aW9uIHByb2R1Y3RzLgovLyBBbGwgVUkgdG8gZGlzcGxheSBwcm9kdWN0cyBzaG91bGQgcHVsbCBmcm9tIHRoaXMgYXJyYXkuCi8vIElEcyBwYXNzZWQgdG8gdGhlIGNoZWNrb3V0IHNlc3Npb24gc2hvdWxkIGJlIHRoZSBzYW1lIGFzIElEcyBmcm9tIHRoaXMgYXJyYXkuCmV4cG9ydCBjb25zdCBQUk9EVUNUUzogU3Vic2NyaXB0aW9uUHJvZHVjdFtdID0gWwogIHsKICAgIGlkOiAnYmFzaWMnLAogICAgbmFtZTogJ0Jhc2ljIFBsYW4nLAogICAgZGVzY3JpcHRpb246ICdQZXJmZWN0IGZvciBnZXR0aW5nIHN0YXJ0ZWQnLAogICAgcHJpY2VJbkNlbnRzOiA5OTksIC8vICQ5Ljk5L21vbnRoCiAgICBpbnRlcnZhbDogJ21vbnRoJywKICAgIGZlYXR1cmVzOiBbCiAgICAgICdDb3JlIGZlYXR1cmVzJywKICAgICAgJ0VtYWlsIHN1cHBvcnQnLAogICAgICAnVXAgdG8gMSwwMDAgcmVxdWVzdHMvbW9udGgnLAogICAgXSwKICB9LAogIHsKICAgIGlkOiAncHJvJywKICAgIG5hbWU6ICdQcm8gUGxhbicsCiAgICBkZXNjcmlwdGlvbjogJ0Jlc3QgZm9yIGdyb3dpbmcgYnVzaW5lc3NlcycsCiAgICBwcmljZUluQ2VudHM6IDI5OTksIC8vICQyOS45OS9tb250aAogICAgaW50ZXJ2YWw6ICdtb250aCcsCiAgICBmZWF0dXJlczogWwogICAgICAnRXZlcnl0aGluZyBpbiBCYXNpYycsCiAgICAgICdQcmlvcml0eSBzdXBwb3J0JywKICAgICAgJ1VwIHRvIDEwLDAwMCByZXF1ZXN0cy9tb250aCcsCiAgICAgICdBZHZhbmNlZCBhbmFseXRpY3MnLAogICAgXSwKICB9LAogIHsKICAgIGlkOiAnZW50ZXJwcmlzZScsCiAgICBuYW1lOiAnRW50ZXJwcmlzZSBQbGFuJywKICAgIGRlc2NyaXB0aW9uOiAnRm9yIGxhcmdlIHNjYWxlIG9wZXJhdGlvbnMnLAogICAgcHJpY2VJbkNlbnRzOiA5OTk5LCAvLyAkOTkuOTkvbW9udGgKICAgIGludGVydmFsOiAnbW9udGgnLAogICAgZmVhdHVyZXM6IFsKICAgICAgJ0V2ZXJ5dGhpbmcgaW4gUHJvJywKICAgICAgJ0RlZGljYXRlZCBzdXBwb3J0JywKICAgICAgJ1VubGltaXRlZCByZXF1ZXN0cycsCiAgICAgICdDdXN0b20gaW50ZWdyYXRpb25zJywKICAgICAgJ1NMQSBndWFyYW50ZWUnLAogICAgXSwKICB9LApdCg=="}
+export interface SubscriptionProduct {
+  id: string
+  name: string
+  description: string
+  priceInCents: number
+  interval: 'month' | 'year'
+  features: string[]
+}
+
+// This is the source of truth for all subscription products.
+// All UI to display products should pull from this array.
+// IDs passed to the checkout session should be the same as IDs from this array.
+export const PRODUCTS: SubscriptionProduct[] = [
+  {
+    id: 'basic',
+    name: 'Basic Plan',
+    description: 'Perfect for getting started',
+    priceInCents: 999, // $9.99/month
+    interval: 'month',
+    features: [
+      'Core features',
+      'Email support',
+      'Up to 1,000 requests/month',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro Plan',
+    description: 'Best for growing businesses',
+    priceInCents: 2999, // $29.99/month
+    interval: 'month',
+    features: [
+      'Everything in Basic',
+      'Priority support',
+      'Up to 10,000 requests/month',
+      'Advanced analytics',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise Plan',
+    description: 'For large scale operations',
+    priceInCents: 9999, // $99.99/month
+    interval: 'month',
+    features: [
+      'Everything in Pro',
+      'Dedicated support',
+      'Unlimited requests',
+      'Custom integrations',
+      'SLA guarantee',
+    ],
+  },
+]

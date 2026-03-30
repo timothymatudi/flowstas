@@ -1,1 +1,36 @@
-{"data":"J3VzZSBzZXJ2ZXInCgppbXBvcnQgeyBzdHJpcGUgfSBmcm9tICdAL2xpYi9zdHJpcGUnCmltcG9ydCB7IFBST0RVQ1RTIH0gZnJvbSAnQC9saWIvcHJvZHVjdHMnCgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gc3RhcnRDaGVja291dFNlc3Npb24ocHJvZHVjdElkOiBzdHJpbmcpIHsKICBjb25zdCBwcm9kdWN0ID0gUFJPRFVDVFMuZmluZCgocCkgPT4gcC5pZCA9PT0gcHJvZHVjdElkKQogIGlmICghcHJvZHVjdCkgewogICAgdGhyb3cgbmV3IEVycm9yKGBQcm9kdWN0IHdpdGggaWQgIiR7cHJvZHVjdElkfSIgbm90IGZvdW5kYCkKICB9CgogIC8vIENyZWF0ZSBDaGVja291dCBTZXNzaW9ucyBmb3Igc3Vic2NyaXB0aW9uCiAgY29uc3Qgc2Vzc2lvbiA9IGF3YWl0IHN0cmlwZS5jaGVja291dC5zZXNzaW9ucy5jcmVhdGUoewogICAgdWlfbW9kZTogJ2VtYmVkZGVkJywKICAgIHJlZGlyZWN0X29uX2NvbXBsZXRpb246ICduZXZlcicsCiAgICBsaW5lX2l0ZW1zOiBbCiAgICAgIHsKICAgICAgICBwcmljZV9kYXRhOiB7CiAgICAgICAgICBjdXJyZW5jeTogJ3VzZCcsCiAgICAgICAgICBwcm9kdWN0X2RhdGE6IHsKICAgICAgICAgICAgbmFtZTogcHJvZHVjdC5uYW1lLAogICAgICAgICAgICBkZXNjcmlwdGlvbjogcHJvZHVjdC5kZXNjcmlwdGlvbiwKICAgICAgICAgIH0sCiAgICAgICAgICB1bml0X2Ftb3VudDogcHJvZHVjdC5wcmljZUluQ2VudHMsCiAgICAgICAgICByZWN1cnJpbmc6IHsKICAgICAgICAgICAgaW50ZXJ2YWw6IHByb2R1Y3QuaW50ZXJ2YWwsCiAgICAgICAgICB9LAogICAgICAgIH0sCiAgICAgICAgcXVhbnRpdHk6IDEsCiAgICAgIH0sCiAgICBdLAogICAgbW9kZTogJ3N1YnNjcmlwdGlvbicsCiAgfSkKCiAgcmV0dXJuIHNlc3Npb24uY2xpZW50X3NlY3JldAp9Cg=="}
+'use server'
+
+import { stripe } from '@/lib/stripe'
+import { PRODUCTS } from '@/lib/products'
+
+export async function startCheckoutSession(productId: string) {
+  const product = PRODUCTS.find((p) => p.id === productId)
+  if (!product) {
+    throw new Error(`Product with id "${productId}" not found`)
+  }
+
+  // Create Checkout Sessions for subscription
+  const session = await stripe.checkout.sessions.create({
+    ui_mode: 'embedded',
+    redirect_on_completion: 'never',
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: product.name,
+            description: product.description,
+          },
+          unit_amount: product.priceInCents,
+          recurring: {
+            interval: product.interval,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'subscription',
+  })
+
+  return session.client_secret
+}

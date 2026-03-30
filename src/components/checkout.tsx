@@ -1,1 +1,30 @@
-{"data":"J3VzZSBjbGllbnQnCgppbXBvcnQgeyB1c2VDYWxsYmFjayB9IGZyb20gJ3JlYWN0JwppbXBvcnQgewogIEVtYmVkZGVkQ2hlY2tvdXQsCiAgRW1iZWRkZWRDaGVja291dFByb3ZpZGVyLAp9IGZyb20gJ0BzdHJpcGUvcmVhY3Qtc3RyaXBlLWpzJwppbXBvcnQgeyBsb2FkU3RyaXBlIH0gZnJvbSAnQHN0cmlwZS9zdHJpcGUtanMnCgppbXBvcnQgeyBzdGFydENoZWNrb3V0U2Vzc2lvbiB9IGZyb20gJ0AvYXBwL2FjdGlvbnMvc3RyaXBlJwoKY29uc3Qgc3RyaXBlUHJvbWlzZSA9IGxvYWRTdHJpcGUocHJvY2Vzcy5lbnYuTkVYVF9QVUJMSUNfU1RSSVBFX1BVQkxJU0hBQkxFX0tFWSEpCgpleHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBDaGVja291dCh7IHByb2R1Y3RJZCB9OiB7IHByb2R1Y3RJZDogc3RyaW5nIH0pIHsKICBjb25zdCBzdGFydENoZWNrb3V0U2Vzc2lvbkZvclByb2R1Y3QgPSB1c2VDYWxsYmFjaygKICAgICgpID0+IHN0YXJ0Q2hlY2tvdXRTZXNzaW9uKHByb2R1Y3RJZCksCiAgICBbcHJvZHVjdElkXQogICkKCiAgcmV0dXJuICgKICAgIDxkaXYgaWQ9ImNoZWNrb3V0IiBjbGFzc05hbWU9InctZnVsbCI+CiAgICAgIDxFbWJlZGRlZENoZWNrb3V0UHJvdmlkZXIKICAgICAgICBzdHJpcGU9e3N0cmlwZVByb21pc2V9CiAgICAgICAgb3B0aW9ucz17eyBjbGllbnRTZWNyZXQ6IHN0YXJ0Q2hlY2tvdXRTZXNzaW9uRm9yUHJvZHVjdCB9fQogICAgICA+CiAgICAgICAgPEVtYmVkZGVkQ2hlY2tvdXQgLz4KICAgICAgPC9FbWJlZGRlZENoZWNrb3V0UHJvdmlkZXI+CiAgICA8L2Rpdj4KICApCn0K"}
+'use client'
+
+import { useCallback } from 'react'
+import {
+  EmbeddedCheckout,
+  EmbeddedCheckoutProvider,
+} from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+
+import { startCheckoutSession } from '@/app/actions/stripe'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+export default function Checkout({ productId }: { productId: string }) {
+  const startCheckoutSessionForProduct = useCallback(
+    () => startCheckoutSession(productId),
+    [productId]
+  )
+
+  return (
+    <div id="checkout" className="w-full">
+      <EmbeddedCheckoutProvider
+        stripe={stripePromise}
+        options={{ clientSecret: startCheckoutSessionForProduct }}
+      >
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    </div>
+  )
+}

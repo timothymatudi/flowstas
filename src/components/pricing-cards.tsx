@@ -1,1 +1,76 @@
-{"data":"J3VzZSBjbGllbnQnCgppbXBvcnQgeyBDaGVjayB9IGZyb20gJ2x1Y2lkZS1yZWFjdCcKaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbicKaW1wb3J0IHsgQ2FyZCwgQ2FyZENvbnRlbnQsIENhcmREZXNjcmlwdGlvbiwgQ2FyZEZvb3RlciwgQ2FyZEhlYWRlciwgQ2FyZFRpdGxlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2NhcmQnCmltcG9ydCB7IFBST0RVQ1RTLCB0eXBlIFN1YnNjcmlwdGlvblByb2R1Y3QgfSBmcm9tICdAL2xpYi9wcm9kdWN0cycKCmludGVyZmFjZSBQcmljaW5nQ2FyZHNQcm9wcyB7CiAgb25TZWxlY3RQbGFuOiAocHJvZHVjdElkOiBzdHJpbmcpID0+IHZvaWQKfQoKZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUHJpY2luZ0NhcmRzKHsgb25TZWxlY3RQbGFuIH06IFByaWNpbmdDYXJkc1Byb3BzKSB7CiAgcmV0dXJuICgKICAgIDxkaXYgY2xhc3NOYW1lPSJncmlkIGdhcC02IG1kOmdyaWQtY29scy0zIj4KICAgICAge1BST0RVQ1RTLm1hcCgocHJvZHVjdCkgPT4gKAogICAgICAgIDxQcmljaW5nQ2FyZAogICAgICAgICAga2V5PXtwcm9kdWN0LmlkfQogICAgICAgICAgcHJvZHVjdD17cHJvZHVjdH0KICAgICAgICAgIG9uU2VsZWN0PXsoKSA9PiBvblNlbGVjdFBsYW4ocHJvZHVjdC5pZCl9CiAgICAgICAgICBpc1BvcHVsYXI9e3Byb2R1Y3QuaWQgPT09ICdwcm8nfQogICAgICAgIC8+CiAgICAgICkpfQogICAgPC9kaXY+CiAgKQp9CgpmdW5jdGlvbiBQcmljaW5nQ2FyZCh7CiAgcHJvZHVjdCwKICBvblNlbGVjdCwKICBpc1BvcHVsYXIsCn06IHsKICBwcm9kdWN0OiBTdWJzY3JpcHRpb25Qcm9kdWN0CiAgb25TZWxlY3Q6ICgpID0+IHZvaWQKICBpc1BvcHVsYXI/OiBib29sZWFuCn0pIHsKICBjb25zdCBwcmljZSA9IChwcm9kdWN0LnByaWNlSW5DZW50cyAvIDEwMCkudG9GaXhlZCgyKQoKICByZXR1cm4gKAogICAgPENhcmQgY2xhc3NOYW1lPXtgcmVsYXRpdmUgZmxleCBmbGV4LWNvbCAke2lzUG9wdWxhciA/ICdib3JkZXItcHJpbWFyeSBzaGFkb3ctbGcnIDogJyd9YH0+CiAgICAgIHtpc1BvcHVsYXIgJiYgKAogICAgICAgIDxkaXYgY2xhc3NOYW1lPSJhYnNvbHV0ZSAtdG9wLTMgbGVmdC0xLzIgLXRyYW5zbGF0ZS14LTEvMiI+CiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9InJvdW5kZWQtZnVsbCBiZy1wcmltYXJ5IHB4LTMgcHktMSB0ZXh0LXhzIGZvbnQtbWVkaXVtIHRleHQtcHJpbWFyeS1mb3JlZ3JvdW5kIj4KICAgICAgICAgICAgTW9zdCBQb3B1bGFyCiAgICAgICAgICA8L3NwYW4+CiAgICAgICAgPC9kaXY+CiAgICAgICl9CiAgICAgIDxDYXJkSGVhZGVyIGNsYXNzTmFtZT0idGV4dC1jZW50ZXIiPgogICAgICAgIDxDYXJkVGl0bGUgY2xhc3NOYW1lPSJ0ZXh0LXhsIj57cHJvZHVjdC5uYW1lfTwvQ2FyZFRpdGxlPgogICAgICAgIDxDYXJkRGVzY3JpcHRpb24+e3Byb2R1Y3QuZGVzY3JpcHRpb259PC9DYXJkRGVzY3JpcHRpb24+CiAgICAgIDwvQ2FyZEhlYWRlcj4KICAgICAgPENhcmRDb250ZW50IGNsYXNzTmFtZT0iZmxleC0xIj4KICAgICAgICA8ZGl2IGNsYXNzTmFtZT0ibWItNiB0ZXh0LWNlbnRlciI+CiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9InRleHQtNHhsIGZvbnQtYm9sZCI+JHtwcmljZX08L3NwYW4+CiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9InRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+L3twcm9kdWN0LmludGVydmFsfTwvc3Bhbj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8dWwgY2xhc3NOYW1lPSJzcGFjZS15LTMiPgogICAgICAgICAge3Byb2R1Y3QuZmVhdHVyZXMubWFwKChmZWF0dXJlKSA9PiAoCiAgICAgICAgICAgIDxsaSBrZXk9e2ZlYXR1cmV9IGNsYXNzTmFtZT0iZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTIiPgogICAgICAgICAgICAgIDxDaGVjayBjbGFzc05hbWU9ImgtNCB3LTQgdGV4dC1wcmltYXJ5IiAvPgogICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT0idGV4dC1zbSI+e2ZlYXR1cmV9PC9zcGFuPgogICAgICAgICAgICA8L2xpPgogICAgICAgICAgKSl9CiAgICAgICAgPC91bD4KICAgICAgPC9DYXJkQ29udGVudD4KICAgICAgPENhcmRGb290ZXI+CiAgICAgICAgPEJ1dHRvbgogICAgICAgICAgb25DbGljaz17b25TZWxlY3R9CiAgICAgICAgICBjbGFzc05hbWU9InctZnVsbCIKICAgICAgICAgIHZhcmlhbnQ9e2lzUG9wdWxhciA/ICdkZWZhdWx0JyA6ICdvdXRsaW5lJ30KICAgICAgICA+CiAgICAgICAgICBTdWJzY3JpYmUKICAgICAgICA8L0J1dHRvbj4KICAgICAgPC9DYXJkRm9vdGVyPgogICAgPC9DYXJkPgogICkKfQo="}
+'use client'
+
+import { Check } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { PRODUCTS, type SubscriptionProduct } from '@/lib/products'
+
+interface PricingCardsProps {
+  onSelectPlan: (productId: string) => void
+}
+
+export default function PricingCards({ onSelectPlan }: PricingCardsProps) {
+  return (
+    <div className="grid gap-6 md:grid-cols-3">
+      {PRODUCTS.map((product) => (
+        <PricingCard
+          key={product.id}
+          product={product}
+          onSelect={() => onSelectPlan(product.id)}
+          isPopular={product.id === 'pro'}
+        />
+      ))}
+    </div>
+  )
+}
+
+function PricingCard({
+  product,
+  onSelect,
+  isPopular,
+}: {
+  product: SubscriptionProduct
+  onSelect: () => void
+  isPopular?: boolean
+}) {
+  const price = (product.priceInCents / 100).toFixed(2)
+
+  return (
+    <Card className={`relative flex flex-col ${isPopular ? 'border-primary shadow-lg' : ''}`}>
+      {isPopular && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+            Most Popular
+          </span>
+        </div>
+      )}
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">{product.name}</CardTitle>
+        <CardDescription>{product.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1">
+        <div className="mb-6 text-center">
+          <span className="text-4xl font-bold">${price}</span>
+          <span className="text-muted-foreground">/{product.interval}</span>
+        </div>
+        <ul className="space-y-3">
+          {product.features.map((feature) => (
+            <li key={feature} className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-primary" />
+              <span className="text-sm">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+      <CardFooter>
+        <Button
+          onClick={onSelect}
+          className="w-full"
+          variant={isPopular ? 'default' : 'outline'}
+        >
+          Subscribe
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
