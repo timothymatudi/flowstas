@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 
 const schema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(1, 'Password is required'),
 })
 
 type FormData = z.infer<typeof schema>
@@ -36,7 +36,7 @@ export default function LoginPage() {
       password: data.password,
     })
     if (error) {
-      setError(error.message)
+      setError('Invalid email or password. Please try again.')
       setLoading(false)
       return
     }
@@ -45,55 +45,78 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Sign in to Flowstas</h1>
-          <p className="mt-2 text-muted-foreground">Enter your credentials to access your account</p>
+    <div className="min-h-screen flex">
+      {/* Left branding panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
+        <div className="text-primary-foreground text-2xl font-bold">Flowstas</div>
+        <div>
+          <h2 className="text-4xl font-bold text-primary-foreground mb-4">
+            Welcome back
+          </h2>
+          <p className="text-primary-foreground/70 text-lg">
+            Sign in to manage your subscriptions and access your dashboard.
+          </p>
         </div>
+        <p className="text-primary-foreground/50 text-sm">© 2026 Flowstas. All rights reserved.</p>
+      </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...register('email')}
-            />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+      {/* Right form panel */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-background">
+        <div className="w-full max-w-sm space-y-8">
+          <div>
+            <div className="lg:hidden text-2xl font-bold mb-8">Flowstas</div>
+            <h1 className="text-2xl font-bold text-foreground">Sign in to your account</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/sign-up" className="font-medium text-primary underline underline-offset-4">
+                Create one free
+              </Link>
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              {...register('password')}
-            />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-          </div>
-
-          {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200">
-              {error}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                className="h-11"
+                {...register('email')}
+              />
+              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
-          )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link href="/auth/reset-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="h-11"
+                {...register('password')}
+              />
+              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+            </div>
 
-        <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/sign-up" className="font-medium underline">
-            Sign up
-          </Link>
-        </p>
+            {error && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign in'}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   )
