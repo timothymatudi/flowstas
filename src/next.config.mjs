@@ -6,6 +6,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  turbopack: {
+    root: '/vercel/path0',
+  },
 }
 
 export default nextConfig
