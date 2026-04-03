@@ -7,7 +7,6 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { signUpAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -41,14 +40,18 @@ export default function SignUpPage() {
     setLoading(true)
     setError(null)
 
-    const result = await signUpAction(data.email, data.password)
-    if (result.error) {
-      setError(result.error)
+    const supabase = createClient()
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    })
+
+    if (signUpError) {
+      setError(signUpError.message)
       setLoading(false)
       return
     }
 
-    const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
