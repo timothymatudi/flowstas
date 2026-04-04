@@ -1,1 +1,45 @@
-{"data":"aW1wb3J0IHR5cGUgeyBNZXRhZGF0YSB9IGZyb20gJ25leHQnCmltcG9ydCB7IEdlaXN0LCBHZWlzdF9Nb25vIH0gZnJvbSAnbmV4dC9mb250L2dvb2dsZScKaW1wb3J0IHsgQW5hbHl0aWNzIH0gZnJvbSAnQHZlcmNlbC9hbmFseXRpY3MvbmV4dCcKaW1wb3J0ICcuL2dsb2JhbHMuY3NzJwoKY29uc3QgX2dlaXN0ID0gR2Vpc3QoeyBzdWJzZXRzOiBbImxhdGluIl0gfSk7CmNvbnN0IF9nZWlzdE1vbm8gPSBHZWlzdF9Nb25vKHsgc3Vic2V0czogWyJsYXRpbiJdIH0pOwoKZXhwb3J0IGNvbnN0IG1ldGFkYXRhOiBNZXRhZGF0YSA9IHsKICB0aXRsZTogJ3YwIEFwcCcsCiAgZGVzY3JpcHRpb246ICdDcmVhdGVkIHdpdGggdjAnLAogIGdlbmVyYXRvcjogJ3YwLmFwcCcsCiAgaWNvbnM6IHsKICAgIGljb246IFsKICAgICAgewogICAgICAgIHVybDogJy9pY29uLWxpZ2h0LTMyeDMyLnBuZycsCiAgICAgICAgbWVkaWE6ICcocHJlZmVycy1jb2xvci1zY2hlbWU6IGxpZ2h0KScsCiAgICAgIH0sCiAgICAgIHsKICAgICAgICB1cmw6ICcvaWNvbi1kYXJrLTMyeDMyLnBuZycsCiAgICAgICAgbWVkaWE6ICcocHJlZmVycy1jb2xvci1zY2hlbWU6IGRhcmspJywKICAgICAgfSwKICAgICAgewogICAgICAgIHVybDogJy9pY29uLnN2ZycsCiAgICAgICAgdHlwZTogJ2ltYWdlL3N2Zyt4bWwnLAogICAgICB9LAogICAgXSwKICAgIGFwcGxlOiAnL2FwcGxlLWljb24ucG5nJywKICB9LAp9CgpleHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBSb290TGF5b3V0KHsKICBjaGlsZHJlbiwKfTogUmVhZG9ubHk8ewogIGNoaWxkcmVuOiBSZWFjdC5SZWFjdE5vZGUKfT4pIHsKICByZXR1cm4gKAogICAgPGh0bWwgbGFuZz0iZW4iPgogICAgICA8Ym9keSBjbGFzc05hbWU9ImZvbnQtc2FucyBhbnRpYWxpYXNlZCI+CiAgICAgICAge2NoaWxkcmVufQogICAgICAgIDxBbmFseXRpY3MgLz4KICAgICAgPC9ib2R5PgogICAgPC9odG1sPgogICkKfQo="}
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import './globals.css'
+
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: 'v0 App',
+  description: 'Created with v0',
+  generator: 'v0.app',
+  icons: {
+    icon: [
+      {
+        url: '/icon-light-32x32.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/icon-dark-32x32.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/apple-icon.png',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className="font-sans antialiased">
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
+}
