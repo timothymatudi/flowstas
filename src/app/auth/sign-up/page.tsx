@@ -5,8 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { signUpAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,7 +27,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function SignUpPage() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -40,31 +38,16 @@ export default function SignUpPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-    })
-
-    if (signUpError) {
-      setError(signUpError.message)
+    const result = await signUpAction(data.email, data.password)
+    if (result.error) {
+      setError(result.error)
       setLoading(false)
       return
     }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-
-    if (signInError) {
-      setError(signInError.message)
-      setLoading(false)
-      return
-    }
-
-    router.push('/dashboard')
-    router.refresh()
+    // Wait a moment for session to be established before redirect
+    await new Promise(resolve => setTimeout(resolve, 100))
+    window.location.href = '/dashboard'
   }
 
   return (
