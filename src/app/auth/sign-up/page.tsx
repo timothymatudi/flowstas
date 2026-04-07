@@ -29,6 +29,7 @@ type FormData = z.infer<typeof schema>
 export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -37,6 +38,7 @@ export default function SignUpPage() {
   async function onSubmit(data: FormData) {
     setLoading(true)
     setError(null)
+    setSuccess(false)
 
     const result = await signUpAction(data.email, data.password)
     if (result.error) {
@@ -45,9 +47,8 @@ export default function SignUpPage() {
       return
     }
 
-    // Wait a moment for session to be established before redirect
-    await new Promise(resolve => setTimeout(resolve, 100))
-    window.location.href = '/dashboard'
+    setSuccess(true)
+    setLoading(false)
   }
 
   return (
@@ -137,7 +138,14 @@ export default function SignUpPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+            {success && (
+              <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+                <p className="font-medium">Check your email!</p>
+                <p>We sent a confirmation link to your inbox. Click it to verify your account.</p>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full h-11 text-base" disabled={loading || success}>
               {loading ? 'Creating account...' : 'Create free account'}
             </Button>
 
