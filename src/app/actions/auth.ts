@@ -1,5 +1,6 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 export async function signUpAction(email: string, password: string) {
@@ -9,7 +10,7 @@ export async function signUpAction(email: string, password: string) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
+      emailRedirectTo: 'https://flowstas.com/auth/callback',
     },
   })
 
@@ -17,5 +18,11 @@ export async function signUpAction(email: string, password: string) {
     return { error: error.message }
   }
 
-  return { success: true, message: 'Check your email for a confirmation link' }
+  // Email confirmation is disabled — session returned immediately, redirect to dashboard
+  if (data.session) {
+    redirect('/dashboard')
+  }
+
+  // Email confirmation is enabled — tell user to check email
+  return { success: true }
 }
