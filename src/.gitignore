@@ -1,4 +1,11 @@
 .vercel
+.env
+.env.local
 .env*.local
 node_modules/
 .next/
+prisma/
+prisma.config.ts
+skills-lock.json
+.agents/
+.claude/
