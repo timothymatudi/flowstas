@@ -1,31 +1,13 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/" className="text-xl font-bold">Flowstas</Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</Link>
-            <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
-            <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</Link>
-            <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/sign-up">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
 
-      <main className="container mx-auto px-4 py-16 max-w-4xl">
+      <main className="flex-1 container mx-auto px-4 py-16 max-w-4xl">
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
           <p className="text-muted-foreground">Last updated: April 1, 2026</p>
@@ -125,44 +107,7 @@ export default function TermsPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-12 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="text-xl font-bold">Flowstas</Link>
-              <p className="text-sm text-muted-foreground mt-2">
-                Manage your subscriptions and business operations with ease.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/#features" className="hover:text-foreground transition-colors">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-                <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Support</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
-                <li><Link href="/contact" className="hover:text-foreground transition-colors">Help Center</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-            © 2026 Flowstas. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

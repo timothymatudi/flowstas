@@ -3,8 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, ArrowLeft, Zap } from 'lucide-react'
+import { Check, Zap } from 'lucide-react'
 import { PRODUCTS } from '@/lib/products'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
 
 export default async function PricingPage() {
   const supabase = await createClient()
@@ -23,51 +25,20 @@ export default async function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/" className="text-xl font-bold">
-            Flowstas
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Features
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium text-foreground transition-colors">
-              Pricing
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <Button asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            ) : (
-              <>
-                <Button variant="ghost" asChild className="hidden sm:inline-flex">
-                  <Link href="/auth/login">Sign in</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/auth/sign-up">Get Started</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="flex-1 container mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">
             <Zap className="h-3 w-3 mr-1" />
             Simple, transparent pricing
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
             Choose the right plan for you
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
             Start free and scale as you grow. All plans include a 14-day free trial with no credit card required.
           </p>
         </div>
@@ -177,18 +148,13 @@ export default async function PricingPage() {
           <p className="text-muted-foreground mb-6">
             Our team is here to help. Reach out anytime.
           </p>
-          <Button variant="outline" size="lg">
-            Contact Sales
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/contact">Contact Sales</Link>
           </Button>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © 2026 Flowstas. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

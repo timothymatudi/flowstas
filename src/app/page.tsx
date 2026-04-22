@@ -14,13 +14,14 @@ import {
   CheckCircle2,
   Star
 } from 'lucide-react'
+import { Footer } from '@/components/footer'
 
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -60,7 +61,7 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <main>
+      <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 md:py-32">
           <div className="container mx-auto px-4 text-center">
@@ -269,7 +270,7 @@ export default async function HomePage() {
                   <Link href="/contact">Talk to Sales</Link>
                 </Button>
               </div>
-              <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Free 14-day trial
@@ -288,46 +289,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="text-xl font-bold">
-                Flowstas
-              </Link>
-              <p className="text-sm text-muted-foreground mt-2">
-                Manage your subscriptions and business operations with ease.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#features" className="hover:text-foreground transition-colors">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-                <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Support</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
-                <li><Link href="/contact" className="hover:text-foreground transition-colors">Help Center</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-            © 2026 Flowstas. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
