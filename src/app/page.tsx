@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Footer } from '@/components/footer'
 
+// Home page component
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
