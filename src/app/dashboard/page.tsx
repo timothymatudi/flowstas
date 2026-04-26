@@ -14,38 +14,33 @@ import {
   Activity,
   BarChart3,
   Settings,
-  Zap,
-  ArrowRight
+  Zap
 } from 'lucide-react'
 import { PRODUCTS } from '@/lib/products'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (error || !user) {
     redirect('/auth/login')
   }
 
-  // Get user profile
+  // Fetch profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name')
+    .select('*')
     .eq('id', user.id)
     .single()
 
-  // Get subscription status
+  // Fetch subscription
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('*')
     .eq('user_id', user.id)
-    .eq('status', 'active')
     .single()
 
-  const currentPlan = subscription 
-    ? PRODUCTS.find(p => p.id === subscription.plan) 
-    : null
-
+  const currentPlan = subscription ? PRODUCTS.find(p => p.id === subscription.plan) : null
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'there'
 
   return (
@@ -73,33 +68,6 @@ export default async function DashboardPage() {
           </Button>
         </div>
       </div>
-
-      {/* Subscription Status Card */}
-      {!subscription && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Upgrade to unlock all features</h3>
-                  <p className="text-muted-foreground">
-                    You&apos;re on the free plan. Upgrade to get unlimited access to all features.
-                  </p>
-                </div>
-              </div>
-              <Button asChild>
-                <Link href="/pricing">
-                  View Plans
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -159,14 +127,16 @@ export default async function DashboardPage() {
             <CardDescription>Your subscription details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {currentPlan ? (
+            {currentPlan && subscription ? (
               <>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold text-lg">{currentPlan.name}</p>
                     <p className="text-sm text-muted-foreground">{currentPlan.description}</p>
                   </div>
-                  <Badge variant="secondary">Active</Badge>
+                  <Badge variant={subscription.status === 'active' ? 'secondary' : 'destructive'}>
+                    {subscription.status === 'active' ? 'Active' : subscription.status}
+                  </Badge>
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">

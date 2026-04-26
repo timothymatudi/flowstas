@@ -10,7 +10,8 @@ export async function signUpAction(email: string, password: string) {
     email,
     password,
     options: {
-      emailRedirectTo: 'https://flowstas.com/auth/callback',
+      emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? 
+        `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
     },
   })
 
