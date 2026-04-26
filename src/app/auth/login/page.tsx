@@ -33,13 +33,8 @@ export default function LoginPage() {
       email: data.email,
       password: data.password,
     })
-    if (error) {
-      setError(error.message || 'Invalid email or password. Please try again.')
-      setLoading(false)
-      return
-    }
-    if (!authData?.session) {
-      setError('Please check your email to confirm your account before signing in.')
+    if (error || !authData?.session) {
+      setError('Invalid email or password. Please try again.')
       setLoading(false)
       return
     }
