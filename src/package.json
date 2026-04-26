@@ -1,6 +1,5 @@
 {
   "name": "flowstas",
-  "description": "Flowstas - AI-Powered Social Media Management",
   "version": "0.1.0",
   "private": true,
   "scripts": {

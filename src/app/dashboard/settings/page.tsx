@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,17 +7,13 @@ import { NotificationSettings } from '@/components/notification-settings'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (error || !user) {
-    redirect('/auth/login')
-  }
-
-  // Fetch profile
+  // Get user profile
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', user!.id)
     .single()
 
   return (
@@ -47,8 +42,8 @@ export default async function SettingsPage() {
             </CardHeader>
             <CardContent>
               <ProfileForm 
-                userId={user.id}
-                email={user.email || ''}
+                userId={user!.id}
+                email={user!.email || ''}
                 initialData={{
                   fullName: profile?.full_name || '',
                   avatarUrl: profile?.avatar_url || '',
@@ -59,7 +54,7 @@ export default async function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="security">
-          <SecuritySettings email={user.email || ''} />
+          <SecuritySettings email={user!.email || ''} />
         </TabsContent>
 
         <TabsContent value="notifications">

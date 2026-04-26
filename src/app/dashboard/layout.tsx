@@ -1,5 +1,16 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Button } from '@/components/ui/button'
+import { 
+  LayoutDashboard, 
+  CreditCard, 
+  BarChart3, 
+  Settings, 
+  LogOut,
+  Menu,
+  X
+} from 'lucide-react'
 import { DashboardNav } from '@/components/dashboard-nav'
 
 export default async function DashboardLayout({
@@ -8,24 +19,25 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (error || !user) {
+  if (!user) {
     redirect('/auth/login')
   }
 
-  // Fetch user profile
+  // Get user profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('full_name, avatar_url')
     .eq('id', user.id)
     .single()
 
-  // Fetch subscription
+  // Get subscription status
   const { data: subscription } = await supabase
     .from('subscriptions')
-    .select('*')
+    .select('plan, status')
     .eq('user_id', user.id)
+    .eq('status', 'active')
     .single()
 
   return (

@@ -5,9 +5,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Header } from '@/components/header'
-import { Footer } from '@/components/footer'
-import { CheckCircle2 } from 'lucide-react'
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false)
@@ -22,20 +19,38 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <Link href="/" className="text-xl font-bold">Flowstas</Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</Link>
+            <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+            <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</Link>
+            <Link href="/contact" className="text-sm font-medium text-foreground transition-colors">Contact</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Link href="/auth/login">Sign in</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/auth/sign-up">Get Started</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
 
-      <main className="flex-1 container mx-auto px-4 py-20 max-w-2xl">
+      <main className="container mx-auto px-4 py-20 max-w-2xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-muted-foreground text-lg">Have a question or need help? We&apos;d love to hear from you.</p>
+          <p className="text-muted-foreground text-lg">Have a question or need help? We'd love to hear from you.</p>
         </div>
 
         {sent ? (
           <div className="rounded-xl border bg-card p-8 text-center">
-            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-primary" />
+            <div className="text-4xl mb-4">✓</div>
             <h2 className="text-xl font-bold mb-2">Message sent!</h2>
-            <p className="text-muted-foreground">We&apos;ll get back to you within 24 hours.</p>
+            <p className="text-muted-foreground">We'll get back to you within 24 hours.</p>
             <Button className="mt-6" asChild><Link href="/">Back to home</Link></Button>
           </div>
         ) : (
@@ -74,8 +89,6 @@ export default function ContactPage() {
           </form>
         )}
       </main>
-
-      <Footer />
     </div>
   )
 }

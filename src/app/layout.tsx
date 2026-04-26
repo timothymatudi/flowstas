@@ -1,4 +1,3 @@
-// Root layout for Flowstas app
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
@@ -35,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
-      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
+    <html lang="en">
+      <body className="font-sans antialiased">
         {children}
         <Analytics />
       </body>

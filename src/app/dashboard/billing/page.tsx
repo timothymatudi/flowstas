@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { 
   CreditCard, 
   Download, 
+  Plus,
   Check,
   AlertCircle
 } from 'lucide-react'
@@ -15,17 +15,14 @@ import { PRODUCTS } from '@/lib/products'
 
 export default async function BillingPage() {
   const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (error || !user) {
-    redirect('/auth/login')
-  }
-
-  // Fetch subscription
+  // Get subscription status
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', user!.id)
+    .eq('status', 'active')
     .single()
 
   const currentPlan = subscription 
@@ -57,7 +54,7 @@ export default async function BillingPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {currentPlan && subscription ? (
+          {subscription && currentPlan ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -92,16 +89,20 @@ export default async function BillingPage() {
             </div>
           ) : (
             <div className="text-center py-8">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="font-semibold mb-2">No active subscription</h3>
               <p className="text-muted-foreground mb-4">
-                You don&apos;t have an active subscription yet.
+                You&apos;re currently on the free plan. Upgrade to access premium features.
               </p>
               <Button asChild>
-                <Link href="/pricing">Choose a Plan</Link>
+                <Link href="/pricing">View Plans</Link>
               </Button>
             </div>
           )}
         </CardContent>
-        {currentPlan && subscription && (
+        {subscription && (
           <CardFooter className="flex justify-between border-t pt-6">
             <Button variant="outline" asChild>
               <Link href="/pricing">Change Plan</Link>
@@ -120,7 +121,7 @@ export default async function BillingPage() {
           <CardDescription>Manage your payment details</CardDescription>
         </CardHeader>
         <CardContent>
-          {subscription?.stripe_customer_id ? (
+          {subscription ? (
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
@@ -134,9 +135,11 @@ export default async function BillingPage() {
               <Button variant="outline" size="sm">Update</Button>
             </div>
           ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              <CreditCard className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No payment method on file</p>
+            <div className="flex items-center justify-center p-8 border border-dashed rounded-lg">
+              <div className="text-center">
+                <Plus className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">No payment method on file</p>
+              </div>
             </div>
           )}
         </CardContent>
@@ -153,26 +156,26 @@ export default async function BillingPage() {
             <div className="space-y-4">
               <InvoiceItem
                 date="April 1, 2026"
-                amount={`$${((currentPlan?.priceInCents || 0) / 100).toFixed(2)}`}
+                amount="$29.99"
                 status="Paid"
-                plan={currentPlan?.name || 'Unknown'}
+                plan="Pro Plan"
               />
               <InvoiceItem
                 date="March 1, 2026"
-                amount={`$${((currentPlan?.priceInCents || 0) / 100).toFixed(2)}`}
+                amount="$29.99"
                 status="Paid"
-                plan={currentPlan?.name || 'Unknown'}
+                plan="Pro Plan"
               />
               <InvoiceItem
                 date="February 1, 2026"
-                amount={`$${((currentPlan?.priceInCents || 0) / 100).toFixed(2)}`}
+                amount="$29.99"
                 status="Paid"
-                plan={currentPlan?.name || 'Unknown'}
+                plan="Pro Plan"
               />
             </div>
           ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              <p>No billing history yet</p>
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No billing history available</p>
             </div>
           )}
         </CardContent>

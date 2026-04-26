@@ -1,17 +1,33 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Header } from '@/components/header'
-import { Footer } from '@/components/footer'
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <Link href="/" className="text-xl font-bold">Flowstas</Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</Link>
+            <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+            <Link href="/about" className="text-sm font-medium text-foreground transition-colors">About</Link>
+            <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Link href="/auth/login">Sign in</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/auth/sign-up">Get Started</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
 
-      <main className="flex-1 container mx-auto px-4 py-20 max-w-4xl">
+      <main className="container mx-auto px-4 py-20 max-w-4xl">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-balance">About Flowstas</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Flowstas</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             We help businesses of all sizes manage their operations, subscriptions, and growth — all in one place.
           </p>
         </div>
@@ -56,8 +72,6 @@ export default function AboutPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   )
 }
