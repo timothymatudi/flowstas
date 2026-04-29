@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,6 +21,7 @@ type FormData = z.infer<typeof schema>
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -29,18 +31,25 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const { error, data: authData } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-    if (error || !authData?.session) {
-      setError('Invalid email or password. Please try again.')
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+      
+      if (error) {
+        setError(error.message || 'Invalid email or password. Please try again.')
+        setLoading(false)
+        return
+      }
+      
+      router.push('/dashboard')
+      router.refresh()
+    } catch {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-      return
     }
-    // Wait a moment for session to be established before redirect
-    await new Promise(resolve => setTimeout(resolve, 100))
-    window.location.href = '/dashboard'
   }
 
   return (

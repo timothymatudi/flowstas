@@ -40,8 +40,11 @@ export default function SignUpPage() {
     setError(null)
     setSuccess(false)
 
-    const result = await signUpAction(data.email, data.password)
-    if (result.error) {
+    const redirectUrl = process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? 
+      `${window.location.origin}/auth/callback`
+
+    const result = await signUpAction(data.email, data.password, redirectUrl)
+    if (result?.error) {
       setError(result.error)
       setLoading(false)
       return

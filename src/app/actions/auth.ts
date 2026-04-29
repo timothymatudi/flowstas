@@ -3,14 +3,14 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export async function signUpAction(email: string, password: string) {
+export async function signUpAction(email: string, password: string, redirectUrl: string) {
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: 'https://flowstas.com/auth/callback',
+      emailRedirectTo: redirectUrl,
     },
   })
 
@@ -25,4 +25,10 @@ export async function signUpAction(email: string, password: string) {
 
   // Email confirmation is enabled — tell user to check email
   return { success: true }
+}
+
+export async function signOutAction() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/auth/login')
 }
