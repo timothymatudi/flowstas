@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User as AuthUser } from '@supabase/supabase-js'
+import OnboardingChecklist, { type OnboardingStep } from '@/components/onboarding-checklist'
 import {
   User, 
   CreditCard, 
@@ -62,6 +63,30 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
     { label: 'Notifications', value: '0', icon: Bell, color: 'text-yellow-500' },
   ]
 
+  const onboardingSteps: OnboardingStep[] = [
+    {
+      label: 'Explore your dashboard',
+      description: "You're here — take a look around.",
+      done: true,
+      href: '/dashboard',
+      cta: 'Open',
+    },
+    {
+      label: 'Complete your profile',
+      description: 'Add your name so your account feels like yours.',
+      done: !!profile?.full_name,
+      href: '/dashboard/settings',
+      cta: 'Edit profile',
+    },
+    {
+      label: 'Choose your plan',
+      description: 'Pick a plan to unlock everything Flowstas offers.',
+      done: subscription?.status === 'active',
+      href: '/dashboard/billing',
+      cta: 'View plans',
+    },
+  ]
+
   return (
     <>
         {/* Header */}
@@ -81,6 +106,9 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
             Sign Out
           </button>
         </div>
+
+        {/* Onboarding checklist */}
+        <OnboardingChecklist steps={onboardingSteps} />
 
         {/* Trial Status Banner */}
         {isTrialActive && (

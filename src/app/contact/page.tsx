@@ -1,17 +1,35 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, MapPin, Phone, Send } from 'lucide-react'
+import { Mail, MapPin, Phone, Send, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { submitContact } from '@/app/actions/contact'
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    setLoading(true)
+    const result = await submitContact({
+      firstName: String(fd.get('firstName') || ''),
+      lastName: String(fd.get('lastName') || ''),
+      email: String(fd.get('email') || ''),
+      subject: String(fd.get('subject') || ''),
+      message: String(fd.get('message') || ''),
+    })
+    setLoading(false)
+    if (result.error) {
+      toast.error('Could not send your message. Please try again.')
+      return
+    }
+    toast.success("Message sent! We'll get back to you within 24 hours.")
     setSubmitted(true)
   }
 
@@ -54,33 +72,38 @@ export default function ContactPage() {
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
-                        <Input id="firstName" placeholder="John" required className="h-12 rounded-xl border-border/60 bg-background" />
+                        <Input id="firstName" name="firstName" placeholder="John" required className="h-12 rounded-xl border-border/60 bg-background" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
-                        <Input id="lastName" placeholder="Doe" required className="h-12 rounded-xl border-border/60 bg-background" />
+                        <Input id="lastName" name="lastName" placeholder="Doe" required className="h-12 rounded-xl border-border/60 bg-background" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                      <Input id="email" type="email" placeholder="john@example.com" required className="h-12 rounded-xl border-border/60 bg-background" />
+                      <Input id="email" name="email" type="email" placeholder="john@example.com" required className="h-12 rounded-xl border-border/60 bg-background" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subject" className="text-sm font-medium">Subject</Label>
-                      <Input id="subject" placeholder="How can we help?" required className="h-12 rounded-xl border-border/60 bg-background" />
+                      <Input id="subject" name="subject" placeholder="How can we help?" required className="h-12 rounded-xl border-border/60 bg-background" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="message" className="text-sm font-medium">Message</Label>
                       <Textarea
                         id="message"
+                        name="message"
                         placeholder="Tell us more about your question..."
                         rows={5}
                         required
                         className="rounded-xl border-border/60 bg-background resize-none"
                       />
                     </div>
-                    <Button type="submit" className="h-12 w-full rounded-xl text-base shadow-premium hover:shadow-premium-lg">
-                      Send Message
+                    <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl text-base shadow-premium hover:shadow-premium-lg">
+                      {loading ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                      ) : (
+                        'Send Message'
+                      )}
                     </Button>
                   </form>
                 )}
