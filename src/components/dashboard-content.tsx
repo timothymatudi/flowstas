@@ -63,8 +63,7 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
   ]
 
   return (
-    <div className="min-h-screen bg-background bg-grid">
-      <div className="container mx-auto px-4 lg:px-8 py-8">
+    <>
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
@@ -209,10 +208,10 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
           <h2 className="text-xl font-semibold text-foreground mb-6">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: BarChart3, label: 'View Analytics', href: '#', color: 'bg-blue-500/10 text-blue-500' },
-              { icon: User, label: 'Edit Profile', href: '#', color: 'bg-purple-500/10 text-purple-500' },
-              { icon: Settings, label: 'Settings', href: '#', color: 'bg-gray-500/10 text-gray-400' },
-              { icon: CreditCard, label: 'Billing', href: '/pricing', color: 'bg-green-500/10 text-green-500' },
+              { icon: BarChart3, label: 'View Analytics', href: '/dashboard/analytics', color: 'bg-blue-500/10 text-blue-500' },
+              { icon: User, label: 'Edit Profile', href: '/dashboard/settings', color: 'bg-purple-500/10 text-purple-500' },
+              { icon: Settings, label: 'Settings', href: '/dashboard/settings', color: 'bg-gray-500/10 text-gray-400' },
+              { icon: CreditCard, label: 'Billing', href: '/dashboard/billing', color: 'bg-green-500/10 text-green-500' },
             ].map((action, index) => (
               <Link
                 key={index}
@@ -227,7 +226,6 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
             ))}
           </div>
         </div>
-      </div>
-    </div>
+    </>
   )
 }
