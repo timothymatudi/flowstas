@@ -1,11 +1,12 @@
-.vercel
-.env
-.env.local
-.env*.local
+# v0 runtime files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+
+# Common ignores
 node_modules/
 .next/
-prisma/
-prisma.config.ts
-skills-lock.json
-.agents/
-.claude/
+.env*.local
+.DS_Store
+.vercel
+*.tsbuildinfo

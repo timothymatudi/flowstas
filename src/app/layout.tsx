@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import Header from '@/components/header'
+import Footer from '@/components/footer'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: 'Flowstas',
-  description: 'Manage your subscriptions and business operations with Flowstas.',
+  title: 'Flowstas | Streamline Your Business Operations',
+  description: 'The all-in-one platform that helps you manage, grow, and scale your business. Trusted by 10,000+ businesses worldwide. Start your free trial today.',
+  generator: 'v0.app',
   icons: {
     icon: [
       {
@@ -35,8 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
-        {children}
+      <body className="flex min-h-screen flex-col font-sans antialiased">
+        <Header />
+        <div className="flex-1">{children}</div>
+        <Footer />
         <Analytics />
       </body>
     </html>

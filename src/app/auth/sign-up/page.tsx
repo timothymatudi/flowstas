@@ -1,162 +1,156 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import Link from 'next/link'
-import { signUpAction } from '@/app/actions/auth'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-const schema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z
-    .string()
-    .min(8, 'At least 8 characters')
-    .regex(/[A-Z]/, 'At least one uppercase letter')
-    .regex(/[0-9]/, 'At least one number')
-    .regex(/[^A-Za-z0-9]/, 'At least one special character'),
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
-
-type FormData = z.infer<typeof schema>
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Loader2, ArrowRight, Mail, Lock, User, Sparkles } from 'lucide-react'
 
 export default function SignUpPage() {
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  })
-
-  async function onSubmit(data: FormData) {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
     setLoading(true)
     setError(null)
-    setSuccess(false)
 
-    const result = await signUpAction(data.email, data.password)
-    if (result.error) {
-      setError(result.error)
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || 
+          `${window.location.origin}/dashboard`,
+        data: {
+          full_name: fullName,
+        },
+      },
+    })
+
+    if (error) {
+      setError(error.message)
       setLoading(false)
-      return
+    } else {
+      router.push('/auth/sign-up-success')
     }
-
-    setSuccess(true)
-    setLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
-        <div className="text-primary-foreground text-2xl font-bold">Flowstas</div>
-        <div>
-          <h2 className="text-4xl font-bold text-primary-foreground mb-4">
-            Start your journey
-          </h2>
-          <p className="text-primary-foreground/70 text-lg">
-            Join thousands of businesses using Flowstas to streamline their operations.
-          </p>
-          <div className="mt-8 space-y-3">
-            {['No credit card required', 'Free trial included', 'Cancel anytime'].map(item => (
-              <div key={item} className="flex items-center gap-3 text-primary-foreground/80">
-                <div className="w-5 h-5 rounded-full bg-primary-foreground/20 flex items-center justify-center text-xs">✓</div>
-                <span>{item}</span>
+    <div className="min-h-screen flex items-center justify-center bg-background bg-grid bg-radial px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+            <span className="text-xl font-bold text-white">F</span>
+          </div>
+          <span className="text-2xl font-bold gradient-text">Flowstas</span>
+        </Link>
+
+        {/* Card */}
+        <div className="glass rounded-2xl p-8 shadow-premium-lg">
+          {/* Trial badge */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">1-Day Free Trial</span>
+            </div>
+          </div>
+
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Create your account</h1>
+            <p className="text-muted-foreground">Start your free trial today, no credit card required</p>
+          </div>
+
+          <form onSubmit={handleSignUp} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="John Doe"
+                  className="input-modern pl-12"
+                  required
+                />
               </div>
-            ))}
-          </div>
-        </div>
-        <p className="text-primary-foreground/50 text-sm">© 2026 Flowstas. All rights reserved.</p>
-      </div>
-
-      {/* Right form panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-background">
-        <div className="w-full max-w-sm space-y-8">
-          <div>
-            <div className="lg:hidden text-2xl font-bold mb-8">Flowstas</div>
-            <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="font-medium text-primary underline underline-offset-4">
-                Sign in
-              </Link>
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                className="h-11"
-                {...register('email')}
-              />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="h-11"
-                {...register('password')}
-              />
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
-              <p className="text-xs text-muted-foreground">
-                Min 8 chars · 1 uppercase · 1 number · 1 special character
-              </p>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="input-modern pl-12"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="h-11"
-                {...register('confirmPassword')}
-              />
-              {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a strong password"
+                  className="input-modern pl-12"
+                  minLength={6}
+                  required
+                />
+              </div>
             </div>
 
             {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+              <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                 {error}
               </div>
             )}
 
-            {success && (
-              <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-                <p className="font-medium">Check your email!</p>
-                <p>We sent a confirmation link to your inbox. Click it to verify your account.</p>
-              </div>
-            )}
-
-            <Button type="submit" className="w-full h-11 text-base" disabled={loading || success}>
-              {loading ? 'Creating account...' : 'Create free account'}
-            </Button>
-
-            <p className="text-center text-xs text-muted-foreground">
-              By creating an account, you agree to our{' '}
-              <Link href="/terms" className="underline underline-offset-4">Terms</Link>
-              {' '}and{' '}
-              <Link href="/privacy" className="underline underline-offset-4">Privacy Policy</Link>
-            </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  Start Free Trial
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-muted-foreground text-sm">
+              Already have an account?{' '}
+              <Link href="/auth/login" className="text-primary hover:underline font-medium">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
+
+        <p className="text-center text-muted-foreground text-xs mt-6">
+          By signing up, you agree to our{' '}
+          <Link href="/terms" className="hover:underline">Terms</Link>
+          {' '}and{' '}
+          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+        </p>
       </div>
     </div>
   )

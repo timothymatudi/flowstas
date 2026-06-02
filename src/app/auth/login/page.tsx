@@ -1,121 +1,125 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-const schema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type FormData = z.infer<typeof schema>
+import { Loader2, ArrowRight, Mail, Lock } from 'lucide-react'
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  })
-
-  async function onSubmit(data: FormData) {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
     setLoading(true)
     setError(null)
-    const supabase = createClient()
-    const { error, data: authData } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     })
-    if (error || !authData?.session) {
-      setError('Invalid email or password. Please try again.')
+
+    if (error) {
+      setError(error.message)
       setLoading(false)
-      return
+    } else {
+      router.push('/dashboard')
+      router.refresh()
     }
-    // Wait a moment for session to be established before redirect
-    await new Promise(resolve => setTimeout(resolve, 100))
-    window.location.href = '/dashboard'
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
-        <div className="text-primary-foreground text-2xl font-bold">Flowstas</div>
-        <div>
-          <h2 className="text-4xl font-bold text-primary-foreground mb-4">
-            Welcome back
-          </h2>
-          <p className="text-primary-foreground/70 text-lg">
-            Sign in to manage your subscriptions and access your dashboard.
-          </p>
-        </div>
-        <p className="text-primary-foreground/50 text-sm">© 2026 Flowstas. All rights reserved.</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-background bg-grid bg-radial px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+            <span className="text-xl font-bold text-white">F</span>
+          </div>
+          <span className="text-2xl font-bold gradient-text">Flowstas</span>
+        </Link>
 
-      {/* Right form panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-background">
-        <div className="w-full max-w-sm space-y-8">
-          <div>
-            <div className="lg:hidden text-2xl font-bold mb-8">Flowstas</div>
-            <h1 className="text-2xl font-bold text-foreground">Sign in to your account</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
-              <Link href="/auth/sign-up" className="font-medium text-primary underline underline-offset-4">
-                Create one free
-              </Link>
-            </p>
+        {/* Card */}
+        <div className="glass rounded-2xl p-8 shadow-premium-lg">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
+            <p className="text-muted-foreground">Sign in to continue to your dashboard</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                className="h-11"
-                {...register('email')}
-              />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="input-modern pl-12"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="/auth/reset-password" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4">
-                  Forgot password?
-                </Link>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="input-modern pl-12"
+                  required
+                />
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                className="h-11"
-                {...register('password')}
-              />
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
             </div>
 
             {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+              <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                 {error}
               </div>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
-            </Button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-muted-foreground text-sm">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
+                Start free trial
+              </Link>
+            </p>
+          </div>
         </div>
+
+        <p className="text-center text-muted-foreground text-xs mt-6">
+          By signing in, you agree to our{' '}
+          <Link href="/terms" className="hover:underline">Terms</Link>
+          {' '}and{' '}
+          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+        </p>
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { PRODUCTS } from '@/lib/products'
 
@@ -9,10 +10,13 @@ export async function startCheckoutSession(productId: string) {
     throw new Error(`Product with id "${productId}" not found`)
   }
 
+  const headersList = await headers()
+  const origin = headersList.get('origin') || 'http://localhost:3000'
+
   // Create Checkout Sessions for subscription
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
-    redirect_on_completion: 'never',
+    return_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
     line_items: [
       {
         price_data: {
