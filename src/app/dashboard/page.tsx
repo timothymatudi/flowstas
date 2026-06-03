@@ -25,11 +25,23 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
+  // Real task counts for the overview stats
+  const { count: totalTasks } = await supabase
+    .from('tasks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  const { count: doneTasks } = await supabase
+    .from('tasks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('status', 'done')
+
   return (
-    <DashboardContent 
-      user={user} 
-      subscription={subscription} 
-      profile={profile} 
+    <DashboardContent
+      user={user}
+      subscription={subscription}
+      profile={profile}
+      taskStats={{ total: totalTasks ?? 0, done: doneTasks ?? 0 }}
     />
   )
 }

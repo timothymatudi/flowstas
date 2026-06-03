@@ -29,6 +29,34 @@ create table if not exists public.subscriptions (
 );
 
 -- =========================================================
+-- tasks: the core task manager (each user sees only their own)
+-- =========================================================
+create table if not exists public.tasks (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users (id) on delete cascade,
+  title       text not null,
+  description text,
+  status      text not null default 'todo',     -- 'todo' | 'in_progress' | 'done'
+  priority    text not null default 'medium',   -- 'low' | 'medium' | 'high'
+  due_date    date,
+  position    integer not null default 0,
+  created_at  timestamptz default now()
+);
+
+-- If an older version of this table exists, add the new columns safely.
+alter table public.tasks add column if not exists description text;
+alter table public.tasks add column if not exists status text not null default 'todo';
+alter table public.tasks add column if not exists priority text not null default 'medium';
+alter table public.tasks add column if not exists due_date date;
+alter table public.tasks add column if not exists position integer not null default 0;
+
+alter table public.tasks enable row level security;
+
+drop policy if exists "own tasks" on public.tasks;
+create policy "own tasks" on public.tasks
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- =========================================================
 -- contact_messages: submissions from the public contact form
 -- =========================================================
 create table if not exists public.contact_messages (

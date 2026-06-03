@@ -35,9 +35,10 @@ interface DashboardContentProps {
   user: AuthUser
   subscription: Subscription | null
   profile: Profile | null
+  taskStats?: { total: number; done: number }
 }
 
-export default function DashboardContent({ user, subscription, profile }: DashboardContentProps) {
+export default function DashboardContent({ user, subscription, profile, taskStats }: DashboardContentProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -56,9 +57,11 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
   const trialExpired = trialEndsAt && trialEndsAt <= now
   const hoursRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60))) : 0
 
+  const tasksDone = taskStats?.done ?? 0
+  const tasksActive = Math.max(0, (taskStats?.total ?? 0) - tasksDone)
   const quickStats = [
-    { label: 'Tasks Completed', value: '0', icon: Check, color: 'text-green-500' },
-    { label: 'Active Projects', value: '0', icon: BarChart3, color: 'text-blue-500' },
+    { label: 'Tasks Completed', value: String(tasksDone), icon: Check, color: 'text-green-500' },
+    { label: 'Active Tasks', value: String(tasksActive), icon: BarChart3, color: 'text-blue-500' },
     { label: 'Team Members', value: '1', icon: User, color: 'text-purple-500' },
     { label: 'Notifications', value: '0', icon: Bell, color: 'text-yellow-500' },
   ]

@@ -15,14 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { 
-  LayoutDashboard, 
-  CreditCard, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  CreditCard,
+  BarChart3,
+  Settings,
   LogOut,
   Menu,
-  X
+  X,
+  ListTodo
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -34,6 +35,7 @@ interface DashboardNavProps {
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard/tasks', label: 'Tasks', icon: ListTodo },
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
