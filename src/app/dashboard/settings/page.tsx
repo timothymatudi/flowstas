@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ProfileForm } from '@/components/profile-form'
 import { SecuritySettings } from '@/components/security-settings'
-import { NotificationSettings } from '@/components/notification-settings'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -29,7 +28,6 @@ export default async function SettingsPage() {
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
@@ -54,11 +52,7 @@ export default async function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="security">
-          <SecuritySettings email={user!.email || ''} />
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationSettings />
+          <SecuritySettings />
         </TabsContent>
       </Tabs>
     </div>

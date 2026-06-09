@@ -17,8 +17,7 @@ import {
   Bell,
   ChevronRight,
   Sparkles,
-  AlertTriangle,
-  Check
+  AlertTriangle
 } from 'lucide-react'
 
 interface Subscription {
@@ -35,10 +34,9 @@ interface DashboardContentProps {
   user: AuthUser
   subscription: Subscription | null
   profile: Profile | null
-  taskStats?: { total: number; done: number }
 }
 
-export default function DashboardContent({ user, subscription, profile, taskStats }: DashboardContentProps) {
+export default function DashboardContent({ user, subscription, profile }: DashboardContentProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -57,13 +55,10 @@ export default function DashboardContent({ user, subscription, profile, taskStat
   const trialExpired = trialEndsAt && trialEndsAt <= now
   const hoursRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60))) : 0
 
-  const tasksDone = taskStats?.done ?? 0
-  const tasksActive = Math.max(0, (taskStats?.total ?? 0) - tasksDone)
   const quickStats = [
-    { label: 'Tasks Completed', value: String(tasksDone), icon: Check, color: 'text-green-500' },
-    { label: 'Active Tasks', value: String(tasksActive), icon: BarChart3, color: 'text-blue-500' },
+    { label: 'Published Sites', value: '0', icon: BarChart3, color: 'text-blue-500' },
+    { label: 'New Messages', value: '0', icon: Bell, color: 'text-yellow-500' },
     { label: 'Team Members', value: '1', icon: User, color: 'text-purple-500' },
-    { label: 'Notifications', value: '0', icon: Bell, color: 'text-yellow-500' },
   ]
 
   const onboardingSteps: OnboardingStep[] = [
@@ -239,7 +234,7 @@ export default function DashboardContent({ user, subscription, profile, taskStat
           <h2 className="text-xl font-semibold text-foreground mb-6">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: BarChart3, label: 'View Analytics', href: '/dashboard/analytics', color: 'bg-blue-500/10 text-blue-500' },
+              { icon: BarChart3, label: 'Publish a Site', href: '/publish', color: 'bg-blue-500/10 text-blue-500' },
               { icon: User, label: 'Edit Profile', href: '/dashboard/settings', color: 'bg-purple-500/10 text-purple-500' },
               { icon: Settings, label: 'Settings', href: '/dashboard/settings', color: 'bg-gray-500/10 text-gray-400' },
               { icon: CreditCard, label: 'Billing', href: '/dashboard/billing', color: 'bg-green-500/10 text-green-500' },

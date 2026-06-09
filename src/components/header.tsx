@@ -49,7 +49,7 @@ export default function Header() {
             <Link href="/auth/login">Sign In</Link>
           </Button>
           <Button asChild className="btn-primary rounded-xl">
-            <Link href="/auth/sign-up">Start Free Trial</Link>
+            <Link href="/auth/sign-up">Get started</Link>
           </Button>
         </div>
 
@@ -86,7 +86,7 @@ export default function Header() {
                 <Link href="/auth/login">Sign In</Link>
               </Button>
               <Button asChild className="w-full btn-primary rounded-xl h-12">
-                <Link href="/auth/sign-up">Start Free Trial</Link>
+                <Link href="/auth/sign-up">Get started</Link>
               </Button>
             </div>
           </div>

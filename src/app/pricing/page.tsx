@@ -60,12 +60,10 @@ export default function PricingPage() {
               {[
                 '1-day free trial',
                 'No setup fees',
-                'Cancel anytime',
-                'Premium support',
                 'Secure payments via Stripe',
-                'Regular feature updates',
-                '99.9% uptime guarantee',
-                'Data export anytime',
+                'Responsive email support',
+                'Private, secure workspace',
+                'Regular product updates',
               ].map((item) => (
                 <div key={item} className="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-4 shadow-premium">
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground/10">

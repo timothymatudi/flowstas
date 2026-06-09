@@ -18,12 +18,12 @@ import {
 import {
   LayoutDashboard,
   CreditCard,
-  BarChart3,
   Settings,
   LogOut,
   Menu,
   X,
-  ListTodo
+  Rocket,
+  Globe
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -35,8 +35,8 @@ interface DashboardNavProps {
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/tasks', label: 'Tasks', icon: ListTodo },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/publish', label: 'Publish a Site', icon: Rocket },
+  { href: '/sites', label: 'My Sites', icon: Globe },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]

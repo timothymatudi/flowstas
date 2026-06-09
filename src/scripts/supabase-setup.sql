@@ -104,6 +104,14 @@ begin
   insert into public.profiles (id, full_name)
   values (new.id, new.raw_user_meta_data->>'full_name')
   on conflict (id) do nothing;
+
+  -- Start every new user on a 1-day free trial. The dashboard reads
+  -- subscriptions.trial_ends_at and status='trialing' to show the countdown;
+  -- the Stripe webhook later upgrades this row to status='active'.
+  insert into public.subscriptions (user_id, plan, status, trial_ends_at)
+  values (new.id, 'trial', 'trialing', now() + interval '1 day')
+  on conflict (user_id) do nothing;
+
   return new;
 end;
 $$;

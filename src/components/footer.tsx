@@ -40,7 +40,7 @@ export default function Footer() {
               <span className="text-xl font-bold gradient-text">Flowstas</span>
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Streamline your business with powerful tools designed for growth. Trusted by thousands of companies worldwide.
+              A clean, focused way to organize your work — Kanban board and list view in one simple workspace.
             </p>
             <div className="mt-6 flex items-center gap-3">
               {socialLinks.map((link) => (

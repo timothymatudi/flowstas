@@ -25,7 +25,12 @@ export async function startCheckoutSession(productId: string) {
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
     return_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-    ...(user ? { metadata: { user_id: user.id } } : {}),
+    // Carry the chosen plan (and user) on the session so the Stripe webhook can
+    // record the correct plan — ad-hoc price_data prices have no nickname to read.
+    metadata: {
+      plan: product.id,
+      ...(user ? { user_id: user.id } : {}),
+    },
     line_items: [
       {
         price_data: {

@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
     }
 
     const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-    const nickname = subscription.items.data[0]?.price?.nickname || 'basic'
-    const plan = nickname.toLowerCase().replace(' plan', '')
+    // Plan comes from the Checkout Session metadata (set in app/actions/stripe.ts).
+    // Matches a PRODUCTS id: 'basic' | 'pro' | 'enterprise'.
+    const plan = session.metadata?.plan || 'basic'
     const period = periodFor(subscription)
 
     await supabase.from('subscriptions').upsert(
