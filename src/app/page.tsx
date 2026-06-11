@@ -16,7 +16,26 @@ const steps = [
 const features = [
   { icon: Rocket, title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
   { icon: Globe, title: 'A real live link', description: 'Every site gets its own address you can share with anyone.' },
-  { icon: MailCheck, title: 'Capture messages', description: "Your site's contact form saves every message and alerts you." },
+  { icon: MailCheck, title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
+]
+
+const faqs = [
+  {
+    q: 'What kind of website can I publish?',
+    a: 'Any static site. Paste a single HTML page, or upload a whole folder or .zip — HTML, CSS, JavaScript, images and fonts all work.',
+  },
+  {
+    q: 'Where does my site go live?',
+    a: 'Every site gets its own link you can share straight away. No servers to set up and no DNS to configure to get started.',
+  },
+  {
+    q: 'What happens to my contact-form messages?',
+    a: 'Every submission is saved and shown in your dashboard, so you never lose an enquiry from a visitor.',
+  },
+  {
+    q: 'Can I cancel anytime?',
+    a: 'Yes. Plans are billed monthly and you can cancel whenever you like — no long-term contract.',
+  },
 ]
 
 export default function HomePage() {
@@ -102,6 +121,25 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-24">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+              Questions, <span className="gradient-text">answered</span>
+            </h2>
+          </div>
+          <div className="max-w-3xl mx-auto grid gap-4">
+            {faqs.map((item, index) => (
+              <div key={index} className="glass-light rounded-2xl p-6 md:p-8">
+                <h3 className="text-lg font-semibold text-foreground mb-2">{item.q}</h3>
+                <p className="text-muted-foreground leading-relaxed">{item.a}</p>
               </div>
             ))}
           </div>

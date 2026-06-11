@@ -13,3 +13,4 @@ node_modules/
 
 # Local published-site store (demo backend)
 .data/
+scripts/run-sql.mjs
