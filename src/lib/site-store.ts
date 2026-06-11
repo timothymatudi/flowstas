@@ -1,16 +1,20 @@
 import 'server-only'
-import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-// Local-disk store for published sites + their form submissions.
-// This is the demo backend; in production these move to Supabase Storage + a
-// database table (the rest of the flow stays identical).
+// Store for published sites + their form submissions, backed by Supabase:
+//   - site files     → Storage bucket "sites", keyed "<id>/<relpath>"
+//   - site metadata   → public.sites table
+//   - form messages   → public.site_submissions table
+// Run scripts/sites-tables.sql once to provision the tables + bucket.
 
 export interface SiteMeta {
   id: string
   name: string
   createdAt: string
+  // number of files in the site (1 for a single pasted HTML page)
+  fileCount: number
 }
 
 export interface Submission {
@@ -21,60 +25,207 @@ export interface Submission {
   createdAt: string
 }
 
-const ROOT = path.join(process.cwd(), '.data', 'sites')
-
-function siteDir(id: string) {
-  return path.join(ROOT, id)
+// A file making up a site: a relative path (e.g. "index.html", "css/app.css")
+// and its bytes.
+export interface SiteFile {
+  path: string
+  bytes: Uint8Array
 }
+
+const BUCKET = 'sites'
 
 function newId() {
   return crypto.randomBytes(4).toString('hex') // 8 hex chars, URL-friendly
 }
 
-export async function createSite(name: string, html: string): Promise<SiteMeta> {
+// Normalise an uploaded relative path: strip leading slashes, collapse "..",
+// and drop anything that would escape the site root. Returns null if unsafe.
+function safeRelPath(rel: string): string | null {
+  const normalized = path
+    .normalize(rel.replace(/\\/g, '/'))
+    .replace(/^(\.\.(\/|$))+/, '')
+    .replace(/^\/+/, '')
+  if (!normalized || normalized === '.' || normalized.split('/').includes('..')) return null
+  return normalized
+}
+
+// If every file shares one top-level folder (the usual result of zipping a
+// folder), strip it so "myfolder/index.html" serves at "/".
+function stripCommonRoot(files: SiteFile[]): SiteFile[] {
+  if (files.length === 0) return files
+  const first = files[0].path.split('/')[0]
+  if (!first) return files
+  const allShare = files.every((f) => f.path === first || f.path.startsWith(first + '/'))
+  if (!allShare || files.some((f) => f.path === first)) return files
+  return files.map((f) => ({ ...f, path: f.path.slice(first.length + 1) }))
+}
+
+// Choose the entry page so "/s/<id>" lands somewhere sensible.
+function pickEntry(paths: string[]): string | null {
+  const lower = paths.map((p) => p.toLowerCase())
+  const idx = lower.indexOf('index.html')
+  if (idx !== -1) return paths[idx]
+  const anyHtml = paths.findIndex((p) => p.toLowerCase().endsWith('.html'))
+  return anyHtml !== -1 ? paths[anyHtml] : null
+}
+
+export async function createSite(name: string, files: SiteFile[]): Promise<SiteMeta> {
+  // Clean + de-dupe paths, drop directory entries and macOS cruft.
+  const cleaned: SiteFile[] = []
+  const seen = new Set<string>()
+  for (const f of files) {
+    if (f.path.endsWith('/') || f.path.startsWith('__MACOSX/') || f.path.includes('/.')) continue
+    const rel = safeRelPath(f.path)
+    if (!rel || seen.has(rel)) continue
+    seen.add(rel)
+    cleaned.push({ path: rel, bytes: f.bytes })
+  }
+  const rooted = stripCommonRoot(cleaned)
+
+  const entry = pickEntry(rooted.map((f) => f.path))
+  if (!entry) throw new Error('Your site needs at least one .html file (e.g. index.html).')
+
+  // Ensure the entry page is reachable at "/" by also writing it as index.html.
+  if (entry.toLowerCase() !== 'index.html' && !rooted.some((f) => f.path === 'index.html')) {
+    const e = rooted.find((f) => f.path === entry)!
+    rooted.push({ path: 'index.html', bytes: e.bytes })
+  }
+
   const id = newId()
-  await fs.mkdir(siteDir(id), { recursive: true })
+  const supabase = createAdminClient()
+
+  // Upload every file into the bucket under this site's id.
+  for (const f of rooted) {
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(`${id}/${f.path}`, Buffer.from(f.bytes), {
+        contentType: contentTypeFor(f.path),
+        upsert: true,
+      })
+    if (error) throw new Error(`Could not store ${f.path}: ${error.message}`)
+  }
+
   const meta: SiteMeta = {
     id,
     name: name.trim() || 'Untitled site',
     createdAt: new Date().toISOString(),
+    fileCount: rooted.length,
   }
-  await fs.writeFile(path.join(siteDir(id), 'meta.json'), JSON.stringify(meta, null, 2))
-  await fs.writeFile(path.join(siteDir(id), 'index.html'), html, 'utf8')
-  await fs.writeFile(path.join(siteDir(id), 'submissions.json'), '[]')
+  const { error: dbError } = await supabase.from('sites').insert({
+    id: meta.id,
+    name: meta.name,
+    file_count: meta.fileCount,
+    created_at: meta.createdAt,
+  })
+  if (dbError) {
+    // Roll back the uploaded files so we don't leave orphans behind.
+    await supabase.storage.from(BUCKET).remove(rooted.map((f) => `${id}/${f.path}`))
+    throw new Error(`Could not save your site: ${dbError.message}`)
+  }
   return meta
 }
 
-export async function getSiteHtml(id: string): Promise<string | null> {
-  try {
-    return await fs.readFile(path.join(siteDir(id), 'index.html'), 'utf8')
-  } catch {
-    return null
+// Convenience for the paste-HTML flow.
+export async function createSiteFromHtml(name: string, html: string): Promise<SiteMeta> {
+  return createSite(name, [{ path: 'index.html', bytes: new TextEncoder().encode(html) }])
+}
+
+export interface ServedFile {
+  bytes: Uint8Array
+  contentType: string
+  isHtml: boolean
+}
+
+const CONTENT_TYPES: Record<string, string> = {
+  html: 'text/html; charset=utf-8',
+  htm: 'text/html; charset=utf-8',
+  css: 'text/css; charset=utf-8',
+  js: 'text/javascript; charset=utf-8',
+  mjs: 'text/javascript; charset=utf-8',
+  json: 'application/json; charset=utf-8',
+  svg: 'image/svg+xml',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  ico: 'image/x-icon',
+  woff: 'font/woff',
+  woff2: 'font/woff2',
+  ttf: 'font/ttf',
+  txt: 'text/plain; charset=utf-8',
+  xml: 'application/xml',
+  pdf: 'application/pdf',
+}
+
+function contentTypeFor(p: string): string {
+  const ext = p.split('.').pop()?.toLowerCase() ?? ''
+  return CONTENT_TYPES[ext] ?? 'application/octet-stream'
+}
+
+// Read one file from a site by request path. An empty/"/" path or a path that
+// points at a folder resolves to that folder's index.html. Returns null if
+// missing or unsafe.
+export async function getSiteFile(id: string, reqPath: string): Promise<ServedFile | null> {
+  const rel = safeRelPath(reqPath || 'index.html')
+  if (rel === null) return null
+  const supabase = createAdminClient()
+
+  let key = `${id}/${rel}`
+  let dl = await supabase.storage.from(BUCKET).download(key)
+  if (dl.error || !dl.data) {
+    // Treat the path as a directory and look for its index.html.
+    key = `${id}/${rel.replace(/\/+$/, '')}/index.html`
+    dl = await supabase.storage.from(BUCKET).download(key)
+    if (dl.error || !dl.data) return null
   }
+
+  const bytes = new Uint8Array(await dl.data.arrayBuffer())
+  const contentType = contentTypeFor(key)
+  return { bytes, contentType, isHtml: contentType.startsWith('text/html') }
 }
 
 export async function getSiteMeta(id: string): Promise<SiteMeta | null> {
-  try {
-    return JSON.parse(await fs.readFile(path.join(siteDir(id), 'meta.json'), 'utf8'))
-  } catch {
-    return null
-  }
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('sites')
+    .select('id, name, created_at, file_count')
+    .eq('id', id)
+    .maybeSingle()
+  if (error || !data) return null
+  return { id: data.id, name: data.name, createdAt: data.created_at, fileCount: data.file_count }
 }
 
 export async function listSites(): Promise<SiteMeta[]> {
-  const ids = await fs.readdir(ROOT).catch(() => [] as string[])
-  const metas = await Promise.all(ids.map((id) => getSiteMeta(id)))
-  return metas
-    .filter((m): m is SiteMeta => m !== null)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('sites')
+    .select('id, name, created_at, file_count')
+    .order('created_at', { ascending: false })
+  if (error || !data) return []
+  return data.map((row) => ({
+    id: row.id,
+    name: row.name,
+    createdAt: row.created_at,
+    fileCount: row.file_count,
+  }))
 }
 
 export async function listSubmissions(id: string): Promise<Submission[]> {
-  try {
-    return JSON.parse(await fs.readFile(path.join(siteDir(id), 'submissions.json'), 'utf8'))
-  } catch {
-    return []
-  }
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('site_submissions')
+    .select('id, name, email, message, created_at')
+    .eq('site_id', id)
+    .order('created_at', { ascending: false })
+  if (error || !data) return []
+  return data.map((row) => ({
+    id: row.id,
+    name: row.name ?? '',
+    email: row.email ?? '',
+    message: row.message ?? '',
+    createdAt: row.created_at,
+  }))
 }
 
 export async function addSubmission(
@@ -82,17 +233,20 @@ export async function addSubmission(
   data: { name: string; email: string; message: string }
 ): Promise<Submission | null> {
   if (!(await getSiteMeta(id))) return null
-  const list = await listSubmissions(id)
-  const submission: Submission = {
-    id: newId(),
-    name: data.name,
-    email: data.email,
-    message: data.message,
-    createdAt: new Date().toISOString(),
+  const supabase = createAdminClient()
+  const { data: row, error } = await supabase
+    .from('site_submissions')
+    .insert({ site_id: id, name: data.name, email: data.email, message: data.message })
+    .select('id, name, email, message, created_at')
+    .single()
+  if (error || !row) return null
+  return {
+    id: row.id,
+    name: row.name ?? '',
+    email: row.email ?? '',
+    message: row.message ?? '',
+    createdAt: row.created_at,
   }
-  list.unshift(submission)
-  await fs.writeFile(path.join(siteDir(id), 'submissions.json'), JSON.stringify(list, null, 2))
-  return submission
 }
 
 // Prepare stored HTML for serving: point the contact form at the real capture
