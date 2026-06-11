@@ -34,7 +34,7 @@ export async function startCheckoutSession(productId: string) {
     line_items: [
       {
         price_data: {
-          currency: 'usd',
+          currency: 'gbp',
           product_data: {
             name: product.name,
             description: product.description,

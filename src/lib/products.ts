@@ -14,26 +14,27 @@ export const PRODUCTS: SubscriptionProduct[] = [
   {
     id: 'basic',
     name: 'Starter',
-    description: 'Everything one person needs to organize their work',
-    priceInCents: 999, // $9.99/month
+    description: 'Everything you need to put one site online',
+    priceInCents: 1000, // £10/month (amount is in pence; currency GBP)
     interval: 'month',
     features: [
-      'Kanban board + list view',
-      'Unlimited tasks',
-      'Three priority levels',
-      'Drag-and-drop organization',
-      'Private, secure workspace',
+      'Publish 1 website',
+      'Paste HTML or upload a zip / folder',
+      'Live instantly with HTTPS',
+      'Contact-form message capture',
+      'Messages inbox in your dashboard',
       'Email support',
     ],
   },
   {
     id: 'pro',
     name: 'Professional',
-    description: 'For power users who want faster help and early access',
-    priceInCents: 2999, // $29.99/month
+    description: 'For freelancers and small teams running several sites',
+    priceInCents: 3000, // £30/month
     interval: 'month',
     features: [
       'Everything in Starter',
+      'Publish up to 10 websites',
       'Priority email support',
       'Early access to new features',
     ],
@@ -42,13 +43,13 @@ export const PRODUCTS: SubscriptionProduct[] = [
     id: 'enterprise',
     name: 'Enterprise',
     description: 'Hands-on support and a direct line to the team',
-    priceInCents: 9999, // $99.99/month
+    priceInCents: 10000, // £100/month
     interval: 'month',
     features: [
       'Everything in Professional',
+      'Unlimited websites',
       'Dedicated support contact',
       'Personal onboarding session',
-      'Priority feature requests',
       'Invoiced billing',
     ],
   },

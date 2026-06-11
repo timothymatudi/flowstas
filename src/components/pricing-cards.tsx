@@ -31,7 +31,9 @@ function PricingCard({
   onSelect: () => void
   isPopular?: boolean
 }) {
-  const price = (product.priceInCents / 100).toFixed(0)
+  // Whole pounds show as "10"; anything with pence shows as "10.50".
+  const pounds = product.priceInCents / 100
+  const price = Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2)
 
   return (
     <div
@@ -57,7 +59,7 @@ function PricingCard({
 
       <div className="mb-8">
         <div className="flex items-baseline gap-1">
-          <span className="text-sm font-medium text-muted-foreground">$</span>
+          <span className="text-sm font-medium text-muted-foreground">£</span>
           <span className="text-5xl font-bold tracking-tight gradient-text">{price}</span>
           <span className="text-muted-foreground">/{product.interval}</span>
         </div>

@@ -57,7 +57,7 @@ export default async function BillingPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold">
-                    ${(currentPlan.priceInCents / 100).toFixed(2)}
+                    £{(currentPlan.priceInCents / 100).toFixed(2)}
                     <span className="text-sm font-normal text-muted-foreground">/{currentPlan.interval}</span>
                   </p>
                 </div>
