@@ -69,7 +69,11 @@ function pickEntry(paths: string[]): string | null {
   return anyHtml !== -1 ? paths[anyHtml] : null
 }
 
-export async function createSite(name: string, files: SiteFile[]): Promise<SiteMeta> {
+export async function createSite(
+  name: string,
+  files: SiteFile[],
+  ownerId?: string
+): Promise<SiteMeta> {
   // Clean + de-dupe paths, drop directory entries and macOS cruft.
   const cleaned: SiteFile[] = []
   const seen = new Set<string>()
@@ -116,6 +120,7 @@ export async function createSite(name: string, files: SiteFile[]): Promise<SiteM
     name: meta.name,
     file_count: meta.fileCount,
     created_at: meta.createdAt,
+    owner_id: ownerId ?? null,
   })
   if (dbError) {
     // Roll back the uploaded files so we don't leave orphans behind.
@@ -126,8 +131,23 @@ export async function createSite(name: string, files: SiteFile[]): Promise<SiteM
 }
 
 // Convenience for the paste-HTML flow.
-export async function createSiteFromHtml(name: string, html: string): Promise<SiteMeta> {
-  return createSite(name, [{ path: 'index.html', bytes: new TextEncoder().encode(html) }])
+export async function createSiteFromHtml(
+  name: string,
+  html: string,
+  ownerId?: string
+): Promise<SiteMeta> {
+  return createSite(name, [{ path: 'index.html', bytes: new TextEncoder().encode(html) }], ownerId)
+}
+
+// How many sites a given user has published (for plan-limit checks).
+export async function countSitesForOwner(ownerId: string): Promise<number> {
+  const supabase = createAdminClient()
+  const { count, error } = await supabase
+    .from('sites')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_id', ownerId)
+  if (error) return 0
+  return count ?? 0
 }
 
 export interface ServedFile {
@@ -196,12 +216,15 @@ export async function getSiteMeta(id: string): Promise<SiteMeta | null> {
   return { id: data.id, name: data.name, createdAt: data.created_at, fileCount: data.file_count }
 }
 
-export async function listSites(): Promise<SiteMeta[]> {
+// Lists sites for one owner. Pass no ownerId only for admin/global use.
+export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
   const supabase = createAdminClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('sites')
     .select('id, name, created_at, file_count')
     .order('created_at', { ascending: false })
+  if (ownerId) query = query.eq('owner_id', ownerId)
+  const { data, error } = await query
   if (error || !data) return []
   return data.map((row) => ({
     id: row.id,

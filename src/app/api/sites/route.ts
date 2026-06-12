@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 import { unzipSync } from 'fflate'
-import { createSite, createSiteFromHtml, type SiteFile } from '@/lib/site-store'
+import {
+  createSite,
+  createSiteFromHtml,
+  countSitesForOwner,
+  type SiteFile,
+} from '@/lib/site-store'
+import { createClient } from '@/lib/supabase/server'
+import { siteLimitForPlan } from '@/lib/plan-limits'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +21,43 @@ const MAX_TOTAL = 25 * 1024 * 1024
 export async function POST(req: Request) {
   const contentType = req.headers.get('content-type') ?? ''
 
+  // Publishing requires an account, and each plan caps how many sites you can
+  // have. Published sites stay public to view — this only gates creating them.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Please log in to publish your site.', needsAuth: true },
+      { status: 401 }
+    )
+  }
+
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('plan, status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle()
+  const limit = siteLimitForPlan(sub?.plan)
+  if ((await countSitesForOwner(user.id)) >= limit) {
+    return NextResponse.json(
+      {
+        error: `You've reached your plan's limit of ${limit} site${limit === 1 ? '' : 's'}. Upgrade your plan to publish more.`,
+        needsUpgrade: true,
+      },
+      { status: 403 }
+    )
+  }
+
   try {
     if (contentType.includes('application/json')) {
       const body = await req.json().catch(() => null)
       if (!body || typeof body.html !== 'string' || !body.html.trim()) {
         return NextResponse.json({ error: 'Add some HTML for your site first.' }, { status: 400 })
       }
-      const meta = await createSiteFromHtml(String(body.name ?? ''), body.html)
+      const meta = await createSiteFromHtml(String(body.name ?? ''), body.html, user.id)
       return NextResponse.json({ id: meta.id, url: `/s/${meta.id}` })
     }
 
@@ -59,7 +96,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No files received. Pick a folder or a .zip of your site.' }, { status: 400 })
       }
 
-      const meta = await createSite(name, files)
+      const meta = await createSite(name, files, user.id)
       return NextResponse.json({ id: meta.id, url: `/s/${meta.id}` })
     }
 

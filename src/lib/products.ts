@@ -18,7 +18,7 @@ export const PRODUCTS: SubscriptionProduct[] = [
     priceInCents: 1000, // £10/month (amount is in pence; currency GBP)
     interval: 'month',
     features: [
-      'Publish 1 website',
+      'Publish up to 3 websites',
       'Paste HTML or upload a zip / folder',
       'Live instantly with HTTPS',
       'Contact-form message capture',

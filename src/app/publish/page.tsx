@@ -13,6 +13,7 @@ export default function PublishPage() {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errorLink, setErrorLink] = useState<{ href: string; label: string } | null>(null)
   const [liveUrl, setLiveUrl] = useState<string | null>(null)
   const folderInput = useRef<HTMLInputElement>(null)
   const zipInput = useRef<HTMLInputElement>(null)
@@ -20,10 +21,15 @@ export default function PublishPage() {
   async function publish(body: BodyInit, headers?: HeadersInit) {
     setLoading(true)
     setError(null)
+    setErrorLink(null)
     try {
       const res = await fetch('/api/sites', { method: 'POST', body, headers })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not publish')
+      if (!res.ok) {
+        if (data.needsAuth) setErrorLink({ href: '/auth/login', label: 'Log in' })
+        else if (data.needsUpgrade) setErrorLink({ href: '/pricing', label: 'View plans' })
+        throw new Error(data.error || 'Could not publish')
+      }
       setLiveUrl(data.url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not publish')
@@ -108,8 +114,8 @@ export default function PublishPage() {
       <div className="mx-auto max-w-2xl">
         <h1 className="text-3xl font-bold text-gray-900">Publish a website</h1>
         <p className="mt-2 text-gray-500">
-          Put your site online in one click. Its contact form will capture messages and alert you
-          automatically.
+          Put your site online in one click. Its contact form captures every message straight to
+          your dashboard.
         </p>
 
         <div className="mt-6 inline-flex rounded-xl bg-gray-100 p-1">
@@ -162,7 +168,16 @@ export default function PublishPage() {
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 font-mono text-sm outline-none focus:border-gray-900"
               />
             </div>
-            {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
+            {error && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+                {errorLink && (
+                  <Link href={errorLink.href} className="ml-2 font-semibold underline">
+                    {errorLink.label} →
+                  </Link>
+                )}
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
@@ -231,7 +246,16 @@ export default function PublishPage() {
                   : `Selected ${files.length} file${files.length === 1 ? '' : 's'}.`}
               </p>
             )}
-            {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
+            {error && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+                {errorLink && (
+                  <Link href={errorLink.href} className="ml-2 font-semibold underline">
+                    {errorLink.label} →
+                  </Link>
+                )}
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
