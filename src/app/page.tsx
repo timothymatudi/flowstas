@@ -11,6 +11,14 @@ import {
   CalendarX,
 } from 'lucide-react'
 
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block mb-4 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-semibold uppercase tracking-wider text-primary">
+      {children}
+    </span>
+  )
+}
+
 const trust = [
   { icon: ShieldCheck, title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
   { icon: Server, title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
@@ -83,24 +91,64 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Browser mockup: an honest illustration of what publishing produces. */}
-            <div className="mt-16 max-w-3xl mx-auto">
+            {/* Browser mockup: a realistic preview of a published site (sample content). */}
+            <div className="relative mt-20 max-w-3xl mx-auto">
+              <div className="absolute -inset-x-10 -top-10 -bottom-10 bg-gradient-to-tr from-primary/15 via-accent/10 to-transparent blur-3xl -z-10" />
+              <div className="absolute -top-3 right-4 sm:right-8 z-20 inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-premium border border-border">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                </span>
+                Live
+              </div>
               <div className="bg-card rounded-2xl overflow-hidden shadow-premium-lg text-left border border-border">
+                {/* Browser chrome */}
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/60">
                   <span className="w-3 h-3 rounded-full bg-red-400" />
                   <span className="w-3 h-3 rounded-full bg-yellow-400" />
                   <span className="w-3 h-3 rounded-full bg-green-400" />
                   <div className="ml-3 flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md bg-background text-sm text-muted-foreground border border-border">
-                    <Globe className="w-3.5 h-3.5 text-primary" />
+                    <Lock className="w-3.5 h-3.5 text-green-600" />
                     <span className="font-medium text-foreground">yoursite.flowstas.com</span>
                   </div>
                 </div>
-                <div className="px-8 py-12 text-center bg-gradient-to-b from-transparent to-secondary/40">
-                  <div className="w-14 h-14 rounded-2xl gradient-primary mx-auto mb-5 flex items-center justify-center glow-sm">
-                    <Rocket className="w-7 h-7 text-white" />
+                {/* Sample published site */}
+                <div className="bg-background">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md gradient-primary" />
+                      <span className="text-sm font-bold text-foreground">Bella&apos;s Bakery</span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>Home</span>
+                      <span>Menu</span>
+                      <span>Contact</span>
+                      <span className="px-3 py-1 rounded-full gradient-primary text-white font-medium">Order</span>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-foreground mb-2">Your site, live on the web</p>
-                  <p className="text-muted-foreground">Share the link, take messages, update it anytime.</p>
+                  <div className="px-6 py-8 grid sm:grid-cols-2 gap-6 items-center">
+                    <div>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-secondary text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                        Freshly baked daily
+                      </span>
+                      <p className="text-2xl font-bold text-foreground leading-tight mb-2">
+                        Warm bread, made every morning
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                        Handmade loaves, pastries and cakes — baked fresh and ready to collect.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-3 py-1.5 rounded-lg gradient-primary text-white text-xs font-semibold">See the menu</span>
+                        <span className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground">Contact us</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="aspect-square rounded-xl bg-gradient-to-br from-amber-200 to-orange-300" />
+                      <div className="aspect-square rounded-xl bg-gradient-to-br from-rose-200 to-pink-300" />
+                      <div className="aspect-square rounded-xl bg-gradient-to-br from-violet-200 to-indigo-300" />
+                      <div className="aspect-square rounded-xl bg-gradient-to-br from-emerald-200 to-teal-300" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -113,9 +161,11 @@ export default function HomePage() {
       <section className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
+            <Eyebrow>How it works</Eyebrow>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Live in <span className="gradient-text">3 simple steps</span>
             </h2>
+            <p className="text-lg text-muted-foreground">From your files to a live website in under a minute.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((item, index) => (
@@ -143,9 +193,11 @@ export default function HomePage() {
       <section id="features" className="py-24 bg-radial-bottom">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
+            <Eyebrow>Features</Eyebrow>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Everything you need to <span className="gradient-text">go live</span>
             </h2>
+            <p className="text-lg text-muted-foreground">No code, no servers — just the essentials, done well.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
@@ -165,6 +217,7 @@ export default function HomePage() {
       <section className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
+            <Eyebrow>Why Flowstas</Eyebrow>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Built to be <span className="gradient-text">dependable</span>
             </h2>
@@ -187,6 +240,7 @@ export default function HomePage() {
       <section id="faq" className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
+            <Eyebrow>FAQ</Eyebrow>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Questions, <span className="gradient-text">answered</span>
             </h2>
