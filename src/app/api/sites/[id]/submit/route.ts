@@ -35,7 +35,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     )
   }
 
-  // Send the visitor back to the site with a success banner.
-  const origin = new URL(req.url).origin
-  return Response.redirect(`${origin}/s/${id}?sent=1`, 303)
+  // Send the visitor back to the exact page they submitted from (works whether
+  // the site was viewed at <slug>.flowstas.com or /s/<id>), with a success
+  // banner. Fall back to the id URL if there's no referer.
+  const referer = req.headers.get('referer')
+  let target: string
+  if (referer) {
+    const u = new URL(referer)
+    u.searchParams.set('sent', '1')
+    target = u.toString()
+  } else {
+    target = `${new URL(req.url).origin}/s/${id}?sent=1`
+  }
+  return Response.redirect(target, 303)
 }

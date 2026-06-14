@@ -53,12 +53,12 @@ export default async function SitesPage() {
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900">{site.name}</h2>
                     <a
-                      href={`/s/${site.id}`}
+                      href={`https://${site.subdomain}.flowstas.com`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-blue-600 hover:underline"
+                      className="text-sm font-medium text-blue-600 hover:underline"
                     >
-                      /s/{site.id} ↗
+                      {site.subdomain}.flowstas.com ↗
                     </a>
                   </div>
                   <div className="flex items-center gap-4">

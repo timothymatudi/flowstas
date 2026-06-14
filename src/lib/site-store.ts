@@ -15,6 +15,8 @@ export interface SiteMeta {
   createdAt: string
   // number of files in the site (1 for a single pasted HTML page)
   fileCount: number
+  // clean slug the site is served at: <subdomain>.flowstas.com
+  subdomain: string
 }
 
 export interface Submission {
@@ -36,6 +38,61 @@ const BUCKET = 'sites'
 
 function newId() {
   return crypto.randomBytes(4).toString('hex') // 8 hex chars, URL-friendly
+}
+
+// Turn a site name into a DNS-safe subdomain label: lowercase, letters/digits/
+// hyphens only, no leading/trailing/double hyphens, max 40 chars. Empty if the
+// name has no usable characters.
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 40)
+    .replace(/-+$/g, '')
+}
+
+// Reserved labels that must never be handed out as a site subdomain (they are
+// the app/marketing hosts or would shadow infrastructure).
+const RESERVED_SUBDOMAINS = new Set([
+  'www', 'app', 'api', 'admin', 'dashboard', 'mail', 'ftp', 'blog', 'help',
+  'support', 'status', 'docs', 'staging', 'dev', 'test', 'cdn', 'assets',
+  'alerts', 'no-reply', 'noreply',
+])
+
+// Pick a unique, available subdomain for a new site. Tries the name slug first,
+// then falls back to appending the site id (which is itself unique).
+async function pickSubdomain(
+  supabase: ReturnType<typeof createAdminClient>,
+  name: string,
+  id: string
+): Promise<string> {
+  const base = slugify(name)
+  const candidates = base && !RESERVED_SUBDOMAINS.has(base) ? [base, `${base}-${id}`] : [`site-${id}`]
+  for (const candidate of candidates) {
+    const { data } = await supabase
+      .from('sites')
+      .select('id')
+      .ilike('subdomain', candidate)
+      .maybeSingle()
+    if (!data) return candidate
+  }
+  return `site-${id}`
+}
+
+// Resolve a subdomain slug to its site id (for host-based serving). Null if none.
+export async function getSiteIdBySubdomain(slug: string): Promise<string | null> {
+  const clean = slug.trim().toLowerCase()
+  if (!clean) return null
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('sites')
+    .select('id')
+    .ilike('subdomain', clean)
+    .maybeSingle()
+  return data?.id ?? null
 }
 
 // Normalise an uploaded relative path: strip leading slashes, collapse "..",
@@ -109,11 +166,13 @@ export async function createSite(
     if (error) throw new Error(`Could not store ${f.path}: ${error.message}`)
   }
 
+  const subdomain = await pickSubdomain(supabase, name.trim() || 'Untitled site', id)
   const meta: SiteMeta = {
     id,
     name: name.trim() || 'Untitled site',
     createdAt: new Date().toISOString(),
     fileCount: rooted.length,
+    subdomain,
   }
   const { error: dbError } = await supabase.from('sites').insert({
     id: meta.id,
@@ -121,6 +180,7 @@ export async function createSite(
     file_count: meta.fileCount,
     created_at: meta.createdAt,
     owner_id: ownerId ?? null,
+    subdomain: meta.subdomain,
   })
   if (dbError) {
     // Roll back the uploaded files so we don't leave orphans behind.
@@ -267,11 +327,17 @@ export async function getSiteMeta(id: string): Promise<SiteMeta | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('sites')
-    .select('id, name, created_at, file_count')
+    .select('id, name, created_at, file_count, subdomain')
     .eq('id', id)
     .maybeSingle()
   if (error || !data) return null
-  return { id: data.id, name: data.name, createdAt: data.created_at, fileCount: data.file_count }
+  return {
+    id: data.id,
+    name: data.name,
+    createdAt: data.created_at,
+    fileCount: data.file_count,
+    subdomain: data.subdomain ?? data.id,
+  }
 }
 
 // Lists sites for one owner. Pass no ownerId only for admin/global use.
@@ -279,7 +345,7 @@ export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
   const supabase = createAdminClient()
   let query = supabase
     .from('sites')
-    .select('id, name, created_at, file_count')
+    .select('id, name, created_at, file_count, subdomain')
     .order('created_at', { ascending: false })
   if (ownerId) query = query.eq('owner_id', ownerId)
   const { data, error } = await query
@@ -289,6 +355,7 @@ export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
     name: row.name,
     createdAt: row.created_at,
     fileCount: row.file_count,
+    subdomain: row.subdomain ?? row.id,
   }))
 }
 

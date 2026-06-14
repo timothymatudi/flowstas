@@ -72,7 +72,8 @@ export default function PublishPage() {
   }
 
   if (liveUrl) {
-    const full = (typeof window !== 'undefined' ? window.location.origin : '') + liveUrl
+    // liveUrl is the absolute subdomain address (https://<slug>.flowstas.com).
+    const full = liveUrl
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
         <div className="w-full max-w-lg rounded-2xl bg-white p-8 text-center shadow-xl">

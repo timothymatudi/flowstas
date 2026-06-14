@@ -58,7 +58,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Add some HTML for your site first.' }, { status: 400 })
       }
       const meta = await createSiteFromHtml(String(body.name ?? ''), body.html, user.id)
-      return NextResponse.json({ id: meta.id, url: `/s/${meta.id}` })
+      return NextResponse.json({
+        id: meta.id,
+        subdomain: meta.subdomain,
+        url: `https://${meta.subdomain}.flowstas.com`,
+      })
     }
 
     if (contentType.includes('multipart/form-data')) {
@@ -97,7 +101,11 @@ export async function POST(req: Request) {
       }
 
       const meta = await createSite(name, files, user.id)
-      return NextResponse.json({ id: meta.id, url: `/s/${meta.id}` })
+      return NextResponse.json({
+        id: meta.id,
+        subdomain: meta.subdomain,
+        url: `https://${meta.subdomain}.flowstas.com`,
+      })
     }
 
     return NextResponse.json({ error: 'Unsupported upload type.' }, { status: 415 })
