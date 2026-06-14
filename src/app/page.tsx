@@ -61,23 +61,26 @@ export default function HomePage() {
   return (
     <div className="relative overflow-hidden">
       {/* Hero */}
-      <section className="relative min-h-[80vh] flex items-center bg-grid bg-radial">
+      <section className="relative flex items-center pt-16 pb-12 md:pt-24">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse-glow" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/20 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
+          <div className="absolute -top-24 right-[8%] w-[520px] h-[520px] bg-primary/10 rounded-full blur-[140px]" />
+          <div className="absolute top-1/3 -left-24 w-[420px] h-[420px] bg-amber-300/20 rounded-full blur-[130px]" />
         </div>
-        <div className="container mx-auto px-4 lg:px-8 py-20 relative z-10">
+        <div className="container mx-auto px-4 lg:px-8 py-12 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-light mb-8 animate-float">
-              <Rocket className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Put your website online in seconds</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card mb-8 border border-border shadow-premium">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              <span className="text-sm font-medium text-foreground">Your website, online in seconds</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
+            <h1 className="font-display text-5xl md:text-7xl mb-7 leading-[1.05]">
               <span className="text-foreground">Publish your website,</span>
               <br />
               <span className="gradient-text">get it live instantly</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
               Add your small website, hit publish, and it goes live at its own address like{' '}
               <span className="font-semibold text-foreground">yoursite.flowstas.com</span> — no servers, no setup. Your contact form even collects messages for you.
             </p>
@@ -162,7 +165,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Eyebrow>How it works</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Live in <span className="gradient-text">3 simple steps</span>
             </h2>
             <p className="text-lg text-muted-foreground">From your files to a live website in under a minute.</p>
@@ -194,7 +197,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Eyebrow>Features</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Everything you need to <span className="gradient-text">go live</span>
             </h2>
             <p className="text-lg text-muted-foreground">No code, no servers — just the essentials, done well.</p>
@@ -218,7 +221,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Eyebrow>Why Flowstas</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Built to be <span className="gradient-text">dependable</span>
             </h2>
           </div>
@@ -241,7 +244,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Eyebrow>FAQ</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Questions, <span className="gradient-text">answered</span>
             </h2>
           </div>
@@ -263,7 +266,7 @@ export default function HomePage() {
             <div className="absolute inset-0 gradient-primary opacity-90" />
             <div className="absolute inset-0 bg-grid opacity-20" />
             <div className="relative p-12 md:p-16 text-center">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              <h2 className="font-display text-4xl md:text-5xl mb-6 text-white">
                 Put your site online today
               </h2>
               <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">

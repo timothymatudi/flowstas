@@ -15,8 +15,8 @@ export default function PricingPage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent via-background to-background" />
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              Simple, Transparent Pricing
+            <h1 className="font-display text-balance text-4xl tracking-tight text-foreground md:text-5xl lg:text-6xl">
+              Simple, transparent pricing
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
               Publish your first site free — no credit card needed. Upgrade when you need more sites, and cancel anytime.

@@ -24,7 +24,7 @@ export default function Header() {
           <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary glow-sm">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-bold gradient-text">Flowstas</span>
+          <span className="font-display text-2xl gradient-text">Flowstas</span>
         </Link>
 
         {/* Desktop Navigation */}
