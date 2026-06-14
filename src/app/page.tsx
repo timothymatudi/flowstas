@@ -85,17 +85,17 @@ export default function HomePage() {
 
             {/* Browser mockup: an honest illustration of what publishing produces. */}
             <div className="mt-16 max-w-3xl mx-auto">
-              <div className="glass-light rounded-2xl overflow-hidden shadow-2xl text-left">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+              <div className="bg-card rounded-2xl overflow-hidden shadow-premium-lg text-left border border-border">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/60">
                   <span className="w-3 h-3 rounded-full bg-red-400" />
                   <span className="w-3 h-3 rounded-full bg-yellow-400" />
                   <span className="w-3 h-3 rounded-full bg-green-400" />
-                  <div className="ml-3 flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md bg-black/20 text-sm text-muted-foreground">
+                  <div className="ml-3 flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md bg-background text-sm text-muted-foreground border border-border">
                     <Globe className="w-3.5 h-3.5 text-primary" />
                     <span className="font-medium text-foreground">yoursite.flowstas.com</span>
                   </div>
                 </div>
-                <div className="px-8 py-12 text-center bg-gradient-to-b from-transparent to-black/10">
+                <div className="px-8 py-12 text-center bg-gradient-to-b from-transparent to-secondary/40">
                   <div className="w-14 h-14 rounded-2xl gradient-primary mx-auto mb-5 flex items-center justify-center glow-sm">
                     <Rocket className="w-7 h-7 text-white" />
                   </div>
