@@ -15,7 +15,7 @@ const steps = [
 
 const features = [
   { icon: Rocket, title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
-  { icon: Globe, title: 'A real live link', description: 'Every site gets its own address you can share with anyone.' },
+  { icon: Globe, title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
   { icon: MailCheck, title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
 ]
 
@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     q: 'Where does my site go live?',
-    a: 'Every site gets its own link you can share straight away. No servers to set up and no DNS to configure to get started.',
+    a: 'Every site gets its own address like yoursite.flowstas.com that you can share straight away — no servers to set up and no DNS to configure to get started.',
   },
   {
     q: 'What happens to my contact-form messages?',
@@ -59,7 +59,8 @@ export default function HomePage() {
               <span className="gradient-text">get it live instantly</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Add your small website, hit publish, and share a live link — no servers, no setup. Your contact form even collects messages for you.
+              Add your small website, hit publish, and it goes live at its own address like{' '}
+              <span className="font-semibold text-foreground">yoursite.flowstas.com</span> — no servers, no setup. Your contact form even collects messages for you.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/publish" className="btn-primary text-lg px-8 py-4 flex items-center gap-2 group">
@@ -69,6 +70,28 @@ export default function HomePage() {
               <Link href="/pricing" className="btn-secondary text-lg px-8 py-4 flex items-center gap-2">
                 View Pricing
               </Link>
+            </div>
+
+            {/* Browser mockup: an honest illustration of what publishing produces. */}
+            <div className="mt-16 max-w-3xl mx-auto">
+              <div className="glass-light rounded-2xl overflow-hidden shadow-2xl text-left">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                  <span className="w-3 h-3 rounded-full bg-red-400" />
+                  <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <span className="w-3 h-3 rounded-full bg-green-400" />
+                  <div className="ml-3 flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md bg-black/20 text-sm text-muted-foreground">
+                    <Globe className="w-3.5 h-3.5 text-primary" />
+                    <span className="font-medium text-foreground">yoursite.flowstas.com</span>
+                  </div>
+                </div>
+                <div className="px-8 py-12 text-center bg-gradient-to-b from-transparent to-black/10">
+                  <div className="w-14 h-14 rounded-2xl gradient-primary mx-auto mb-5 flex items-center justify-center glow-sm">
+                    <Rocket className="w-7 h-7 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground mb-2">Your site, live on the web</p>
+                  <p className="text-muted-foreground">Share the link, take messages, update it anytime.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
