@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { listSites, listSubmissions } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
+import { DeleteSiteButton } from '@/components/delete-site-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,9 +61,12 @@ export default async function SitesPage() {
                       /s/{site.id} ↗
                     </a>
                   </div>
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-                    {subs.length} message{subs.length === 1 ? '' : 's'}
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+                      {subs.length} message{subs.length === 1 ? '' : 's'}
+                    </span>
+                    <DeleteSiteButton id={site.id} name={site.name} />
+                  </div>
                 </div>
                 {subs.length > 0 && (
                   <div className="mt-4 divide-y divide-gray-100 border-t border-gray-100">

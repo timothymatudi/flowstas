@@ -4,7 +4,7 @@ import nextPlugin from '@next/eslint-plugin-next'
 
 export default tseslint.config(
   {
-    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'scripts/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

@@ -1,4 +1,5 @@
-import { addSubmission } from '@/lib/site-store'
+import { addSubmission, getSiteOwnerEmail } from '@/lib/site-store'
+import { sendEmail } from '@/lib/email'
 
 // Capture a contact-form submission from a published site, then notify the owner.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -14,10 +15,25 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   // Feature #1 (from Netlify): alert the owner the instant a message arrives.
-  // Locally we log it; in production this sends an email to the site owner.
-  console.log(
-    `\n📬 New message for site ${id} — ${submission.name} <${submission.email}>: ${submission.message}\n`
-  )
+  // Email the site owner when email is configured (RESEND_API_KEY); otherwise
+  // fall back to logging so nothing is silently lost.
+  const ownerEmail = await getSiteOwnerEmail(id)
+  let emailed = false
+  if (ownerEmail) {
+    emailed = await sendEmail({
+      to: ownerEmail,
+      subject: 'New message from your Flowstas site',
+      text:
+        `You received a new message via your published site (/s/${id}):\n\n` +
+        `From: ${submission.name} <${submission.email}>\n\n` +
+        `${submission.message}\n`,
+    })
+  }
+  if (!emailed) {
+    console.log(
+      `\n📬 New message for site ${id} — ${submission.name} <${submission.email}>: ${submission.message}\n`
+    )
+  }
 
   // Send the visitor back to the site with a success banner.
   const origin = new URL(req.url).origin

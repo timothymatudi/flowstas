@@ -139,6 +139,64 @@ export async function createSiteFromHtml(
   return createSite(name, [{ path: 'index.html', bytes: new TextEncoder().encode(html) }], ownerId)
 }
 
+// Recursively collect every object key stored under "<prefix>/". Supabase's
+// list() only returns one level, so we walk into sub-folders (which come back
+// as entries with a null id) to gather nested files too.
+async function listAllKeys(
+  supabase: ReturnType<typeof createAdminClient>,
+  prefix: string
+): Promise<string[]> {
+  const keys: string[] = []
+  const { data, error } = await supabase.storage.from(BUCKET).list(prefix, { limit: 1000 })
+  if (error || !data) return keys
+  for (const entry of data) {
+    const full = prefix ? `${prefix}/${entry.name}` : entry.name
+    if (entry.id === null) {
+      keys.push(...(await listAllKeys(supabase, full)))
+    } else {
+      keys.push(full)
+    }
+  }
+  return keys
+}
+
+// Permanently delete a site the given user owns: its stored files, its captured
+// form messages, and its metadata row. Returns false if the site doesn't exist
+// or isn't owned by this user (so one user can't delete another's site).
+export async function deleteSite(id: string, ownerId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+
+  const { data: row } = await supabase
+    .from('sites')
+    .select('owner_id')
+    .eq('id', id)
+    .maybeSingle()
+  if (!row || row.owner_id !== ownerId) return false
+
+  const keys = await listAllKeys(supabase, id)
+  if (keys.length > 0) {
+    await supabase.storage.from(BUCKET).remove(keys)
+  }
+  await supabase.from('site_submissions').delete().eq('site_id', id)
+  const { error } = await supabase.from('sites').delete().eq('id', id)
+  return !error
+}
+
+// Look up the email of the user who owns a site, for notifying them. Returns
+// null if the site has no owner or the lookup fails.
+export async function getSiteOwnerEmail(id: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase
+    .from('sites')
+    .select('owner_id')
+    .eq('id', id)
+    .maybeSingle()
+  if (!row?.owner_id) return null
+  const { data, error } = await supabase.auth.admin.getUserById(row.owner_id)
+  if (error || !data?.user?.email) return null
+  return data.user.email
+}
+
 // How many sites a given user has published (for plan-limit checks).
 export async function countSitesForOwner(ownerId: string): Promise<number> {
   const supabase = createAdminClient()
