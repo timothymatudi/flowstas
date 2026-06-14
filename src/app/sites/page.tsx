@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { listSites, listSubmissions } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
 import { DeleteSiteButton } from '@/components/delete-site-button'
+import { ManageSite } from '@/components/manage-site'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,6 +66,7 @@ export default async function SitesPage() {
                     <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
                       {subs.length} message{subs.length === 1 ? '' : 's'}
                     </span>
+                    <ManageSite id={site.id} name={site.name} subdomain={site.subdomain} />
                     <DeleteSiteButton id={site.id} name={site.name} />
                   </div>
                 </div>

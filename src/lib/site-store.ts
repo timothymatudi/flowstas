@@ -126,12 +126,10 @@ function pickEntry(paths: string[]): string | null {
   return anyHtml !== -1 ? paths[anyHtml] : null
 }
 
-export async function createSite(
-  name: string,
-  files: SiteFile[],
-  ownerId?: string
-): Promise<SiteMeta> {
-  // Clean + de-dupe paths, drop directory entries and macOS cruft.
+// Clean + de-dupe an uploaded file set: drop directory entries / macOS cruft,
+// normalise paths, strip a common top folder, and guarantee the entry page is
+// reachable at "/" (also written as index.html). Throws if there's no HTML.
+function prepareSiteFiles(files: SiteFile[]): SiteFile[] {
   const cleaned: SiteFile[] = []
   const seen = new Set<string>()
   for (const f of files) {
@@ -146,16 +144,19 @@ export async function createSite(
   const entry = pickEntry(rooted.map((f) => f.path))
   if (!entry) throw new Error('Your site needs at least one .html file (e.g. index.html).')
 
-  // Ensure the entry page is reachable at "/" by also writing it as index.html.
   if (entry.toLowerCase() !== 'index.html' && !rooted.some((f) => f.path === 'index.html')) {
     const e = rooted.find((f) => f.path === entry)!
     rooted.push({ path: 'index.html', bytes: e.bytes })
   }
+  return rooted
+}
 
-  const id = newId()
-  const supabase = createAdminClient()
-
-  // Upload every file into the bucket under this site's id.
+// Upload a prepared file set into the bucket under "<id>/...". Throws on failure.
+async function uploadSiteFiles(
+  supabase: ReturnType<typeof createAdminClient>,
+  id: string,
+  rooted: SiteFile[]
+): Promise<void> {
   for (const f of rooted) {
     const { error } = await supabase.storage
       .from(BUCKET)
@@ -165,6 +166,18 @@ export async function createSite(
       })
     if (error) throw new Error(`Could not store ${f.path}: ${error.message}`)
   }
+}
+
+export async function createSite(
+  name: string,
+  files: SiteFile[],
+  ownerId?: string
+): Promise<SiteMeta> {
+  const rooted = prepareSiteFiles(files)
+
+  const id = newId()
+  const supabase = createAdminClient()
+  await uploadSiteFiles(supabase, id, rooted)
 
   const subdomain = await pickSubdomain(supabase, name.trim() || 'Untitled site', id)
   const meta: SiteMeta = {
@@ -240,6 +253,76 @@ export async function deleteSite(id: string, ownerId: string): Promise<boolean> 
   await supabase.from('site_submissions').delete().eq('site_id', id)
   const { error } = await supabase.from('sites').delete().eq('id', id)
   return !error
+}
+
+// Rename a site and/or change its subdomain. Ownership-checked; validates the
+// new subdomain (DNS-safe, not reserved, not taken by another site). Returns an
+// error message on failure, or null on success.
+export async function updateSite(
+  id: string,
+  ownerId: string,
+  fields: { name?: string; subdomain?: string }
+): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase
+    .from('sites')
+    .select('owner_id')
+    .eq('id', id)
+    .maybeSingle()
+  if (!row || row.owner_id !== ownerId) return 'Site not found.'
+
+  const update: { name?: string; subdomain?: string } = {}
+  if (fields.name !== undefined) update.name = fields.name.trim() || 'Untitled site'
+  if (fields.subdomain !== undefined) {
+    const slug = slugify(fields.subdomain)
+    if (!slug) return 'Pick a subdomain using letters, numbers or hyphens.'
+    if (RESERVED_SUBDOMAINS.has(slug)) return 'That subdomain is reserved — pick another.'
+    const { data: taken } = await supabase
+      .from('sites')
+      .select('id')
+      .ilike('subdomain', slug)
+      .neq('id', id)
+      .maybeSingle()
+    if (taken) return 'That subdomain is already taken — pick another.'
+    update.subdomain = slug
+  }
+
+  const { error } = await supabase.from('sites').update(update).eq('id', id)
+  return error ? error.message : null
+}
+
+// Replace a site's content with a fresh file set, keeping its id/subdomain/owner.
+// Ownership-checked. Removes the old files first, then uploads the new ones.
+export async function replaceSiteFiles(
+  id: string,
+  ownerId: string,
+  files: SiteFile[]
+): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase
+    .from('sites')
+    .select('owner_id')
+    .eq('id', id)
+    .maybeSingle()
+  if (!row || row.owner_id !== ownerId) return 'Site not found.'
+
+  let rooted: SiteFile[]
+  try {
+    rooted = prepareSiteFiles(files)
+  } catch (err) {
+    return err instanceof Error ? err.message : 'Could not read those files.'
+  }
+
+  // Clear the existing files so removed pages don't linger, then upload anew.
+  const oldKeys = await listAllKeys(supabase, id)
+  if (oldKeys.length > 0) await supabase.storage.from(BUCKET).remove(oldKeys)
+  await uploadSiteFiles(supabase, id, rooted)
+
+  const { error } = await supabase
+    .from('sites')
+    .update({ file_count: rooted.length })
+    .eq('id', id)
+  return error ? error.message : null
 }
 
 // Look up the email of the user who owns a site, for notifying them. Returns
