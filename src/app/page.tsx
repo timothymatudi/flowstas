@@ -5,7 +5,18 @@ import {
   Globe,
   MailCheck,
   MousePointerClick,
+  ShieldCheck,
+  Server,
+  Lock,
+  CalendarX,
 } from 'lucide-react'
+
+const trust = [
+  { icon: ShieldCheck, title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
+  { icon: Server, title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
+  { icon: Lock, title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
+  { icon: CalendarX, title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
+]
 
 const steps = [
   { step: '01', title: 'Add your site', description: 'Paste your HTML or upload your files.', icon: MousePointerClick },
@@ -129,7 +140,7 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="py-24 bg-radial-bottom">
+      <section id="features" className="py-24 bg-radial-bottom">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
@@ -150,8 +161,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* Why trust Flowstas */}
       <section className="py-24">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+              Built to be <span className="gradient-text">dependable</span>
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trust.map((item, index) => (
+              <div key={index} className="glass-light rounded-2xl p-6 card-hover">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-5 glow-sm">
+                  <item.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">

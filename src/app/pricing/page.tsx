@@ -19,7 +19,7 @@ export default function PricingPage() {
               Simple, Transparent Pricing
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Choose the perfect plan for your needs. Start with a 1-day free trial. No credit card required.
+              Publish your first site free — no credit card needed. Upgrade when you need more sites, and cancel anytime.
             </p>
           </div>
         </div>
@@ -54,16 +54,16 @@ export default function PricingPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              All Plans Include
+              Every plan includes
             </h2>
             <div className="mt-10 grid gap-4 text-left sm:grid-cols-2">
               {[
-                '1-day free trial',
-                'No setup fees',
+                'A free site to start — no card needed',
+                'Your own HTTPS web address',
+                'Contact-form message capture',
                 'Secure payments via Stripe',
-                'Responsive email support',
-                'Private, secure workspace',
-                'Regular product updates',
+                'No setup fees, cancel anytime',
+                'Email support',
               ].map((item) => (
                 <div key={item} className="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-4 shadow-premium">
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground/10">

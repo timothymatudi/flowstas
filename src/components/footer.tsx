@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { Sparkles, Twitter, Linkedin, Github } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
 const footerLinks = {
   product: [
-    { href: '/pricing', label: 'Pricing' },
+    { href: '/publish', label: 'Publish a site' },
     { href: '/#features', label: 'Features' },
-    { href: '/#testimonials', label: 'Testimonials' },
+    { href: '/pricing', label: 'Pricing' },
   ],
   company: [
     { href: '/about', label: 'About Us' },
@@ -15,16 +15,9 @@ const footerLinks = {
   ],
   resources: [
     { href: '/contact', label: 'Support' },
-    { href: '/contact', label: 'Help Center' },
-    { href: '/contact', label: 'FAQ' },
+    { href: '/#faq', label: 'FAQ' },
   ],
 }
-
-const socialLinks = [
-  { href: '#', icon: Twitter, label: 'Twitter' },
-  { href: '#', icon: Linkedin, label: 'LinkedIn' },
-  { href: '#', icon: Github, label: 'GitHub' },
-]
 
 export default function Footer() {
   return (
@@ -40,20 +33,9 @@ export default function Footer() {
               <span className="text-xl font-bold gradient-text">Flowstas</span>
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              A clean, focused way to organize your work — Kanban board and list view in one simple workspace.
+              Publish your small website in seconds — it goes live at its own address like
+              yoursite.flowstas.com, with a contact form that captures every message.
             </p>
-            <div className="mt-6 flex items-center gap-3">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl glass-light text-muted-foreground transition-all hover:text-foreground hover:bg-secondary"
-                  aria-label={link.label}
-                >
-                  <link.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Product Links */}
