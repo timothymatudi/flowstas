@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight,
   Rocket,
@@ -12,6 +13,12 @@ import {
   Check,
 } from 'lucide-react'
 import { HeroPublish } from '@/components/hero-publish'
+
+const examples = [
+  { img: '/examples/sunrise-bakery.png', name: 'Sunrise Bakery', kind: 'Local bakery', host: 'sunrise-bakery.flowstas.com' },
+  { img: '/examples/atlas-fitness.png', name: 'Atlas Fitness', kind: 'Fitness studio', host: 'atlas-fitness.flowstas.com' },
+  { img: '/examples/lumen-studio.png', name: 'Lumen Studio', kind: 'Design studio', host: 'lumen-studio.flowstas.com' },
+]
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -108,6 +115,57 @@ export default function HomePage() {
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      </section>
+
+      {/* Real example sites */}
+      <section className="py-20 border-y border-border bg-secondary/40">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <Eyebrow>Real sites</Eyebrow>
+            <h2 className="font-display text-4xl md:text-5xl mb-4 text-foreground">
+              Built &amp; published <span className="gradient-text">on Flowstas</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Three real sites, live right now — each at its own flowstas.com address. Tap any to open it.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {examples.map((e) => (
+              <a
+                key={e.host}
+                href={`https://${e.host}`}
+                target="_blank"
+                rel="noreferrer"
+                className="glass-light rounded-2xl overflow-hidden card-hover block"
+              >
+                <div className="flex items-center gap-1.5 border-b border-border bg-secondary/70 px-3 py-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                  <span className="ml-2 truncate text-xs text-muted-foreground">{e.host}</span>
+                </div>
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={e.img}
+                    alt={`${e.name} — a real site published on Flowstas`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover object-top"
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4">
+                  <div>
+                    <p className="font-semibold text-foreground">{e.name}</p>
+                    <p className="text-sm text-muted-foreground">{e.kind}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                    Visit <ArrowRight className="h-4 w-4" />
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* How it works */}
