@@ -22,10 +22,10 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 const trust = [
-  { icon: ShieldCheck, tint: 'bg-[#e7eaef] text-[#4a5a78]', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
-  { icon: Server, tint: 'bg-[#f3e9e0] text-[#a4482a]', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
-  { icon: Lock, tint: 'bg-[#efe8ee] text-[#7a5577]', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
-  { icon: CalendarX, tint: 'bg-[#e8efe8] text-[#4f6f57]', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
+  { icon: ShieldCheck, tint: 'bg-primary/10 text-primary', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
+  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
+  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
+  { icon: CalendarX, tint: 'bg-primary/10 text-primary', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
 ]
 
 const steps = [
@@ -35,9 +35,9 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-[#f3e9e0] text-[#a4482a]', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
-  { icon: Globe, tint: 'bg-[#e8efe8] text-[#4f6f57]', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
-  { icon: MailCheck, tint: 'bg-[#e7eaef] text-[#4a5a78]', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
+  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
+  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
+  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
 ]
 
 const faqs = [
@@ -65,8 +65,8 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative flex items-center pt-16 pb-12 md:pt-24">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 right-[8%] w-[520px] h-[520px] bg-primary/10 rounded-full blur-[140px]" />
-          <div className="absolute top-1/3 -left-24 w-[420px] h-[420px] bg-amber-300/20 rounded-full blur-[130px]" />
+          <div className="absolute -top-24 right-[6%] w-[560px] h-[560px] bg-primary/10 rounded-full blur-[150px]" />
+          <div className="absolute top-1/3 -left-24 w-[420px] h-[420px] bg-primary/5 rounded-full blur-[130px]" />
         </div>
         <div className="container mx-auto px-4 lg:px-8 py-12 relative z-10">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-12 items-center">
@@ -97,18 +97,8 @@ export default function HomePage() {
               </ul>
             </div>
 
-            {/* Right: the real tool, with a hand-drawn nudge */}
+            {/* Right: the real tool */}
             <div className="relative">
-              <div className="hidden lg:block absolute -top-9 left-2 z-20 font-hand text-2xl text-primary -rotate-6">
-                paste your code, hit publish…
-              </div>
-              <svg
-                className="hidden lg:block absolute -top-7 left-52 w-16 h-12 text-primary/70"
-                viewBox="0 0 64 48" fill="none" aria-hidden
-              >
-                <path d="M2 4 C 28 6, 50 14, 56 36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-                <path d="M48 32 L 57 38 L 50 44" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              </svg>
               <HeroPublish />
             </div>
           </div>
