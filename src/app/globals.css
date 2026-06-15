@@ -121,14 +121,24 @@
     0 36px 60px -28px rgba(20, 30, 70, 0.22);
 }
 
-/* Strong confident blue accent */
+/* Cool signature gradient */
 .gradient-primary {
-  background: linear-gradient(135deg, #3b5bff 0%, #2541e0 100%);
+  background: linear-gradient(135deg, #3b5bff 0%, #00b4d8 100%);
 }
 
 .gradient-text {
-  color: #2647e8;
-  -webkit-text-fill-color: #2647e8;
+  background: linear-gradient(100deg, #2647e8 0%, #00a3c4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Signature hero mesh — cool, designed brand backdrop */
+.hero-mesh {
+  background:
+    radial-gradient(40% 55% at 78% 8%, rgba(0, 180, 216, 0.20), transparent 70%),
+    radial-gradient(45% 60% at 88% 30%, rgba(59, 91, 255, 0.22), transparent 70%),
+    radial-gradient(40% 50% at 60% -5%, rgba(124, 58, 237, 0.12), transparent 70%);
 }
 
 .gradient-border {

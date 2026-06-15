@@ -71,10 +71,7 @@ export default function HomePage() {
     <div className="relative overflow-hidden">
       {/* Hero */}
       <section className="relative flex items-center pt-16 pb-12 md:pt-24">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 right-[6%] w-[560px] h-[560px] bg-primary/10 rounded-full blur-[150px]" />
-          <div className="absolute top-1/3 -left-24 w-[420px] h-[420px] bg-primary/5 rounded-full blur-[130px]" />
-        </div>
+        <div className="absolute inset-0 hero-mesh pointer-events-none" />
         <div className="container mx-auto px-4 lg:px-8 py-12 relative z-10">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-12 items-center">
             {/* Left: the pitch */}
