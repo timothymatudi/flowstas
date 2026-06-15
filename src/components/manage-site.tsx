@@ -9,21 +9,46 @@ export function ManageSite({
   id,
   name: initialName,
   subdomain: initialSubdomain,
+  customDomain: initialDomain,
+  hasPassword,
 }: {
   id: string
   name: string
   subdomain: string
+  customDomain: string | null
+  hasPassword: boolean
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(initialName)
   const [subdomain, setSubdomain] = useState(initialSubdomain)
+  const [domain, setDomain] = useState(initialDomain ?? '')
+  const [password, setPassword] = useState('')
   const [html, setHtml] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [ok, setOk] = useState<string | null>(null)
   const folderInput = useRef<HTMLInputElement>(null)
   const zipInput = useRef<HTMLInputElement>(null)
+
+  async function patch(payload: Record<string, unknown>, okMsg: string) {
+    setBusy(true); setError(null); setOk(null)
+    try {
+      const res = await fetch(`/api/sites/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not save')
+      setOk(okMsg)
+      router.refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not save')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   async function saveDetails() {
     setBusy(true); setError(null); setOk(null)
@@ -165,6 +190,67 @@ export function ManageSite({
           accept=".zip,application/zip"
           onChange={(e) => uploadFiles(Array.from(e.target.files ?? []))}
         />
+      </div>
+
+      {/* Custom domain */}
+      <div className="border-t border-gray-200 pt-4">
+        <p className="mb-2 text-sm font-medium text-gray-700">Connect your own domain</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="www.yourbusiness.com"
+            className="flex-1 min-w-[180px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
+          />
+          <button
+            onClick={() => patch({ customDomain: domain }, domain.trim() ? 'Domain connected — add the DNS record below.' : 'Domain removed.')}
+            disabled={busy}
+            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+          >
+            {domain.trim() ? 'Connect' : 'Remove'}
+          </button>
+        </div>
+        {domain.trim() && (
+          <p className="mt-2 text-xs text-gray-500">
+            At your domain registrar, add a <span className="font-medium text-gray-700">CNAME</span> record
+            pointing <span className="font-medium text-gray-700">{domain.trim()}</span> to{' '}
+            <span className="font-mono text-gray-700">cname.vercel-dns.com</span> (for an apex domain, use an
+            A record to <span className="font-mono text-gray-700">76.76.21.21</span>). HTTPS turns on
+            automatically once it resolves.
+          </p>
+        )}
+      </div>
+
+      {/* Password protection */}
+      <div className="border-t border-gray-200 pt-4">
+        <p className="mb-2 text-sm font-medium text-gray-700">
+          Password protection {hasPassword && <span className="text-amber-700">· currently on</span>}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={hasPassword ? 'Enter a new password…' : 'Set a password…'}
+            className="flex-1 min-w-[180px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
+          />
+          <button
+            onClick={() => { patch({ password }, 'Password updated.'); setPassword('') }}
+            disabled={busy || !password.trim()}
+            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+          >
+            {hasPassword ? 'Change' : 'Set'}
+          </button>
+          {hasPassword && (
+            <button
+              onClick={() => patch({ password: '' }, 'Password removed — the site is public again.')}
+              disabled={busy}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            >
+              Remove
+            </button>
+          )}
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

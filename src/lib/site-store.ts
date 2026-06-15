@@ -2,6 +2,7 @@ import 'server-only'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { addDomainToProject, removeDomainFromProject } from '@/lib/vercel'
 
 // Store for published sites + their form submissions, backed by Supabase:
 //   - site files     → Storage bucket "sites", keyed "<id>/<relpath>"
@@ -17,6 +18,10 @@ export interface SiteMeta {
   fileCount: number
   // clean slug the site is served at: <subdomain>.flowstas.com
   subdomain: string
+  // connected custom domain, if any (e.g. www.yourbiz.com)
+  customDomain: string | null
+  // whether the site is password-protected
+  hasPassword: boolean
 }
 
 export interface Submission {
@@ -93,6 +98,115 @@ export async function getSiteIdBySubdomain(slug: string): Promise<string | null>
     .ilike('subdomain', clean)
     .maybeSingle()
   return data?.id ?? null
+}
+
+// Resolve a connected custom domain (e.g. www.yourbiz.com) to its site id.
+export async function getSiteIdByCustomDomain(host: string): Promise<string | null> {
+  const clean = host.trim().toLowerCase().replace(/^www\./, '')
+  if (!clean) return null
+  const supabase = createAdminClient()
+  // Match either the bare domain or the www. form.
+  const { data } = await supabase
+    .from('sites')
+    .select('id, custom_domain')
+    .or(`custom_domain.ilike.${clean},custom_domain.ilike.www.${clean}`)
+    .maybeSingle()
+  return data?.id ?? null
+}
+
+// Connect or disconnect a custom domain (owner-checked). Validates the domain,
+// ensures it isn't taken, attaches it on Vercel, then stores it. Returns an
+// error message or null on success.
+export async function setCustomDomain(id: string, ownerId: string, domain: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase.from('sites').select('owner_id, custom_domain').eq('id', id).maybeSingle()
+  if (!row || row.owner_id !== ownerId) return 'Site not found.'
+
+  const clean = domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+  // Clearing the domain.
+  if (!clean) {
+    if (row.custom_domain) await removeDomainFromProject(row.custom_domain)
+    const { error } = await supabase.from('sites').update({ custom_domain: null }).eq('id', id)
+    return error ? error.message : null
+  }
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(clean) || clean.endsWith('.flowstas.com')) {
+    return 'Enter a valid domain you own, e.g. www.yourbusiness.com.'
+  }
+  const { data: taken } = await supabase
+    .from('sites').select('id').ilike('custom_domain', clean).neq('id', id).maybeSingle()
+  if (taken) return 'That domain is already connected to another site.'
+
+  const added = await addDomainToProject(clean)
+  if (!added.ok) return added.error
+
+  const { error } = await supabase.from('sites').update({ custom_domain: clean }).eq('id', id)
+  return error ? error.message : null
+}
+
+// --- Per-site secrets (password gate) ---
+const SITE_SECRET = process.env.SUPABASE_JWT_SECRET || 'flowstas-fallback-secret'
+function sign(...parts: string[]): string {
+  return crypto.createHmac('sha256', SITE_SECRET).update(parts.join(':')).digest('hex')
+}
+
+export function unlockCookieName(id: string): string {
+  return `flowstas_unlock_${id}`
+}
+// The capability token a visitor's cookie must hold to view a protected site.
+export function unlockToken(passwordHash: string): string {
+  return sign('cookie', passwordHash)
+}
+export function checkSitePassword(id: string, passwordHash: string, password: string): boolean {
+  return sign('pw', id, password) === passwordHash
+}
+
+// Fetch the password hash for a site (null = public).
+export async function getSitePasswordHash(id: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('sites').select('password_hash').eq('id', id).maybeSingle()
+  return data?.password_hash ?? null
+}
+
+// Set or clear a site's password (owner-checked). Empty password clears it.
+export async function setSitePassword(id: string, ownerId: string, password: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase.from('sites').select('owner_id').eq('id', id).maybeSingle()
+  if (!row || row.owner_id !== ownerId) return 'Site not found.'
+  const password_hash = password.trim() ? sign('pw', id, password.trim()) : null
+  const { error } = await supabase.from('sites').update({ password_hash }).eq('id', id)
+  return error ? error.message : null
+}
+
+// --- Analytics ---
+// Record one page view for a site (per-day counter). Best-effort.
+export async function recordView(id: string): Promise<void> {
+  const supabase = createAdminClient()
+  await supabase.rpc('flowstas_record_view', { p_site: id })
+}
+
+export interface ViewStats {
+  total: number
+  days: { day: string; views: number }[] // last 7 days, oldest first
+}
+export async function getViewStats(id: string): Promise<ViewStats> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('site_view_stats')
+    .select('day, views')
+    .eq('site_id', id)
+    .order('day', { ascending: true })
+  const rows = data ?? []
+  const total = rows.reduce((s, r) => s + (r.views ?? 0), 0)
+  // Build a dense last-7-day series (fill gaps with 0).
+  const byDay = new Map(rows.map((r) => [r.day, r.views as number]))
+  const days: { day: string; views: number }[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() - i)
+    const key = d.toISOString().slice(0, 10)
+    days.push({ day: key, views: byDay.get(key) ?? 0 })
+  }
+  return { total, days }
 }
 
 // Normalise an uploaded relative path: strip leading slashes, collapse "..",
@@ -186,6 +300,8 @@ export async function createSite(
     createdAt: new Date().toISOString(),
     fileCount: rooted.length,
     subdomain,
+    customDomain: null,
+    hasPassword: false,
   }
   const { error: dbError } = await supabase.from('sites').insert({
     id: meta.id,
@@ -410,7 +526,7 @@ export async function getSiteMeta(id: string): Promise<SiteMeta | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('sites')
-    .select('id, name, created_at, file_count, subdomain')
+    .select('id, name, created_at, file_count, subdomain, custom_domain, password_hash')
     .eq('id', id)
     .maybeSingle()
   if (error || !data) return null
@@ -420,6 +536,8 @@ export async function getSiteMeta(id: string): Promise<SiteMeta | null> {
     createdAt: data.created_at,
     fileCount: data.file_count,
     subdomain: data.subdomain ?? data.id,
+    customDomain: data.custom_domain ?? null,
+    hasPassword: !!data.password_hash,
   }
 }
 
@@ -428,7 +546,7 @@ export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
   const supabase = createAdminClient()
   let query = supabase
     .from('sites')
-    .select('id, name, created_at, file_count, subdomain')
+    .select('id, name, created_at, file_count, subdomain, custom_domain, password_hash')
     .order('created_at', { ascending: false })
   if (ownerId) query = query.eq('owner_id', ownerId)
   const { data, error } = await query
@@ -439,6 +557,8 @@ export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
     createdAt: row.created_at,
     fileCount: row.file_count,
     subdomain: row.subdomain ?? row.id,
+    customDomain: row.custom_domain ?? null,
+    hasPassword: !!row.password_hash,
   }))
 }
 

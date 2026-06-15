@@ -9,5 +9,5 @@ export async function GET(
 ) {
   const { id, path: segments } = await params
   const reqPath = (segments ?? []).join('/')
-  return serveSite(id, reqPath, req.url)
+  return serveSite(id, reqPath, req)
 }

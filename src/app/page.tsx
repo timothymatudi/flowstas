@@ -11,6 +11,8 @@ import {
   Lock,
   CalendarX,
   Check,
+  Link2,
+  BarChart3,
 } from 'lucide-react'
 import { HeroPublish } from '@/components/hero-publish'
 
@@ -42,9 +44,12 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
-  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
-  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
+  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in about 20 seconds — no servers, no code.' },
+  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com, with HTTPS on by default.' },
+  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Connect your own domain', description: 'Point www.yourbusiness.com at your site and we handle the HTTPS certificate automatically.' },
+  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
+  { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
+  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
 ]
 
 const faqs = [

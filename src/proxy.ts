@@ -12,21 +12,26 @@ const RESERVED = new Set([
   'alerts', 'no-reply', 'noreply',
 ])
 
-// Returns the single-level subdomain label when the host is a published-site
-// address like "<slug>.flowstas.com", else null (apex, www, *.vercel.app,
-// localhost — all the app itself).
-function siteSlugFromHost(host: string): string | null {
+// True when the Host is a published site — either "<slug>.flowstas.com" or a
+// connected custom domain — rather than the app's own hosts (apex, www,
+// *.vercel.app, localhost).
+function isSiteHost(host: string): boolean {
   const h = host.split(':')[0].toLowerCase()
-  if (!h.endsWith(SUFFIX)) return null
-  const label = h.slice(0, -SUFFIX.length)
-  if (!label || label.includes('.') || RESERVED.has(label)) return null
-  return label
+  if (!h) return false
+  if (h === 'flowstas.com' || h === 'www.flowstas.com') return false
+  if (h === 'localhost' || h.startsWith('127.') || h.startsWith('192.168.') || h.endsWith('.local')) return false
+  if (h.endsWith('.vercel.app')) return false
+  if (h.endsWith(SUFFIX)) {
+    const label = h.slice(0, -SUFFIX.length)
+    return !!label && !label.includes('.') && !RESERVED.has(label)
+  }
+  // Any other host that resolves here is a connected custom domain → a site.
+  return true
 }
 
 export async function proxy(request: NextRequest) {
-  // Published-site traffic on a subdomain: serve the site, skip all auth work.
-  const slug = siteSlugFromHost(request.headers.get('host') ?? '')
-  if (slug) {
+  // Published-site traffic (subdomain or custom domain): serve it, skip auth.
+  if (isSiteHost(request.headers.get('host') ?? '')) {
     const path = request.nextUrl.pathname
     // Let the form-capture API and framework assets reach their real handlers;
     // everything else is rewritten to the host-based site server.

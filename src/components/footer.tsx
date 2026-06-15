@@ -33,7 +33,7 @@ export default function Footer() {
               <span className="font-display text-2xl gradient-text">Flowstas</span>
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Publish your small website in seconds — it goes live at its own address like
+              Publish your website in seconds — it goes live at its own address like
               yoursite.flowstas.com, with a contact form that captures every message.
             </p>
           </div>

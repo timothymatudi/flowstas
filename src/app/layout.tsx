@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: 'Flowstas | Publish your website in seconds',
     template: '%s | Flowstas',
   },
-  description: 'Add your small website, hit publish, and share a live link — no servers, no setup. Your contact form collects messages for you.',
+  description: 'Publish your website in seconds — paste HTML or drop a zip and it goes live at its own address with HTTPS, a contact form, and your own custom domain. No servers, no setup.',
   keywords: [
     'website hosting',
     'publish a website',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     url: 'https://flowstas.com',
     siteName: 'Flowstas',
     title: 'Flowstas | Publish your website in seconds',
-    description: 'Add your small website, hit publish, and share a live link. Your contact form collects messages for you.',
+    description: 'Paste HTML or drop a zip and your site is live — its own address, HTTPS, a contact form, and your own custom domain.',
     locale: 'en_US',
   },
   twitter: {

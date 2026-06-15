@@ -1,11 +1,26 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { listSites, listSubmissions } from '@/lib/site-store'
+import { listSites, listSubmissions, getViewStats, type ViewStats } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
 import { DeleteSiteButton } from '@/components/delete-site-button'
 import { ManageSite } from '@/components/manage-site'
 
 export const dynamic = 'force-dynamic'
+
+function Sparkline({ stats }: { stats: ViewStats }) {
+  const max = Math.max(1, ...stats.days.map((d) => d.views))
+  return (
+    <span className="inline-flex items-end gap-0.5 h-5" title="Views, last 7 days">
+      {stats.days.map((d) => (
+        <span
+          key={d.day}
+          className="w-1.5 rounded-sm bg-blue-500/70"
+          style={{ height: `${Math.max(10, (d.views / max) * 100)}%` }}
+        />
+      ))}
+    </span>
+  )
+}
 
 export default async function SitesPage() {
   const supabase = await createClient()
@@ -16,7 +31,11 @@ export default async function SitesPage() {
 
   const sites = await listSites(user.id)
   const data = await Promise.all(
-    sites.map(async (site) => ({ site, subs: await listSubmissions(site.id) }))
+    sites.map(async (site) => ({
+      site,
+      subs: await listSubmissions(site.id),
+      stats: await getViewStats(site.id),
+    }))
   )
 
   return (
@@ -48,28 +67,50 @@ export default async function SitesPage() {
           </div>
         ) : (
           <div className="mt-8 space-y-5">
-            {data.map(({ site, subs }) => (
+            {data.map(({ site, subs, stats }) => (
               <div key={site.id} className="rounded-2xl bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">{site.name}</h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-semibold text-gray-900">{site.name}</h2>
+                      {site.hasPassword && (
+                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          🔒 Protected
+                        </span>
+                      )}
+                    </div>
                     <a
-                      href={`https://${site.subdomain}.flowstas.com`}
+                      href={`https://${site.customDomain || `${site.subdomain}.flowstas.com`}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-sm font-medium text-blue-600 hover:underline"
                     >
-                      {site.subdomain}.flowstas.com ↗
+                      {site.customDomain || `${site.subdomain}.flowstas.com`} ↗
                     </a>
+                    {site.customDomain && (
+                      <p className="text-xs text-gray-400">also at {site.subdomain}.flowstas.com</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-2 text-sm text-gray-600">
+                      <Sparkline stats={stats} />
+                      <span><span className="font-semibold text-gray-900">{stats.total}</span> views</span>
+                    </span>
                     <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
                       {subs.length} message{subs.length === 1 ? '' : 's'}
                     </span>
-                    <ManageSite id={site.id} name={site.name} subdomain={site.subdomain} />
                     <DeleteSiteButton id={site.id} name={site.name} />
                   </div>
                 </div>
+
+                <ManageSite
+                  id={site.id}
+                  name={site.name}
+                  subdomain={site.subdomain}
+                  customDomain={site.customDomain}
+                  hasPassword={site.hasPassword}
+                />
+
                 {subs.length > 0 && (
                   <div className="mt-4 divide-y divide-gray-100 border-t border-gray-100">
                     {subs.map((s) => (

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { updateSite, replaceSiteFiles } from '@/lib/site-store'
+import { updateSite, replaceSiteFiles, setSitePassword, setCustomDomain } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
 import { parseUpload } from '@/lib/upload-parse'
 
@@ -20,14 +20,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!user) return NextResponse.json({ error: 'Please log in.', needsAuth: true }, { status: 401 })
 
   const body = await req.json().catch(() => null)
-  if (!body || (body.name === undefined && body.subdomain === undefined)) {
-    return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 })
-  }
+  if (!body) return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 })
 
-  const error = await updateSite(id, user.id, {
-    name: typeof body.name === 'string' ? body.name : undefined,
-    subdomain: typeof body.subdomain === 'string' ? body.subdomain : undefined,
-  })
+  let error: string | null = null
+  if (body.name !== undefined || body.subdomain !== undefined) {
+    error = await updateSite(id, user.id, {
+      name: typeof body.name === 'string' ? body.name : undefined,
+      subdomain: typeof body.subdomain === 'string' ? body.subdomain : undefined,
+    })
+  }
+  if (!error && body.password !== undefined) {
+    error = await setSitePassword(id, user.id, String(body.password))
+  }
+  if (!error && body.customDomain !== undefined) {
+    error = await setCustomDomain(id, user.id, String(body.customDomain))
+  }
   if (error) return NextResponse.json({ error }, { status: 400 })
   return NextResponse.json({ ok: true })
 }
