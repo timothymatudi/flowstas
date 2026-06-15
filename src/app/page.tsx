@@ -9,6 +9,7 @@ import {
   Server,
   Lock,
   CalendarX,
+  Check,
 } from 'lucide-react'
 import { HeroPublish } from '@/components/hero-publish'
 
@@ -21,10 +22,10 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 const trust = [
-  { icon: ShieldCheck, title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
-  { icon: Server, title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
-  { icon: Lock, title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
-  { icon: CalendarX, title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
+  { icon: ShieldCheck, tint: 'bg-sky-100 text-sky-600', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
+  { icon: Server, tint: 'bg-amber-100 text-amber-600', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
+  { icon: Lock, tint: 'bg-rose-100 text-rose-600', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
+  { icon: CalendarX, tint: 'bg-violet-100 text-violet-600', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
 ]
 
 const steps = [
@@ -34,9 +35,9 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
-  { icon: Globe, title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
-  { icon: MailCheck, title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
+  { icon: Rocket, tint: 'bg-violet-100 text-violet-600', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
+  { icon: Globe, tint: 'bg-emerald-100 text-emerald-600', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
+  { icon: MailCheck, tint: 'bg-amber-100 text-amber-600', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
 ]
 
 const faqs = [
@@ -68,29 +69,53 @@ export default function HomePage() {
           <div className="absolute top-1/3 -left-24 w-[420px] h-[420px] bg-amber-300/20 rounded-full blur-[130px]" />
         </div>
         <div className="container mx-auto px-4 lg:px-8 py-12 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card mb-8 border border-border shadow-premium">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-              </span>
-              <span className="text-sm font-medium text-foreground">Your website, online in seconds</span>
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-12 items-center">
+            {/* Left: the pitch */}
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card mb-7 border border-border shadow-premium">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                </span>
+                <span className="text-sm font-medium text-foreground">Your website, online in seconds</span>
+              </div>
+              <h1 className="font-display text-5xl md:text-6xl xl:text-7xl mb-6 leading-[1.04]">
+                <span className="text-foreground">Publish your website, </span>
+                <span className="gradient-text">get it live instantly.</span>
+              </h1>
+              <p className="text-lg text-muted-foreground mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                No servers, no setup, no code. Paste your site or drop a zip — it goes live at its
+                own <span className="font-semibold text-foreground">yoursite.flowstas.com</span>,
+                contact form and all.
+              </p>
+              <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2.5 text-sm text-muted-foreground">
+                {['Live in seconds', 'Automatic HTTPS', 'Free to start'].map((t) => (
+                  <li key={t} className="inline-flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-green-600" /> {t}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h1 className="font-display text-5xl md:text-7xl mb-7 leading-[1.05]">
-              <span className="text-foreground">Publish your website,</span>
-              <br />
-              <span className="gradient-text">get it live instantly</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Add your small website, hit publish, and it goes live at its own address like{' '}
-              <span className="font-semibold text-foreground">yoursite.flowstas.com</span> — no servers, no setup. Your contact form even collects messages for you.
-            </p>
-            <HeroPublish />
-            <p className="mt-6 text-sm text-muted-foreground">
-              Prefer a bigger editor or to upload a folder?{' '}
-              <Link href="/publish" className="font-medium text-primary hover:underline">Open the full publish page</Link>
-            </p>
+
+            {/* Right: the real tool, with a hand-drawn nudge */}
+            <div className="relative">
+              <div className="hidden lg:block absolute -top-9 left-2 z-20 font-hand text-2xl text-primary -rotate-6">
+                paste your code, hit publish…
+              </div>
+              <svg
+                className="hidden lg:block absolute -top-7 left-52 w-16 h-12 text-primary/70"
+                viewBox="0 0 64 48" fill="none" aria-hidden
+              >
+                <path d="M2 4 C 28 6, 50 14, 56 36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <path d="M48 32 L 57 38 L 50 44" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              </svg>
+              <HeroPublish />
+            </div>
           </div>
+          <p className="mt-10 text-center text-sm text-muted-foreground">
+            Prefer a bigger editor or to upload a whole folder?{' '}
+            <Link href="/publish" className="font-medium text-primary hover:underline">Open the full publish page</Link>
+          </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
@@ -105,22 +130,17 @@ export default function HomePage() {
             </h2>
             <p className="text-lg text-muted-foreground">From your files to a live website in under a minute.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10 md:gap-8 max-w-5xl mx-auto">
             {steps.map((item, index) => (
-              <div key={index} className="relative">
-                <div className="glass-light rounded-2xl p-8 text-center card-hover h-full">
-                  <div className="text-6xl font-bold text-primary/20 mb-4">{item.step}</div>
-                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-6 glow-sm">
-                    <item.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+              <div key={index} className="relative text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                  <span className="font-display text-5xl text-primary/35">{item.step}</span>
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-foreground">
+                    <item.icon className="h-5 w-5" />
+                  </span>
                 </div>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                    <ArrowRight className="w-8 h-8 text-primary/40" />
-                  </div>
-                )}
+                <h3 className="text-xl font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -140,8 +160,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="glass-light rounded-2xl p-8 card-hover">
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mb-6 glow-sm">
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.tint}`}>
+                  <feature.icon className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
@@ -163,8 +183,8 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {trust.map((item, index) => (
               <div key={index} className="glass-light rounded-2xl p-6 card-hover">
-                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-5 glow-sm">
-                  <item.icon className="w-6 h-6 text-white" />
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ${item.tint}`}>
+                  <item.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>

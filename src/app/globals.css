@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Caveat:wght@500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -103,6 +103,23 @@
   font-family: 'Fraunces', 'Georgia', 'Times New Roman', serif;
   font-weight: 600;
   letter-spacing: -0.015em;
+}
+
+/* Handwritten accent — for human, hand-made annotations */
+.font-hand {
+  font-family: 'Caveat', 'Comic Sans MS', cursive;
+  font-weight: 600;
+}
+
+/* Faint paper grain over the whole page for a tactile, human feel */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
 /* Glassmorphism (light theme) */

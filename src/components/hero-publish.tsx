@@ -54,7 +54,7 @@ export function HeroPublish() {
 
   if (result) {
     return (
-      <div className="relative mt-12 max-w-xl mx-auto">
+      <div className="relative w-full max-w-xl mx-auto">
         <div className="bg-card rounded-2xl border border-border shadow-premium-lg p-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
             <Check className="h-6 w-6" />
@@ -74,7 +74,7 @@ export function HeroPublish() {
   }
 
   return (
-    <div className="relative mt-12 max-w-xl mx-auto text-left">
+    <div className="relative w-full max-w-xl mx-auto text-left">
       <div className="absolute -inset-x-8 -top-6 -bottom-6 bg-gradient-to-tr from-primary/10 via-amber-200/20 to-transparent blur-3xl -z-10" />
       <div className="bg-card rounded-2xl border border-border shadow-premium-lg p-5 sm:p-6">
         <input
