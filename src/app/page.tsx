@@ -10,6 +10,7 @@ import {
   Lock,
   CalendarX,
 } from 'lucide-react'
+import { HeroPublish } from '@/components/hero-publish'
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -84,77 +85,11 @@ export default function HomePage() {
               Add your small website, hit publish, and it goes live at its own address like{' '}
               <span className="font-semibold text-foreground">yoursite.flowstas.com</span> — no servers, no setup. Your contact form even collects messages for you.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/publish" className="btn-primary text-lg px-8 py-4 flex items-center gap-2 group">
-                Publish a site
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="/pricing" className="btn-secondary text-lg px-8 py-4 flex items-center gap-2">
-                View Pricing
-              </Link>
-            </div>
-
-            {/* Browser mockup: a realistic preview of a published site (sample content). */}
-            <div className="relative mt-20 max-w-3xl mx-auto">
-              <div className="absolute -inset-x-10 -top-10 -bottom-10 bg-gradient-to-tr from-primary/15 via-accent/10 to-transparent blur-3xl -z-10" />
-              <div className="absolute -top-3 right-4 sm:right-8 z-20 inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-premium border border-border">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-                </span>
-                Live
-              </div>
-              <div className="bg-card rounded-2xl overflow-hidden shadow-premium-lg text-left border border-border">
-                {/* Browser chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/60">
-                  <span className="w-3 h-3 rounded-full bg-red-400" />
-                  <span className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <span className="w-3 h-3 rounded-full bg-green-400" />
-                  <div className="ml-3 flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md bg-background text-sm text-muted-foreground border border-border">
-                    <Lock className="w-3.5 h-3.5 text-green-600" />
-                    <span className="font-medium text-foreground">yoursite.flowstas.com</span>
-                  </div>
-                </div>
-                {/* Sample published site */}
-                <div className="bg-background">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md gradient-primary" />
-                      <span className="text-sm font-bold text-foreground">Bella&apos;s Bakery</span>
-                    </div>
-                    <div className="hidden sm:flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>Home</span>
-                      <span>Menu</span>
-                      <span>Contact</span>
-                      <span className="px-3 py-1 rounded-full gradient-primary text-white font-medium">Order</span>
-                    </div>
-                  </div>
-                  <div className="px-6 py-8 grid sm:grid-cols-2 gap-6 items-center">
-                    <div>
-                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-secondary text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                        Freshly baked daily
-                      </span>
-                      <p className="text-2xl font-bold text-foreground leading-tight mb-2">
-                        Warm bread, made every morning
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                        Handmade loaves, pastries and cakes — baked fresh and ready to collect.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1.5 rounded-lg gradient-primary text-white text-xs font-semibold">See the menu</span>
-                        <span className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground">Contact us</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="aspect-square rounded-xl bg-gradient-to-br from-amber-200 to-orange-300" />
-                      <div className="aspect-square rounded-xl bg-gradient-to-br from-rose-200 to-pink-300" />
-                      <div className="aspect-square rounded-xl bg-gradient-to-br from-violet-200 to-indigo-300" />
-                      <div className="aspect-square rounded-xl bg-gradient-to-br from-emerald-200 to-teal-300" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <HeroPublish />
+            <p className="mt-6 text-sm text-muted-foreground">
+              Prefer a bigger editor or to upload a folder?{' '}
+              <Link href="/publish" className="font-medium text-primary hover:underline">Open the full publish page</Link>
+            </p>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
