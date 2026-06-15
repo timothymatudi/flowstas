@@ -20,29 +20,32 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 glass">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8">
-        <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary glow-sm">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
-          <span className="font-display text-2xl gradient-text">Flowstas</span>
-        </Link>
+        {/* Left: logo + nav, grouped together */}
+        <div className="flex items-center gap-6 lg:gap-9">
+          <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary glow-sm">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-display text-2xl gradient-text">Flowstas</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
-                pathname === link.href 
-                  ? 'bg-primary/15 text-primary' 
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
+                  pathname === link.href
+                    ? 'bg-primary/15 text-primary'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         <div className="hidden items-center gap-3 md:flex">
           <Button variant="ghost" asChild className="rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary">
