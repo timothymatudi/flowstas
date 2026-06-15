@@ -22,10 +22,10 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 const trust = [
-  { icon: ShieldCheck, tint: 'bg-sky-100 text-sky-600', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
-  { icon: Server, tint: 'bg-amber-100 text-amber-600', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
-  { icon: Lock, tint: 'bg-rose-100 text-rose-600', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
-  { icon: CalendarX, tint: 'bg-violet-100 text-violet-600', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
+  { icon: ShieldCheck, tint: 'bg-[#e7eaef] text-[#4a5a78]', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
+  { icon: Server, tint: 'bg-[#f3e9e0] text-[#a4482a]', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
+  { icon: Lock, tint: 'bg-[#efe8ee] text-[#7a5577]', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
+  { icon: CalendarX, tint: 'bg-[#e8efe8] text-[#4f6f57]', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
 ]
 
 const steps = [
@@ -35,9 +35,9 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-violet-100 text-violet-600', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
-  { icon: Globe, tint: 'bg-emerald-100 text-emerald-600', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
-  { icon: MailCheck, tint: 'bg-amber-100 text-amber-600', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
+  { icon: Rocket, tint: 'bg-[#f3e9e0] text-[#a4482a]', title: 'Publish in one click', description: 'Your website goes live instantly — no servers, no setup, no code.' },
+  { icon: Globe, tint: 'bg-[#e8efe8] text-[#4f6f57]', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com — share it with anyone.' },
+  { icon: MailCheck, tint: 'bg-[#e7eaef] text-[#4a5a78]', title: 'Capture messages', description: "Your site's contact form saves every message to your dashboard inbox." },
 ]
 
 const faqs = [
