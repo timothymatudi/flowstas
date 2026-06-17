@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { DNS_CNAME_TARGET, DNS_A_RECORD } from '@/lib/domain-dns'
 
 // Inline "Edit" panel for a published site: rename + change subdomain, or
 // replace the site's content (paste HTML, or upload a folder / .zip).
@@ -214,8 +215,8 @@ export function ManageSite({
           <p className="mt-2 text-xs text-gray-500">
             At your domain registrar, add a <span className="font-medium text-gray-700">CNAME</span> record
             pointing <span className="font-medium text-gray-700">{domain.trim()}</span> to{' '}
-            <span className="font-mono text-gray-700">cname.vercel-dns.com</span> (for an apex domain, use an
-            A record to <span className="font-mono text-gray-700">76.76.21.21</span>). HTTPS turns on
+            <span className="font-mono text-gray-700">{DNS_CNAME_TARGET}</span> (for an apex domain, use an
+            A record to <span className="font-mono text-gray-700">{DNS_A_RECORD}</span>). HTTPS turns on
             automatically once it resolves.
           </p>
         )}

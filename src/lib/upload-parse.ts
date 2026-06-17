@@ -1,5 +1,7 @@
 import { unzipSync } from 'fflate'
 import type { SiteFile } from '@/lib/site-store'
+import { importFromUrl } from '@/lib/import-url'
+import { importFromGithub } from '@/lib/import-github'
 
 // Max accepted upload size (bytes) — keeps a single publish reasonable.
 const MAX_TOTAL = 25 * 1024 * 1024
@@ -10,6 +12,8 @@ export type ParsedUpload =
 
 // Turn a publish/update request into a set of site files. Accepts either:
 //  - JSON  { name, html }                  → single pasted HTML page
+//  - JSON  { name?, importUrl }             → snapshot a live page by its URL
+//  - JSON  { name?, repoUrl }               → a public GitHub repo (static site)
 //  - multipart with a `zip` file            → unzipped into a site
 //  - multipart with one+ `files`            → a folder upload (webkitRelativePath)
 export async function parseUpload(req: Request): Promise<ParsedUpload> {
@@ -17,6 +21,19 @@ export async function parseUpload(req: Request): Promise<ParsedUpload> {
 
   if (contentType.includes('application/json')) {
     const body = await req.json().catch(() => null)
+    if (body && typeof body.importUrl === 'string' && body.importUrl.trim()) {
+      const imported = await importFromUrl(body.importUrl)
+      if (!imported.ok) return imported
+      // Let the user's chosen name win; fall back to the site's hostname.
+      const name = String(body.name ?? '').trim() || imported.name
+      return { ok: true, name, files: imported.files }
+    }
+    if (body && typeof body.repoUrl === 'string' && body.repoUrl.trim()) {
+      const imported = await importFromGithub(body.repoUrl)
+      if (!imported.ok) return imported
+      const name = String(body.name ?? '').trim() || imported.name
+      return { ok: true, name, files: imported.files }
+    }
     if (!body || typeof body.html !== 'string' || !body.html.trim()) {
       return { ok: false, status: 400, error: 'Add some HTML for your site first.' }
     }
