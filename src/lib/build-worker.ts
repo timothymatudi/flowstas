@@ -56,3 +56,46 @@ export async function startDeploy(opts: {
     }),
   })
 }
+
+// Generic JSON call to a non-streaming worker endpoint (/secrets, /lifecycle,
+// /domain). Returns the parsed JSON; throws with the worker's message on failure.
+// Feature routes (secrets, domain, lifecycle) use these so they never need to
+// re-implement worker auth/transport.
+export async function workerPost<T = Record<string, unknown>>(
+  path: '/secrets' | '/lifecycle' | '/domain',
+  body: Record<string, unknown>
+): Promise<T> {
+  const base = process.env.FLOWSTAS_WORKER_URL
+  const token = process.env.WORKER_TOKEN
+  if (!base || !token) throw new Error('Build worker is not configured.')
+  const res = await fetch(`${base.replace(/\/$/, '')}${path}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
+  if (!res.ok || data.ok === false) {
+    throw new Error((data.error as string) || `Worker error (${res.status}).`)
+  }
+  return data as T
+}
+
+// Set real env vars/secrets on an app (used by the secrets manager).
+export function setAppSecrets(flyApp: string, secrets: Record<string, string>) {
+  return workerPost<{ ok: true; count: number }>('/secrets', { name: flyApp, secrets })
+}
+
+// stop | start | restart an app (used by lifecycle controls).
+export function appLifecycle(flyApp: string, action: 'stop' | 'start' | 'restart') {
+  return workerPost<{ ok: true; action: string }>('/lifecycle', { name: flyApp, action })
+}
+
+// add | remove a custom domain on an app (used by the domain panel). On add the
+// worker returns the CNAME target to point the domain at.
+export function appDomain(flyApp: string, action: 'add' | 'remove', domain: string) {
+  return workerPost<{ ok: true; domain: string; cname?: string }>('/domain', {
+    name: flyApp,
+    action,
+    domain,
+  })
+}
