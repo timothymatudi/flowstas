@@ -53,6 +53,19 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body))
 }
 
+// Return an app's public dedicated IPs ({ v4, v6 }) so customers can point
+// branded A/AAAA records at them. Empty strings if none allocated yet.
+function listAppIps(app) {
+  try {
+    const rows = JSON.parse(runFly(['ips', 'list', '--app', app, '--json']))
+    const v4 = rows.find((r) => r.Type === 'v4' || r.type === 'v4')
+    const v6 = rows.find((r) => r.Type === 'v6' || r.type === 'v6')
+    return { v4: (v4?.Address || v4?.address || ''), v6: (v6?.Address || v6?.address || '') }
+  } catch {
+    return { v4: '', v6: '' }
+  }
+}
+
 function readJson(req) {
   return new Promise((resolve, reject) => {
     let body = ''
@@ -146,9 +159,19 @@ const server = createServer(async (req, res) => {
     }
     try {
       if (action === 'add') {
+        // Ensure the app has dedicated IPs so customers point A/AAAA records at
+        // numbers (branded as "Flowstas") — never at a *.fly.dev host. This keeps
+        // the underlying provider hidden from customers.
+        let ips = listAppIps(name)
+        if (!ips.v4) {
+          try { runFly(['ips', 'allocate-v4', '--app', name, '--yes']) } catch {}
+        }
+        if (!ips.v6) {
+          try { runFly(['ips', 'allocate-v6', '--app', name]) } catch {}
+        }
         runFly(['certs', 'add', domain, '--app', name])
-        // Customers point their domain at the app's stable Fly hostname.
-        return sendJson(res, 200, { ok: true, domain, cname: `${name}.fly.dev` })
+        ips = listAppIps(name)
+        return sendJson(res, 200, { ok: true, domain, a: ips.v4, aaaa: ips.v6 })
       }
       if (action === 'remove') {
         runFly(['certs', 'remove', domain, '--app', name, '--yes'])

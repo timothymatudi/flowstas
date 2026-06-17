@@ -91,9 +91,10 @@ export function appLifecycle(flyApp: string, action: 'stop' | 'start' | 'restart
 }
 
 // add | remove a custom domain on an app (used by the domain panel). On add the
-// worker returns the CNAME target to point the domain at.
+// worker returns branded A/AAAA IPs to point the domain at (never a fly.dev host,
+// so the underlying provider stays hidden from customers).
 export function appDomain(flyApp: string, action: 'add' | 'remove', domain: string) {
-  return workerPost<{ ok: true; domain: string; cname?: string }>('/domain', {
+  return workerPost<{ ok: true; domain: string; a?: string; aaaa?: string }>('/domain', {
     name: flyApp,
     action,
     domain,
