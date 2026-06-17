@@ -1,0 +1,135 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { appLimitForPlan } from '@/lib/plan-limits'
+import { createApp, countAppsForOwner, updateAppDeploy, listApps } from '@/lib/app-store'
+import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
+
+export const dynamic = 'force-dynamic'
+// Builds can take a few minutes; allow the longest the platform permits.
+export const maxDuration = 300
+
+const VALID_REPO = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/
+
+// List the signed-in user's apps.
+export async function GET() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Please log in.' }, { status: 401 })
+  return NextResponse.json({ apps: await listApps(user.id) })
+}
+
+// Deploy a new app from a public GitHub repo. Streams build logs back as plain
+// text; the final line is "FLOWSTAS_RESULT {json}" carrying the live URL or error.
+export async function POST(req: Request) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Please log in to deploy an app.', needsAuth: true },
+      { status: 401 }
+    )
+  }
+
+  if (!workerConfigured()) {
+    return NextResponse.json(
+      { error: 'App hosting is not configured yet. Please try again later.' },
+      { status: 503 }
+    )
+  }
+
+  let body: { name?: string; repo?: string; branch?: string }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
+  }
+
+  const repo = (body.repo || '').trim()
+  const name = (body.name || '').trim()
+  const branch = (body.branch || '').trim() || null
+  if (!VALID_REPO.test(repo)) {
+    return NextResponse.json(
+      { error: 'Paste a public GitHub repo link, e.g. https://github.com/you/your-app.' },
+      { status: 400 }
+    )
+  }
+
+  // Each plan caps how many running apps you can have.
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('plan, status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle()
+  const limit = appLimitForPlan(sub?.plan)
+  if ((await countAppsForOwner(user.id)) >= limit) {
+    return NextResponse.json(
+      {
+        error: `You've reached your plan's limit of ${limit} app${limit === 1 ? '' : 's'}. Upgrade to deploy more.`,
+        needsUpgrade: true,
+      },
+      { status: 403 }
+    )
+  }
+
+  // Record the app (status "building"), then kick off the worker.
+  const app = await createApp(name || repo.split('/').pop() || 'app', repo, branch, user.id)
+
+  let workerRes: Response
+  try {
+    workerRes = await startDeploy({ repo, name: app.flyApp, branch })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Could not start the build.'
+    await updateAppDeploy(app.id, { ok: false, error: message }, message)
+    return NextResponse.json({ error: message }, { status: 502 })
+  }
+  if (!workerRes.ok || !workerRes.body) {
+    const text = await workerRes.text().catch(() => '')
+    const message = `Build worker error (${workerRes.status}). ${text}`.trim()
+    await updateAppDeploy(app.id, { ok: false, error: message }, message)
+    return NextResponse.json({ error: message }, { status: 502 })
+  }
+
+  // Stream the worker's log output to the browser while capturing the full text,
+  // so we can record the outcome (url/error) when the build finishes.
+  const encoder = new TextEncoder()
+  const decoder = new TextDecoder()
+  let captured = ''
+  const reader = workerRes.body.getReader()
+
+  const stream = new ReadableStream({
+    start(controller) {
+      // First line carries the app id so the browser can link to it.
+      controller.enqueue(encoder.encode(`FLOWSTAS_APP ${app.id}\n`))
+    },
+    async pull(controller) {
+      const { done, value } = await reader.read()
+      if (done) {
+        const result = parseResult(captured) ?? {
+          ok: false as const,
+          error: 'Build ended without a result.',
+        }
+        await updateAppDeploy(app.id, result, captured)
+        controller.close()
+        return
+      }
+      captured += decoder.decode(value, { stream: true })
+      controller.enqueue(value)
+    },
+    cancel() {
+      reader.cancel().catch(() => {})
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Accel-Buffering': 'no',
+    },
+  })
+}

@@ -23,7 +23,9 @@ import {
   Menu,
   X,
   Rocket,
-  Globe
+  Globe,
+  Server,
+  Boxes
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -37,6 +39,8 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/publish', label: 'Publish a Site', icon: Rocket },
   { href: '/sites', label: 'My Sites', icon: Globe },
+  { href: '/deploy', label: 'Deploy an App', icon: Server },
+  { href: '/apps', label: 'My Apps', icon: Boxes },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]

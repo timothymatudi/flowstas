@@ -1,0 +1,20 @@
+# Flowstas build worker — the always-on helper that builds + deploys customer
+# apps. Stays warm (min 1 machine) so deploys start instantly; it's tiny.
+app = "flowstas-build-worker"
+primary_region = "lhr"
+
+[build]
+  # Dockerfile + build context are passed on the CLI at deploy time, because the
+  # context must be the repo's scripts/ dir (to reach ../deploy-app.mjs), not the
+  # folder this fly.toml lives in.
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
