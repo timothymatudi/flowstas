@@ -36,10 +36,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, redeployed: 0 })
   }
 
+  // The branch that was pushed, e.g. "refs/heads/main" -> "main".
+  const pushedBranch =
+    typeof payload.ref === 'string' && payload.ref.startsWith('refs/heads/')
+      ? payload.ref.slice('refs/heads/'.length)
+      : null
+  const defaultBranch: string | undefined = payload.repository?.default_branch
+
   const apps = await listAppsByRepo(url)
   let redeployed = 0
 
   for (const app of apps) {
+    // Only redeploy when the push is to the branch this app tracks (apps with no
+    // explicit branch follow the repo's default), so a feature-branch push
+    // doesn't trigger a production rebuild.
+    const tracked = app.branch ?? defaultBranch
+    if (pushedBranch && tracked && pushedBranch !== tracked) continue
+
     try {
       const res = await startDeploy({ repo: app.repo, name: app.flyApp, branch: app.branch })
       if (!res.ok || !res.body) {
