@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
-import { getApp } from '@/lib/app-store'
+import { getApp, getLatestDeployLog } from '@/lib/app-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,6 +36,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (history.length === 0 || history[history.length - 1].role !== 'user')
     return NextResponse.json({ error: 'Ask the assistant a question.' }, { status: 400 })
 
+  // Tail the most recent deploy log — it can be up to 100K chars, so keep the
+  // last ~8K (where build failures surface) to stay within a sane prompt size.
+  const fullLog = await getLatestDeployLog(app.id)
+  const logTail = fullLog ? fullLog.slice(-8000) : null
+
   const context = [
     `App name: ${app.name}`,
     `Repository: ${app.repo}`,
@@ -44,6 +49,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     app.url ? `Live URL: ${app.url}` : null,
     app.customDomain ? `Custom domain: ${app.customDomain}` : null,
     app.lastError ? `Most recent deploy error:\n${app.lastError}` : 'No deploy error on record.',
+    logTail ? `Tail of the most recent build/deploy log:\n${logTail}` : null,
   ]
     .filter(Boolean)
     .join('\n')

@@ -131,6 +131,20 @@ export async function getApp(id: string, ownerId: string): Promise<AppMeta | nul
   return rowToMeta(data)
 }
 
+// The captured build/deploy logs from the app's most recent deploy. Used to
+// give the AI assistant the raw output it needs to explain a failure.
+export async function getLatestDeployLog(appId: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('app_deploys')
+    .select('logs')
+    .eq('app_id', appId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (data?.logs as string) ?? null
+}
+
 export async function listApps(ownerId: string): Promise<AppMeta[]> {
   const supabase = createAdminClient()
   const { data } = await supabase
