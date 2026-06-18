@@ -5,6 +5,7 @@ import type { AppMeta } from '@/lib/app-store'
 import { AppLifecycle } from '@/components/app-lifecycle'
 import { AppSecrets } from '@/components/app-secrets'
 import { AppDomain } from '@/components/app-domain'
+import { AppAutoDeploy } from '@/components/app-autodeploy'
 
 // Inline management panel for a deployed app. This file owns the layout only;
 // each feature lives in its own component (lifecycle, secrets, domain) so they
@@ -27,6 +28,7 @@ export function ManageApp({ app }: { app: AppMeta }) {
           <AppLifecycle app={app} />
           <AppSecrets app={app} />
           <AppDomain app={app} />
+          <AppAutoDeploy app={app} />
         </div>
       )}
     </div>

@@ -141,6 +141,19 @@ export async function listApps(ownerId: string): Promise<AppMeta[]> {
   return (data ?? []).map(rowToMeta)
 }
 
+// Find apps deployed from a given repo (any owner). Used by the GitHub webhook
+// to know which app(s) to redeploy when code is pushed. Repo match is
+// case-insensitive and ignores a trailing ".git" or slash.
+export async function listAppsByRepo(repo: string): Promise<AppMeta[]> {
+  const clean = repo.trim().toLowerCase().replace(/\.git$/, '').replace(/\/$/, '')
+  if (!clean) return []
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('apps').select('*')
+  return (data ?? [])
+    .map(rowToMeta)
+    .filter((a) => a.repo.toLowerCase().replace(/\.git$/, '').replace(/\/$/, '') === clean)
+}
+
 export async function countAppsForOwner(ownerId: string): Promise<number> {
   const supabase = createAdminClient()
   const { count } = await supabase
