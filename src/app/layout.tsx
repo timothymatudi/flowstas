@@ -3,7 +3,19 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/sonner'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
+import { IntroOverlay } from '@/components/intro-overlay'
 import './globals.css'
+
+// Runs synchronously before the app paints: on the homepage, if the visitor
+// hasn't seen the intro (or forced it with ?intro=1), mark <html> so the static
+// cover paints immediately — no flash of the app before the intro launches.
+const introBootstrap = `(function(){try{
+  if(location.pathname!=='/')return;
+  var force=location.search.indexOf('intro=1')>-1;
+  var seen=false;try{seen=localStorage.getItem('flowstas-intro-seen')==='1'}catch(e){}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(force||(!seen&&!reduce))document.documentElement.classList.add('intro-active');
+}catch(e){}})();`
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://flowstas.com'),
@@ -65,8 +77,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the bootstrap script mutates <html>'s class
+    // before hydration, which is an intentional, expected SSR/client mismatch.
+    <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col font-sans antialiased">
+        {/* Runs before the rest of the body paints (see introBootstrap), then an
+            instant dark cover so the app never flashes in front of the intro. */}
+        <script dangerouslySetInnerHTML={{ __html: introBootstrap }} />
+        <div id="intro-precover" aria-hidden="true" />
+        <IntroOverlay />
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />
