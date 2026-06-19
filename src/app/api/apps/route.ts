@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     )
   }
 
-  let body: { name?: string; repo?: string; branch?: string }
+  let body: { name?: string; repo?: string; branch?: string; githubToken?: string }
   try {
     body = await req.json()
   } catch {
@@ -51,9 +51,18 @@ export async function POST(req: Request) {
   const repo = (body.repo || '').trim()
   const name = (body.name || '').trim()
   const branch = (body.branch || '').trim() || null
+  // For private repos the user supplies a GitHub token. We pass it straight to
+  // the worker for the clone and never store it.
+  const githubToken = (body.githubToken || '').trim() || null
   if (!VALID_REPO.test(repo)) {
     return NextResponse.json(
-      { error: 'Paste a public GitHub repo link, e.g. https://github.com/you/your-app.' },
+      { error: 'Paste a GitHub repo link, e.g. https://github.com/you/your-app.' },
+      { status: 400 }
+    )
+  }
+  if (githubToken && !/^[A-Za-z0-9_]{20,300}$/.test(githubToken)) {
+    return NextResponse.json(
+      { error: 'That doesn’t look like a valid GitHub access token.' },
       { status: 400 }
     )
   }
@@ -81,7 +90,7 @@ export async function POST(req: Request) {
 
   let workerRes: Response
   try {
-    workerRes = await startDeploy({ repo, name: app.flyApp, branch })
+    workerRes = await startDeploy({ repo, name: app.flyApp, branch, githubToken })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Could not start the build.'
     await updateAppDeploy(app.id, { ok: false, error: message }, message)

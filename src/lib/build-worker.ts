@@ -37,6 +37,9 @@ export async function startDeploy(opts: {
   repo: string
   name: string
   branch?: string | null
+  // GitHub access token for a private repo. Used by the worker for the clone
+  // only; never persisted by Flowstas.
+  githubToken?: string | null
 }): Promise<Response> {
   const base = process.env.FLOWSTAS_WORKER_URL
   const token = process.env.WORKER_TOKEN
@@ -53,6 +56,7 @@ export async function startDeploy(opts: {
       repo: opts.repo,
       name: opts.name,
       ...(opts.branch ? { branch: opts.branch } : {}),
+      ...(opts.githubToken ? { token: opts.githubToken } : {}),
     }),
   })
 }

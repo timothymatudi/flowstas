@@ -45,10 +45,27 @@ if (!repo || !name) {
 }
 
 // 1. Clone --------------------------------------------------------------------
+// Private repos pass a GitHub token via the GH_TOKEN env var (set by the worker).
+// We feed it to git through a credential helper that reads it from the
+// environment, so the token never appears in the command, the streamed build
+// logs, or the process list.
+const token = process.env.GH_TOKEN || ''
 const work = mkdtempSync(join(tmpdir(), 'flowstas-deploy-'))
 const src = join(work, 'src')
-console.log(`\n▶ Cloning ${repo} → ${src}`)
-run(`git clone --depth 1 ${branch ? `--branch ${branch} ` : ''}${repo} ${src}`)
+const branchArg = branch ? `--branch ${branch} ` : ''
+console.log(`\n▶ Cloning ${repo}${branch ? ` (branch ${branch})` : ''}${token ? ' (private)' : ''} → ${src}`)
+if (token) {
+  // Run directly (not via run(), which echoes the command) so the helper config
+  // isn't printed. The token stays in $GH_TOKEN; git expands it only inside the
+  // helper subprocess.
+  const helper = `!f() { echo username=x-access-token; echo password=$GH_TOKEN; }; f`
+  execSync(`git -c credential.helper='${helper}' clone --depth 1 ${branchArg}${repo} ${src}`, {
+    stdio: 'inherit',
+    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+  })
+} else {
+  run(`git clone --depth 1 ${branchArg}${repo} ${src}`)
+}
 
 // Some repos nest the app in a subfolder; pick the dir that has package.json.
 function findAppRoot(dir) {

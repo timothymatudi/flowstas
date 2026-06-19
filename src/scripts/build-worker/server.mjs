@@ -188,12 +188,17 @@ const server = createServer(async (req, res) => {
     return sendJson(res, 404, { error: 'not found' })
   }
 
-  const { repo, branch } = payload
+  const { repo, branch, token } = payload
   if (!VALID_REPO.test(repo || '')) {
-    return sendJson(res, 400, { error: 'repo must be a public https://github.com/owner/name URL' })
+    return sendJson(res, 400, { error: 'repo must be a https://github.com/owner/name URL' })
   }
   if (branch && !/^[\w./-]{1,100}$/.test(branch)) {
     return sendJson(res, 400, { error: 'invalid branch name' })
+  }
+  // Optional GitHub token for private repos (classic ghp_… or fine-grained
+  // github_pat_…). Passed to the engine via env so it never lands in argv/logs.
+  if (token != null && !/^[A-Za-z0-9_]{20,300}$/.test(token)) {
+    return sendJson(res, 400, { error: 'invalid token' })
   }
 
   // Stream the build as it happens so the website can show live logs.
@@ -203,7 +208,7 @@ const server = createServer(async (req, res) => {
   if (branch) args.push('--branch', branch)
 
   const child = spawn(process.execPath, args, {
-    env: { ...process.env, FORCE_COLOR: '0' },
+    env: { ...process.env, FORCE_COLOR: '0', ...(token ? { GH_TOKEN: token } : {}) },
   })
 
   child.stdout.on('data', (d) => res.write(d))

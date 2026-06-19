@@ -15,6 +15,7 @@ export default function DeployPage() {
   const [name, setName] = useState('')
   const [repo, setRepo] = useState('')
   const [branch, setBranch] = useState('')
+  const [githubToken, setGithubToken] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
   const [logs, setLogs] = useState('')
   const [liveUrl, setLiveUrl] = useState<string | null>(null)
@@ -26,7 +27,7 @@ export default function DeployPage() {
   async function handleDeploy(e: React.FormEvent) {
     e.preventDefault()
     if (!repo.trim()) {
-      setError('Paste the link to your app’s public GitHub repo first.')
+      setError('Paste the link to your app’s GitHub repo first.')
       return
     }
     setPhase('building')
@@ -40,7 +41,7 @@ export default function DeployPage() {
       const res = await fetch('/api/apps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, repo, branch }),
+        body: JSON.stringify({ name, repo, branch, githubToken }),
       })
 
       // Non-streaming error (auth, plan limit, bad repo) comes back as JSON.
@@ -122,7 +123,7 @@ export default function DeployPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Public GitHub repo</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">GitHub repo</label>
             <input
               value={repo}
               onChange={(e) => setRepo(e.target.value)}
@@ -143,6 +144,25 @@ export default function DeployPage() {
               disabled={phase === 'building'}
               className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900 disabled:bg-gray-50"
             />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Access token <span className="text-gray-400">(only for private repos)</span>
+            </label>
+            <input
+              value={githubToken}
+              onChange={(e) => setGithubToken(e.target.value)}
+              type="password"
+              placeholder="ghp_… or github_pat_…"
+              autoComplete="off"
+              spellCheck={false}
+              disabled={phase === 'building'}
+              className="w-full rounded-lg border border-gray-200 px-4 py-3 font-mono text-sm outline-none focus:border-gray-900 disabled:bg-gray-50"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              For a private repo, paste a GitHub token with read access. It’s used to fetch your
+              code once and is never stored.
+            </p>
           </div>
 
           {error && (
