@@ -388,3 +388,18 @@
 .intro-closing #intro-precover {
   opacity: 0;
 }
+
+/* Intro scene motion (see components/intro-variants). */
+@keyframes intro-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.intro-pop {
+  animation: intro-pop 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}

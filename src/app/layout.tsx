@@ -11,7 +11,7 @@ import './globals.css'
 // cover paints immediately — no flash of the app before the intro launches.
 const introBootstrap = `(function(){try{
   if(location.pathname!=='/')return;
-  var force=location.search.indexOf('intro=1')>-1;
+  var force=/[?&]intro=/.test(location.search);
   var seen=false;try{seen=localStorage.getItem('flowstas-intro-seen')==='1'}catch(e){}
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(force||(!seen&&!reduce))document.documentElement.classList.add('intro-active');
