@@ -30,6 +30,26 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
     }
   }
 
+  async function redeploy() {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/apps/${app.id}/redeploy`, { method: 'POST' })
+      const data = await res.json()
+      // A failed build returns 200 with an { error } message; surface it but
+      // still refresh so the dashboard shows the new "error" status and logs.
+      if (!res.ok || data.error) {
+        router.refresh()
+        throw new Error(data.error || 'Could not rebuild the app.')
+      }
+      router.refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not rebuild the app.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function remove() {
     if (!confirm('Delete this app? This stops it and removes it for good.')) return
     setBusy(true)
@@ -93,7 +113,7 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
             Start
           </button>
         )}
-        {app.status !== 'stopped' && (
+        {app.status !== 'stopped' && app.status !== 'building' && (
           <button
             onClick={() => lifecycle('restart')}
             disabled={busy}
@@ -101,6 +121,21 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           >
             Restart
           </button>
+        )}
+        {app.status !== 'building' && (
+          <button
+            onClick={redeploy}
+            disabled={busy}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            title="Rebuild from the latest code on your tracked branch"
+          >
+            {busy ? 'Working…' : app.status === 'error' ? 'Retry deploy' : 'Redeploy'}
+          </button>
+        )}
+        {app.status === 'building' && (
+          <span className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" /> Building…
+          </span>
         )}
         <button
           onClick={remove}
@@ -110,6 +145,20 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           Delete app
         </button>
       </div>
+
+      {app.status !== 'building' && (
+        <p className="mt-2 text-xs text-gray-400">
+          Redeploy rebuilds from the latest code on your{' '}
+          {app.branch ? (
+            <>
+              <span className="font-medium text-gray-600">{app.branch}</span> branch
+            </>
+          ) : (
+            'default branch'
+          )}
+          . This can take a few minutes.
+        </p>
+      )}
 
       {error && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
