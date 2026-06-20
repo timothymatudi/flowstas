@@ -124,6 +124,7 @@ COPY . .
 ${envLines}
 RUN npm run build
 ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
 CMD ["npm", "run", "start"]
 `
@@ -153,9 +154,20 @@ primary_region = "lhr"
 // 4. Ensure app exists, then deploy -------------------------------------------
 console.log(`\n▶ Ensuring Fly app "${name}" exists`)
 try {
-  run(`flyctl apps create ${name} --org personal`)
-} catch {
-  console.log('  (app already exists — continuing)')
+  // Capture stderr so we can tell "name already taken" (the expected re-deploy
+  // case) apart from a real failure (bad token, quota, name owned by another
+  // org). Swallowing every error here hid real failures behind a confusing
+  // deploy crash further down.
+  run(`flyctl apps create ${name} --org personal`, { stdio: ['ignore', 'inherit', 'pipe'] })
+} catch (err) {
+  const stderr = (err.stderr || '').toString()
+  if (/already.*taken|already exists|name has already been taken/i.test(stderr)) {
+    console.log('  (app already exists — continuing)')
+  } else {
+    console.error(stderr || err.message)
+    console.error(`✗ Could not create or access Fly app "${name}".`)
+    process.exit(1)
+  }
 }
 
 console.log(`\n▶ Deploying to Fly (remote build)`)
