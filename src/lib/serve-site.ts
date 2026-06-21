@@ -8,7 +8,13 @@ import {
 } from '@/lib/site-store'
 
 // A simple, clean password gate shown for protected sites.
-function passwordGateHtml(id: string, failed: boolean): string {
+function passwordGateHtml(id: string, status: 'bad' | 'rate' | null): string {
+  const error =
+    status === 'rate'
+      ? 'Too many attempts — please wait a moment and try again.'
+      : status === 'bad'
+        ? 'Incorrect password — try again.'
+        : ''
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Protected site</title>
 <style>body{margin:0;font-family:system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;align-items:center;justify-content:center}
 .c{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:32px;max-width:360px;width:90%;box-shadow:0 12px 40px -16px rgba(0,0,0,.2);text-align:center}
@@ -18,7 +24,7 @@ button{width:100%;padding:12px;border:0;border-radius:10px;background:#1c1917;co
 .e{color:#dc2626;font-size:13px;margin-bottom:12px}</style></head>
 <body><form class="c" method="POST" action="/api/sites/${id}/unlock">
 <h1>🔒 This site is private</h1><p>Enter the password to continue.</p>
-${failed ? '<div class="e">Incorrect password — try again.</div>' : ''}
+${error ? `<div class="e">${error}</div>` : ''}
 <input type="password" name="password" placeholder="Password" autofocus required>
 <button type="submit">Enter site</button></form></body></html>`
 }
@@ -33,8 +39,9 @@ export async function serveSite(id: string, reqPath: string, req: Request): Prom
     const want = `${unlockCookieName(id)}=${unlockToken(pwHash)}`
     const cookies = (req.headers.get('cookie') || '').split(';').map((c) => c.trim())
     if (!cookies.includes(want)) {
-      const failed = new URL(req.url).searchParams.get('pw') === 'bad'
-      return new Response(passwordGateHtml(id, failed), {
+      const pw = new URL(req.url).searchParams.get('pw')
+      const status = pw === 'bad' || pw === 'rate' ? pw : null
+      return new Response(passwordGateHtml(id, status), {
         status: 401,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       })

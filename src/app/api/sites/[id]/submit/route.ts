@@ -1,9 +1,16 @@
 import { addSubmission, getSiteOwnerEmail } from '@/lib/site-store'
 import { sendEmail } from '@/lib/email'
+import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 
 // Capture a contact-form submission from a published site, then notify the owner.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+
+  // Throttle submissions per IP+site so a site's contact form can't be used to
+  // flood the owner's inbox: 5 messages per minute.
+  const rl = rateLimit(`submit:${id}:${clientIp(req)}`, 5, 60_000)
+  if (!rl.ok) return tooManyRequests(rl.retryAfter)
+
   const form = await req.formData()
   const submission = await addSubmission(id, {
     name: String(form.get('name') ?? ''),
