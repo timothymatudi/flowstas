@@ -1,4 +1,5 @@
 import { getSitePasswordHash, checkSitePassword, unlockCookieName, unlockToken } from '@/lib/site-store'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -6,6 +7,17 @@ export const dynamic = 'force-dynamic'
 // cookie, then send the visitor back to the page they came from.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+
+  // Throttle password guesses per IP+site so a protected site can't be
+  // brute-forced: 10 attempts per minute.
+  const rl = rateLimit(`unlock:${id}:${clientIp(req)}`, 10, 60_000)
+  if (!rl.ok) {
+    const back = new URL(req.headers.get('referer') ?? req.url)
+    back.search = ''
+    back.searchParams.set('pw', 'rate')
+    return Response.redirect(back.toString(), 303)
+  }
+
   const form = await req.formData()
   const password = String(form.get('password') ?? '')
   const hash = await getSitePasswordHash(id)
