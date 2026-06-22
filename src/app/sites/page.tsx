@@ -14,7 +14,7 @@ function Sparkline({ stats }: { stats: ViewStats }) {
       {stats.days.map((d) => (
         <span
           key={d.day}
-          className="w-1.5 rounded-sm bg-blue-500/70"
+          className="w-1.5 rounded-sm bg-primary/70"
           style={{ height: `${Math.max(10, (d.views / max) * 100)}%` }}
         />
       ))}
@@ -39,28 +39,25 @@ export default async function SitesPage() {
   )
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
+    <main className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Sites</h1>
-            <p className="mt-1 text-gray-500">
+            <h1 className="text-3xl font-bold text-foreground">My Sites</h1>
+            <p className="mt-1 text-muted-foreground">
               {sites.length} site{sites.length === 1 ? '' : 's'} published
             </p>
           </div>
-          <Link
-            href="/publish"
-            className="rounded-xl bg-gray-900 px-5 py-3 font-semibold text-white hover:bg-gray-700"
-          >
+          <Link href="/publish" className="btn-primary">
             + Publish a site
           </Link>
         </div>
 
         {data.length === 0 ? (
-          <div className="mt-10 rounded-2xl bg-white p-10 text-center shadow-sm">
-            <p className="text-gray-500">
+          <div className="mt-10 glass-light rounded-2xl p-10 text-center">
+            <p className="text-muted-foreground">
               No sites yet.{' '}
-              <Link href="/publish" className="font-medium text-blue-600 hover:underline">
+              <Link href="/publish" className="font-medium text-primary hover:underline">
                 Publish your first one →
               </Link>
             </p>
@@ -68,11 +65,11 @@ export default async function SitesPage() {
         ) : (
           <div className="mt-8 space-y-5">
             {data.map(({ site, subs, stats }) => (
-              <div key={site.id} className="rounded-2xl bg-white p-6 shadow-sm">
+              <div key={site.id} className="glass-light rounded-2xl p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-semibold text-gray-900">{site.name}</h2>
+                      <h2 className="text-lg font-semibold text-foreground">{site.name}</h2>
                       {site.hasPassword && (
                         <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                           🔒 Protected
@@ -83,20 +80,20 @@ export default async function SitesPage() {
                       href={`https://${site.customDomain || `${site.subdomain}.flowstas.com`}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm font-medium text-blue-600 hover:underline"
+                      className="text-sm font-medium text-primary hover:underline"
                     >
                       {site.customDomain || `${site.subdomain}.flowstas.com`} ↗
                     </a>
                     {site.customDomain && (
-                      <p className="text-xs text-gray-400">also at {site.subdomain}.flowstas.com</p>
+                      <p className="text-xs text-muted-foreground">also at {site.subdomain}.flowstas.com</p>
                     )}
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Sparkline stats={stats} />
-                      <span><span className="font-semibold text-gray-900">{stats.total}</span> views</span>
+                      <span><span className="font-semibold text-foreground">{stats.total}</span> views</span>
                     </span>
-                    <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+                    <span className="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-foreground">
                       {subs.length} message{subs.length === 1 ? '' : 's'}
                     </span>
                     <DeleteSiteButton id={site.id} name={site.name} />
@@ -112,14 +109,14 @@ export default async function SitesPage() {
                 />
 
                 {subs.length > 0 && (
-                  <div className="mt-4 divide-y divide-gray-100 border-t border-gray-100">
+                  <div className="mt-4 divide-y divide-border border-t border-border">
                     {subs.map((s) => (
                       <div key={s.id} className="py-3">
-                        <p className="text-sm font-medium text-gray-900">
-                          {s.name} <span className="font-normal text-gray-400">· {s.email}</span>
+                        <p className="text-sm font-medium text-foreground">
+                          {s.name} <span className="font-normal text-muted-foreground">· {s.email}</span>
                         </p>
-                        <p className="text-sm text-gray-600">{s.message}</p>
-                        <p className="mt-0.5 text-xs text-gray-400">
+                        <p className="text-sm text-muted-foreground">{s.message}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
                           {new Date(s.createdAt).toLocaleString()}
                         </p>
                       </div>

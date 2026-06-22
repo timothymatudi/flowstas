@@ -73,22 +73,22 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
         ? 'text-red-600'
         : app.status === 'building'
           ? 'text-amber-600'
-          : 'text-gray-500'
+          : 'text-muted-foreground'
 
   return (
     <section>
-      <h3 className="text-sm font-semibold text-gray-900">Status &amp; controls</h3>
+      <h3 className="text-sm font-semibold text-foreground">Status &amp; controls</h3>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span>
           Status <span className={`font-medium ${statusColor}`}>{app.status}</span>
         </span>
         <span>
-          Branch <span className="font-medium text-gray-700">{app.branch || 'default'}</span>
+          Branch <span className="font-medium text-foreground">{app.branch || 'default'}</span>
         </span>
         <span>
           Created{' '}
-          <span className="font-medium text-gray-700">
+          <span className="font-medium text-foreground">
             {new Date(app.createdAt).toLocaleDateString()}
           </span>
         </span>
@@ -99,7 +99,7 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           <button
             onClick={() => lifecycle('stop')}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             Stop
           </button>
@@ -108,7 +108,7 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           <button
             onClick={() => lifecycle('start')}
             disabled={busy}
-            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+            className="btn-primary rounded-lg px-3 py-2 text-sm"
           >
             Start
           </button>
@@ -117,7 +117,7 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           <button
             onClick={() => lifecycle('restart')}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             Restart
           </button>
@@ -126,7 +126,7 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           <button
             onClick={redeploy}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
             title="Rebuild from the latest code on your tracked branch"
           >
             {busy ? 'Working…' : app.status === 'error' ? 'Retry deploy' : 'Redeploy'}
@@ -147,11 +147,11 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
       </div>
 
       {app.status !== 'building' && (
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-muted-foreground">
           Redeploy rebuilds from the latest code on your{' '}
           {app.branch ? (
             <>
-              <span className="font-medium text-gray-600">{app.branch}</span> branch
+              <span className="font-medium text-foreground">{app.branch}</span> branch
             </>
           ) : (
             'default branch'

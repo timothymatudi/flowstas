@@ -12,6 +12,9 @@ const supabase = createClient(
 // In Stripe API 2025+ the billing period moved onto subscription items.
 function periodFor(subscription: Stripe.Subscription) {
   const item = subscription.items.data[0]
+  if (!item) {
+    return null
+  }
   return {
     start: new Date(item.current_period_start * 1000).toISOString(),
     end: new Date(item.current_period_end * 1000).toISOString(),
@@ -34,57 +37,64 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object
-    const customerId = session.customer as string
-    const subscriptionId = session.subscription as string
-    const userId = session.metadata?.user_id
+  try {
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      const customerId = session.customer as string
+      const subscriptionId = session.subscription as string
+      const userId = session.metadata?.user_id
 
-    if (!userId || !subscriptionId) {
-      return NextResponse.json({ received: true })
+      if (!userId || !subscriptionId) {
+        return NextResponse.json({ received: true })
+      }
+
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      // Plan comes from the Checkout Session metadata (set in app/actions/stripe.ts).
+      // Matches a PRODUCTS id: 'basic' | 'pro' | 'enterprise'.
+      const plan = session.metadata?.plan || 'basic'
+      const period = periodFor(subscription)
+
+      await supabase.from('subscriptions').upsert(
+        {
+          user_id: userId,
+          plan,
+          status: 'active',
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscriptionId,
+          current_period_start: period?.start ?? null,
+          current_period_end: period?.end ?? null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
     }
 
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-    // Plan comes from the Checkout Session metadata (set in app/actions/stripe.ts).
-    // Matches a PRODUCTS id: 'basic' | 'pro' | 'enterprise'.
-    const plan = session.metadata?.plan || 'basic'
-    const period = periodFor(subscription)
+    if (event.type === 'customer.subscription.deleted') {
+      const sub = event.data.object
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'canceled', updated_at: new Date().toISOString() })
+        .eq('stripe_subscription_id', sub.id)
+    }
 
-    await supabase.from('subscriptions').upsert(
-      {
-        user_id: userId,
-        plan,
-        status: 'active',
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId,
-        current_period_start: period.start,
-        current_period_end: period.end,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' }
-    )
-  }
-
-  if (event.type === 'customer.subscription.deleted') {
-    const sub = event.data.object
-    await supabase
-      .from('subscriptions')
-      .update({ status: 'canceled', updated_at: new Date().toISOString() })
-      .eq('stripe_subscription_id', sub.id)
-  }
-
-  if (event.type === 'customer.subscription.updated') {
-    const sub = event.data.object
-    const period = periodFor(sub)
-    await supabase
-      .from('subscriptions')
-      .update({
-        status: sub.status === 'active' ? 'active' : 'canceled',
-        current_period_start: period.start,
-        current_period_end: period.end,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('stripe_subscription_id', sub.id)
+    if (event.type === 'customer.subscription.updated') {
+      const sub = event.data.object
+      const period = periodFor(sub)
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: sub.status === 'active' ? 'active' : 'canceled',
+          current_period_start: period?.start ?? null,
+          current_period_end: period?.end ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('stripe_subscription_id', sub.id)
+    }
+  } catch (err) {
+    // Don't 500 on a malformed/unexpected event: that makes Stripe mark
+    // delivery failed and retry forever. Log and ack so we move on.
+    console.error('Stripe webhook handler error:', err)
+    return NextResponse.json({ received: true })
   }
 
   return NextResponse.json({ received: true })

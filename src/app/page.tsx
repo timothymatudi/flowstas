@@ -44,8 +44,8 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in about 20 seconds — no servers, no code.' },
-  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Every site goes live at its own subdomain like yoursite.flowstas.com, with HTTPS on by default.' },
+  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
+  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Pick your own subdomain like yourname.flowstas.com and your site goes live there, with HTTPS on by default.' },
   { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Connect your own domain', description: 'Point www.yourbusiness.com at your site and we handle the HTTPS certificate automatically.' },
   { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
   { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
@@ -64,7 +64,7 @@ const faqs = [
   },
   {
     q: 'Where does my site go live?',
-    a: 'Every site gets its own address like yoursite.flowstas.com that you can share straight away — no servers to set up and no DNS to configure to get started.',
+    a: 'You choose your own address like yourname.flowstas.com when you publish, and you can share it straight away — no servers to set up and no DNS to configure to get started.',
   },
   {
     q: 'What happens to my contact-form messages?',
@@ -98,8 +98,8 @@ export default function HomePage() {
                 <span className="gradient-text">get it live instantly.</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                No servers, no setup, no code. Paste your site or drop a zip — it goes live at its
-                own <span className="font-semibold text-foreground">yoursite.flowstas.com</span>,
+                No servers, no setup, no code. Paste your site or drop a zip — it goes live at the
+                <span className="font-semibold text-foreground"> yourname.flowstas.com</span> address you pick,
                 contact form and all.
               </p>
               <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2.5 text-sm text-muted-foreground">

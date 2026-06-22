@@ -15,11 +15,11 @@ export function ManageApp({ app }: { app: AppMeta }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="mt-4 border-t border-gray-100 pt-4">
+    <div className="mt-4 border-t border-border pt-4">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="text-sm font-medium text-gray-600 hover:text-gray-900"
+        className="text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         {open ? 'Hide settings' : 'Manage app'} {open ? '▲' : '▼'}
       </button>

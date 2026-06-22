@@ -6,18 +6,20 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User as AuthUser } from '@supabase/supabase-js'
 import OnboardingChecklist, { type OnboardingStep } from '@/components/onboarding-checklist'
+import { isTrialActive } from '@/lib/plan-limits'
 import {
-  User, 
-  CreditCard, 
-  Settings, 
-  LogOut, 
-  Clock, 
-  Zap, 
+  User,
+  CreditCard,
+  Settings,
+  LogOut,
+  Clock,
+  Zap,
   BarChart3,
   Bell,
   ChevronRight,
   Sparkles,
-  AlertTriangle
+  AlertTriangle,
+  Server
 } from 'lucide-react'
 
 interface Subscription {
@@ -34,9 +36,12 @@ interface DashboardContentProps {
   user: AuthUser
   subscription: Subscription | null
   profile: Profile | null
+  sitesCount: number
+  appsCount: number
+  messagesCount: number
 }
 
-export default function DashboardContent({ user, subscription, profile }: DashboardContentProps) {
+export default function DashboardContent({ user, subscription, profile, sitesCount, appsCount, messagesCount }: DashboardContentProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -48,17 +53,17 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
     router.refresh()
   }
 
-  // Calculate trial status
+  // Calculate trial status (shared logic so it matches plan limits everywhere)
   const trialEndsAt = subscription?.trial_ends_at ? new Date(subscription.trial_ends_at) : null
   const now = new Date()
-  const isTrialActive = trialEndsAt && trialEndsAt > now
-  const trialExpired = trialEndsAt && trialEndsAt <= now
+  const trialActive = isTrialActive(subscription)
+  const trialExpired = subscription?.status === 'trialing' && trialEndsAt !== null && trialEndsAt <= now
   const hoursRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60))) : 0
 
   const quickStats = [
-    { label: 'Published Sites', value: '0', icon: BarChart3, color: 'text-blue-500' },
-    { label: 'New Messages', value: '0', icon: Bell, color: 'text-yellow-500' },
-    { label: 'Team Members', value: '1', icon: User, color: 'text-purple-500' },
+    { label: 'Published Sites', value: String(sitesCount), icon: BarChart3, color: 'text-blue-500' },
+    { label: 'Live Apps', value: String(appsCount), icon: Server, color: 'text-green-500' },
+    { label: 'New Messages', value: String(messagesCount), icon: Bell, color: 'text-yellow-500' },
   ]
 
   const onboardingSteps: OnboardingStep[] = [
@@ -109,7 +114,7 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
         <OnboardingChecklist steps={onboardingSteps} />
 
         {/* Trial Status Banner */}
-        {isTrialActive && (
+        {trialActive && (
           <div className="glass-light rounded-2xl p-6 mb-8 border border-primary/20">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-start gap-4">
@@ -217,13 +222,21 @@ export default function DashboardContent({ user, subscription, profile }: Dashbo
                 <Zap className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-1 capitalize">
-                {subscription?.plan || 'Trial'} Plan
+                {subscription?.status === 'active' && subscription?.plan
+                  ? subscription.plan
+                  : trialActive
+                    ? 'Trial'
+                    : 'Free'} Plan
               </h3>
               <p className="text-sm text-muted-foreground mb-6 capitalize">
-                Status: {subscription?.status || 'Active'}
+                Status: {subscription?.status === 'active'
+                  ? 'Active'
+                  : trialActive
+                    ? 'Trialing'
+                    : 'No active plan'}
               </p>
               <Link href="/pricing" className="btn-primary w-full flex items-center justify-center gap-2">
-                {subscription?.plan === 'trial' ? 'Upgrade Plan' : 'Manage Subscription'}
+                {subscription?.status === 'active' ? 'Manage Subscription' : 'Upgrade Plan'}
               </Link>
             </div>
           </div>

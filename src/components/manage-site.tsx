@@ -103,7 +103,7 @@ export function ManageSite({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:underline"
+        className="text-sm font-medium text-muted-foreground hover:text-foreground hover:underline"
       >
         Edit
       </button>
@@ -111,25 +111,25 @@ export function ManageSite({
   }
 
   return (
-    <div className="mt-4 space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+    <div className="mt-4 space-y-4 rounded-xl border border-border bg-secondary/50 p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-gray-700">Site name</span>
+          <span className="mb-1 block font-medium text-foreground">Site name</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 outline-none focus:border-gray-900"
+            className="input-modern px-3 py-2"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-gray-700">Subdomain</span>
+          <span className="mb-1 block font-medium text-foreground">Subdomain</span>
           <div className="flex items-center">
             <input
               value={subdomain}
               onChange={(e) => setSubdomain(e.target.value)}
-              className="w-full rounded-l-lg border border-gray-200 px-3 py-2 outline-none focus:border-gray-900"
+              className="input-modern rounded-r-none px-3 py-2"
             />
-            <span className="rounded-r-lg border border-l-0 border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-500">
+            <span className="rounded-r-[var(--radius)] border border-l-0 border-border bg-secondary px-3 py-2 text-sm text-muted-foreground">
               .flowstas.com
             </span>
           </div>
@@ -138,39 +138,39 @@ export function ManageSite({
       <button
         onClick={saveDetails}
         disabled={busy}
-        className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
       >
         {busy ? 'Saving…' : 'Save details'}
       </button>
 
-      <div className="border-t border-gray-200 pt-4">
-        <p className="mb-2 text-sm font-medium text-gray-700">Replace content</p>
+      <div className="border-t border-border pt-4">
+        <p className="mb-2 text-sm font-medium text-foreground">Replace content</p>
         <textarea
           value={html}
           onChange={(e) => setHtml(e.target.value)}
           rows={4}
           placeholder="Paste new HTML to replace the page…"
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 font-mono text-xs outline-none focus:border-gray-900"
+          className="input-modern px-3 py-2 font-mono text-xs"
         />
         <div className="mt-2 flex flex-wrap gap-2">
           <button
             onClick={() => replaceContent(JSON.stringify({ html }), { 'Content-Type': 'application/json' })}
             disabled={busy || !html.trim()}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             Replace with this HTML
           </button>
           <button
             onClick={() => folderInput.current?.click()}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             📁 Upload folder
           </button>
           <button
             onClick={() => zipInput.current?.click()}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             🗜️ Upload .zip
           </button>
@@ -194,37 +194,37 @@ export function ManageSite({
       </div>
 
       {/* Custom domain */}
-      <div className="border-t border-gray-200 pt-4">
-        <p className="mb-2 text-sm font-medium text-gray-700">Connect your own domain</p>
+      <div className="border-t border-border pt-4">
+        <p className="mb-2 text-sm font-medium text-foreground">Connect your own domain</p>
         <div className="flex flex-wrap items-center gap-2">
           <input
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="www.yourbusiness.com"
-            className="flex-1 min-w-[180px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
+            className="input-modern flex-1 min-w-[180px] px-3 py-2 text-sm"
           />
           <button
             onClick={() => patch({ customDomain: domain }, domain.trim() ? 'Domain connected — add the DNS record below.' : 'Domain removed.')}
             disabled={busy}
-            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+            className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {domain.trim() ? 'Connect' : 'Remove'}
           </button>
         </div>
         {domain.trim() && (
-          <p className="mt-2 text-xs text-gray-500">
-            At your domain registrar, add a <span className="font-medium text-gray-700">CNAME</span> record
-            pointing <span className="font-medium text-gray-700">{domain.trim()}</span> to{' '}
-            <span className="font-mono text-gray-700">{DNS_CNAME_TARGET}</span> (for an apex domain, use an
-            A record to <span className="font-mono text-gray-700">{DNS_A_RECORD}</span>). HTTPS turns on
+          <p className="mt-2 text-xs text-muted-foreground">
+            At your domain registrar, add a <span className="font-medium text-foreground">CNAME</span> record
+            pointing <span className="font-medium text-foreground">{domain.trim()}</span> to{' '}
+            <span className="font-mono text-foreground">{DNS_CNAME_TARGET}</span> (for an apex domain, use an
+            A record to <span className="font-mono text-foreground">{DNS_A_RECORD}</span>). HTTPS turns on
             automatically once it resolves.
           </p>
         )}
       </div>
 
       {/* Password protection */}
-      <div className="border-t border-gray-200 pt-4">
-        <p className="mb-2 text-sm font-medium text-gray-700">
+      <div className="border-t border-border pt-4">
+        <p className="mb-2 text-sm font-medium text-foreground">
           Password protection {hasPassword && <span className="text-amber-700">· currently on</span>}
         </p>
         <div className="flex flex-wrap items-center gap-2">
@@ -233,12 +233,12 @@ export function ManageSite({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={hasPassword ? 'Enter a new password…' : 'Set a password…'}
-            className="flex-1 min-w-[180px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
+            className="input-modern flex-1 min-w-[180px] px-3 py-2 text-sm"
           />
           <button
             onClick={() => { patch({ password }, 'Password updated.'); setPassword('') }}
             disabled={busy || !password.trim()}
-            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+            className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {hasPassword ? 'Change' : 'Set'}
           </button>
@@ -246,7 +246,7 @@ export function ManageSite({
             <button
               onClick={() => patch({ password: '' }, 'Password removed — the site is public again.')}
               disabled={busy}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+              className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
             >
               Remove
             </button>
@@ -254,10 +254,10 @@ export function ManageSite({
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       {ok && <p className="text-sm text-green-600">{ok}</p>}
 
-      <button onClick={() => setOpen(false)} className="text-sm text-gray-500 hover:underline">
+      <button onClick={() => setOpen(false)} className="text-sm text-muted-foreground hover:underline">
         Close
       </button>
     </div>

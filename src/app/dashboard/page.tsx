@@ -1,12 +1,14 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DashboardContent from '@/components/dashboard-content'
+import { listSites, listSubmissions } from '@/lib/site-store'
+import { listApps } from '@/lib/app-store'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
     redirect('/auth/login')
   }
@@ -25,11 +27,26 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
+  // Get real counts for this user
+  const [sites, apps] = await Promise.all([
+    listSites(user.id),
+    listApps(user.id),
+  ])
+
+  // Sum contact-form messages across this user's sites
+  const submissionCounts = await Promise.all(
+    sites.map((site) => listSubmissions(site.id).then((s) => s.length))
+  )
+  const messagesCount = submissionCounts.reduce((sum, n) => sum + n, 0)
+
   return (
     <DashboardContent
       user={user}
       subscription={subscription}
       profile={profile}
+      sitesCount={sites.length}
+      appsCount={apps.length}
+      messagesCount={messagesCount}
     />
   )
 }

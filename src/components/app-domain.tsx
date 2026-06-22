@@ -60,34 +60,34 @@ export function AppDomain({ app }: { app: AppMeta }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-gray-700">Connect your own domain</p>
+      <p className="text-sm font-medium text-foreground">Connect your own domain</p>
 
       {connected ? (
         <div className="space-y-3">
           <p className="text-sm font-medium text-green-700">✓ {connected} connected</p>
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
+          <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
             {records.a || records.aaaa ? (
               <>
                 <p className="mb-2">At your domain provider, add these records:</p>
                 {records.a && (
                   <p>
-                    <span className="font-medium text-gray-700">A record</span> · point{' '}
-                    <span className="font-mono text-gray-700">{connected}</span> to{' '}
-                    <span className="font-mono text-gray-700">{records.a}</span>
+                    <span className="font-medium text-foreground">A record</span> · point{' '}
+                    <span className="font-mono text-foreground">{connected}</span> to{' '}
+                    <span className="font-mono text-foreground">{records.a}</span>
                   </p>
                 )}
                 {records.aaaa && (
                   <p>
-                    <span className="font-medium text-gray-700">AAAA record</span> · point{' '}
-                    <span className="font-mono text-gray-700">{connected}</span> to{' '}
-                    <span className="font-mono text-gray-700">{records.aaaa}</span>
+                    <span className="font-medium text-foreground">AAAA record</span> · point{' '}
+                    <span className="font-mono text-foreground">{connected}</span> to{' '}
+                    <span className="font-mono text-foreground">{records.aaaa}</span>
                   </p>
                 )}
               </>
             ) : (
               <p>DNS targets are shown right after connecting.</p>
             )}
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-muted-foreground">
               These point your domain at the Flowstas servers. HTTPS turns on automatically once your
               DNS points to us — usually within the hour.
             </p>
@@ -95,7 +95,7 @@ export function AppDomain({ app }: { app: AppMeta }) {
           <button
             onClick={disconnect}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             {busy ? 'Disconnecting…' : 'Disconnect'}
           </button>
@@ -107,12 +107,12 @@ export function AppDomain({ app }: { app: AppMeta }) {
             onChange={(e) => setDomain(e.target.value)}
             placeholder="app.yourbusiness.com"
             disabled={busy}
-            className="flex-1 min-w-[180px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900 disabled:opacity-50"
+            className="input-modern flex-1 min-w-[180px] px-3 py-2 text-sm disabled:opacity-50"
           />
           <button
             onClick={connect}
             disabled={busy || !domain.trim()}
-            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+            className="btn-primary rounded-lg px-3 py-2 text-sm"
           >
             {busy ? 'Connecting…' : 'Connect'}
           </button>

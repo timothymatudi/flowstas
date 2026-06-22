@@ -1,10 +1,10 @@
 import { Users, Target, Award, TrendingUp } from 'lucide-react'
 
 const stats = [
-  { value: '10,000+', label: 'Active Users' },
-  { value: '50+', label: 'Countries' },
-  { value: '99.9%', label: 'Uptime' },
-  { value: '24/7', label: 'Support' },
+  { value: 'Automatic HTTPS', label: 'On every site' },
+  { value: 'Live in seconds', label: 'Publish instantly' },
+  { value: 'Free to start', label: 'No card required' },
+  { value: 'Cancel anytime', label: 'No lock-in' },
 ]
 
 const values = [
@@ -42,7 +42,7 @@ export default function AboutPage() {
               About Flowstas
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              We are on a mission to help businesses of all sizes streamline their operations and achieve their goals.
+              We are a small UK product that makes it simple to publish a website and host your apps, without the usual setup or jargon.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-3xl font-bold text-foreground md:text-4xl">{stat.value}</p>
+                <p className="text-xl font-bold text-foreground md:text-2xl">{stat.value}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
               </div>
             ))}
@@ -69,13 +69,13 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">Our Story</h2>
             <div className="mt-8 space-y-6 text-lg leading-relaxed text-muted-foreground">
               <p>
-                Flowstas was founded with a simple idea: make powerful business tools accessible to everyone. We saw too many businesses struggling with complex, expensive software that slowed them down instead of helping them grow.
+                Flowstas is a new, independent product built in the UK. It started from a simple frustration: getting a website online or running a small app shouldn&apos;t mean wrestling with servers, build configs, and DNS for a whole weekend.
               </p>
               <p>
-                Our founding team came together with decades of combined experience in enterprise software, but with a shared frustration: why did business tools have to be so complicated?
+                So we set out to build something more direct. Paste in your site or connect a repo, choose a name, and publish, with HTTPS handled for you. No agency, no complicated setup.
               </p>
               <p>
-                Today, we serve thousands of customers worldwide, from small startups to large enterprises. Our platform continues to evolve based on real feedback from real users, ensuring we always deliver exactly what businesses need.
+                We&apos;re early, and we&apos;re building Flowstas in the open. The roadmap is shaped by the people who use it, and we&apos;d rather grow carefully and earn your trust than overpromise. If you try it, we&apos;d genuinely love your feedback.
               </p>
             </div>
           </div>

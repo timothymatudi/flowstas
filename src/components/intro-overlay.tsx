@@ -17,10 +17,10 @@ const FADE = 600 // keep in sync with .intro-closing transition in globals.css
 const DURATION = 3000 // time the scene is on screen before the cross-fade out (ms)
 
 const TAGLINE: Record<string, string> = {
-  en: 'The future is AI — and it’s here.',
-  fr: 'Le futur, c’est l’IA — et il est là.',
-  sw: 'Wakati ujao ni AI — na umefika.',
-  ln: 'Lobi ezali AI — mpe esili.',
+  en: 'Your idea. Online. In minutes.',
+  fr: 'Votre idée. En ligne. En quelques minutes.',
+  sw: 'Wazo lako. Mtandaoni. Kwa dakika chache.',
+  ln: 'Likanisi na yo. Na Internet. Na miniti moke.',
 }
 
 function currentLang(): string {

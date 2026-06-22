@@ -97,10 +97,19 @@ export default async function BillingPage() {
           )}
         </CardContent>
         {subscription && (
-          <CardFooter className="border-t pt-6">
+          <CardFooter className="border-t pt-6 gap-3">
             <Button variant="outline" asChild>
               <Link href="/pricing">Change Plan</Link>
             </Button>
+            {subscription.stripe_customer_id ? (
+              <form action="/api/stripe/portal" method="POST">
+                <Button type="submit">Manage billing</Button>
+              </form>
+            ) : (
+              <Button asChild>
+                <Link href="/pricing">View Plans</Link>
+              </Button>
+            )}
           </CardFooter>
         )}
       </Card>

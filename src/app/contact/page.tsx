@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, MapPin, Phone, Send, Loader2 } from 'lucide-react'
+import { Mail, Send, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,7 +29,7 @@ export default function ContactPage() {
       toast.error('Could not send your message. Please try again.')
       return
     }
-    toast.success("Message sent! We'll get back to you within 24 hours.")
+    toast.success("Message sent! We'll get back to you as soon as we can.")
     setSubmitted(true)
   }
 
@@ -64,7 +64,7 @@ export default function ContactPage() {
                     </div>
                     <h3 className="mb-2 text-2xl font-bold text-foreground">Message Sent!</h3>
                     <p className="text-muted-foreground">
-                      We&apos;ve received your message and will get back to you within 24 hours.
+                      We&apos;ve received your message and will get back to you as soon as we can.
                     </p>
                   </div>
                 ) : (
@@ -127,29 +127,6 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
                     <p className="mt-1 text-muted-foreground">support@flowstas.com</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-6 shadow-premium transition-all hover:shadow-premium-lg">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-foreground/5">
-                    <Phone className="h-5 w-5 text-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Phone</h3>
-                    <p className="mt-1 text-muted-foreground">+1 (555) 123-4567</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-6 shadow-premium transition-all hover:shadow-premium-lg">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-foreground/5">
-                    <MapPin className="h-5 w-5 text-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Office</h3>
-                    <p className="mt-1 text-muted-foreground">
-                      123 Business Street<br />
-                      San Francisco, CA 94102
-                    </p>
                   </div>
                 </div>
               </div>

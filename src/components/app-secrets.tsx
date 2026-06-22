@@ -67,8 +67,8 @@ export function AppSecrets({ app }: { app: AppMeta }) {
 
   return (
     <section>
-      <h3 className="text-sm font-semibold text-gray-900">Environment &amp; secrets</h3>
-      <p className="mt-1 text-xs text-gray-500">
+      <h3 className="text-sm font-semibold text-foreground">Environment &amp; secrets</h3>
+      <p className="mt-1 text-xs text-muted-foreground">
         Set API keys and secrets (e.g. <span className="font-mono">SUPABASE_URL</span>) so logins and payments
         work. Values are write-only — for security we never show saved values back.{' '}
         <span className="font-mono">NEXT_PUBLIC_*</span> variables only take effect on your next deploy.
@@ -83,7 +83,7 @@ export function AppSecrets({ app }: { app: AppMeta }) {
               disabled={saving}
               placeholder="KEY"
               spellCheck={false}
-              className="w-40 rounded-lg border border-gray-200 px-3 py-2 font-mono text-sm uppercase outline-none focus:border-gray-900 disabled:opacity-50"
+              className="input-modern w-40 px-3 py-2 font-mono text-sm uppercase disabled:opacity-50"
             />
             <input
               value={row.value}
@@ -91,14 +91,14 @@ export function AppSecrets({ app }: { app: AppMeta }) {
               disabled={saving}
               placeholder="value"
               spellCheck={false}
-              className="min-w-[160px] flex-1 rounded-lg border border-gray-200 px-3 py-2 font-mono text-sm outline-none focus:border-gray-900 disabled:opacity-50"
+              className="input-modern min-w-[160px] flex-1 px-3 py-2 font-mono text-sm disabled:opacity-50"
             />
             <button
               type="button"
               onClick={() => removeRow(i)}
               disabled={saving}
               aria-label="Remove this variable"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 disabled:opacity-50"
+              className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary disabled:opacity-50"
             >
               Remove
             </button>
@@ -111,7 +111,7 @@ export function AppSecrets({ app }: { app: AppMeta }) {
           type="button"
           onClick={addRow}
           disabled={saving}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50"
         >
           + Add variable
         </button>
@@ -119,7 +119,7 @@ export function AppSecrets({ app }: { app: AppMeta }) {
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+          className="btn-primary rounded-lg px-4 py-2 text-sm"
         >
           {saving ? 'Saving…' : 'Save secrets'}
         </button>
