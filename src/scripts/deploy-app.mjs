@@ -43,6 +43,9 @@ function capture(cmd, opts = {}) {
 const repo = arg('--repo')
 const name = arg('--name')
 const branch = arg('--branch')
+// --dry: clone + detect + generate the Dockerfile, then stop (no Fly deploy).
+// Used to verify framework detection without spending Fly resources.
+const dry = process.argv.includes('--dry')
 if (!repo || !name) {
   console.error('Usage: node scripts/deploy-app.mjs --repo <url> --name <app> [--branch <b>]')
   process.exit(1)
@@ -171,6 +174,14 @@ function detectPlan() {
   if (scripts.build)
     return { kind: 'static', label: 'Static build', build: `${pm.run} build`, outDir: 'dist', pm }
 
+  // No build/start script: fall back to running the main entry file directly
+  // (covers plain Node apps that only ship a `dev` script or none).
+  const entries = [pkg.main, 'server.js', 'index.js', 'src/index.js', 'app.js', 'src/server.js', 'main.js']
+  for (const e of entries) {
+    if (e && existsSync(join(appRoot, e)))
+      return { kind: 'server', label: `Node app (${e})`, build: null, start: `node ${e}`, pm }
+  }
+
   return null
 }
 
@@ -183,8 +194,17 @@ if (!plan) {
   process.exit(1)
 }
 
+// The port Fly should route to. For our generated Dockerfiles it's always
+// INTERNAL_PORT; for a repo's own Dockerfile we read its EXPOSE so apps that
+// listen on a different port (e.g. Python/gunicorn on 5000) still work.
+let internalPort = INTERNAL_PORT
 if (plan.kind === 'dockerfile') {
   console.log('▶ Detected a Dockerfile — using it as-is.')
+  const m = readFileSync(join(appRoot, 'Dockerfile'), 'utf8').match(/^\s*EXPOSE\s+(\d+)/im)
+  if (m) {
+    internalPort = parseInt(m[1], 10)
+    console.log(`▶ Using EXPOSE ${internalPort} from your Dockerfile.`)
+  }
 } else {
   console.log(`▶ Detected ${plan.label}`)
   const envNames = scanEnvNames(appRoot)
@@ -249,7 +269,7 @@ if (!existsSync(join(appRoot, 'fly.toml'))) {
 primary_region = "lhr"
 [build]
 [http_service]
-  internal_port = ${INTERNAL_PORT}
+  internal_port = ${internalPort}
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
@@ -259,6 +279,14 @@ primary_region = "lhr"
   memory = "1024mb"
 `
   )
+}
+
+if (dry) {
+  const df = existsSync(join(appRoot, 'Dockerfile')) ? readFileSync(join(appRoot, 'Dockerfile'), 'utf8') : '(none)'
+  console.log(`\n▶ DRY RUN — plan: ${plan.label || plan.kind}`)
+  console.log(`\n----- Dockerfile -----\n${df}\n----------------------`)
+  console.log('✅ Dry run OK (no Fly deploy performed).')
+  process.exit(0)
 }
 
 // 4. Ensure app exists, then deploy -------------------------------------------
