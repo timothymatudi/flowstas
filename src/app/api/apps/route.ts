@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { appLimitForPlan } from '@/lib/plan-limits'
+import { appLimitForPlan, effectivePlan } from '@/lib/plan-limits'
 import { createApp, countAppsForOwner, updateAppDeploy, listApps } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
 
@@ -70,11 +70,10 @@ export async function POST(req: Request) {
   // Each plan caps how many running apps you can have.
   const { data: sub } = await supabase
     .from('subscriptions')
-    .select('plan, status')
+    .select('plan, status, trial_ends_at')
     .eq('user_id', user.id)
-    .eq('status', 'active')
     .maybeSingle()
-  const limit = appLimitForPlan(sub?.plan)
+  const limit = appLimitForPlan(effectivePlan(sub))
   if ((await countAppsForOwner(user.id)) >= limit) {
     return NextResponse.json(
       {
