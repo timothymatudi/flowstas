@@ -75,21 +75,17 @@ ${context}`
 
   const client = new Anthropic()
 
+  // Open the stream up front so any immediate API error (auth, bad request) is
+  // surfaced as a normal JSON error response before we commit to a 200 stream.
+  let stream: ReturnType<typeof client.messages.stream>
   try {
-    const stream = client.messages.stream({
+    stream = client.messages.stream({
       model: 'claude-opus-4-8',
       max_tokens: 16000,
       thinking: { type: 'adaptive' },
       system,
       messages: history.map((m) => ({ role: m.role, content: m.content })),
     })
-    const message = await stream.finalMessage()
-    const reply = message.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('')
-      .trim()
-    return NextResponse.json({ reply })
   } catch (e) {
     if (e instanceof Anthropic.APIError)
       return NextResponse.json(
@@ -98,4 +94,37 @@ ${context}`
       )
     return NextResponse.json({ error: 'The assistant could not respond.' }, { status: 502 })
   }
+
+  // Stream the assistant's text back as it generates so the client can render
+  // tokens live instead of waiting for the whole reply.
+  const encoder = new TextEncoder()
+  const responseBody = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        for await (const event of stream) {
+          if (
+            event.type === 'content_block_delta' &&
+            event.delta.type === 'text_delta' &&
+            event.delta.text
+          ) {
+            controller.enqueue(encoder.encode(event.delta.text))
+          }
+        }
+        controller.close()
+      } catch {
+        // The stream has already started (status 200), so we can't change the
+        // status code; just end it. The client treats a truncated stream that
+        // produced no text as an error.
+        controller.error(new Error('stream-failed'))
+      }
+    },
+  })
+
+  return new Response(responseBody, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  })
 }

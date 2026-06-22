@@ -68,11 +68,18 @@ export default function DashboardContent({ user, subscription, profile, sitesCou
 
   const onboardingSteps: OnboardingStep[] = [
     {
-      label: 'Explore your dashboard',
-      description: "You're here — take a look around.",
-      done: true,
-      href: '/dashboard',
-      cta: 'Open',
+      label: 'Publish your first site',
+      description: 'Get a site live on the web in minutes.',
+      done: sitesCount > 0,
+      href: '/publish',
+      cta: 'Publish a site',
+    },
+    {
+      label: 'Deploy your first app',
+      description: 'Ship a full app from your repo to a live URL.',
+      done: appsCount > 0,
+      href: '/deploy',
+      cta: 'Deploy an app',
     },
     {
       label: 'Complete your profile',

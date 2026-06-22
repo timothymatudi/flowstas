@@ -3,7 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard-nav'
 import { isTrialActive } from '@/lib/plan-limits'
 
-export default async function DashboardLayout({
+// Shell for all logged-in product pages: /dashboard, /publish, /sites,
+// /deploy, /apps, /assistant (and nested billing/settings). Requires auth and
+// renders the dashboard sidebar instead of the marketing header/footer.
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode

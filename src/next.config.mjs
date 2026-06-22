@@ -11,6 +11,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      // Billing lives under the dashboard; keep a bare /billing working.
+      { source: '/billing', destination: '/dashboard/billing', permanent: false },
+    ]
+  },
 }
 
 export default nextConfig
