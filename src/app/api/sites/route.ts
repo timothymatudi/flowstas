@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSite, countSitesForOwner } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
-import { siteLimitForPlan } from '@/lib/plan-limits'
+import { siteLimitForPlan, effectivePlan } from '@/lib/plan-limits'
 import { parseUpload } from '@/lib/upload-parse'
 
 export const dynamic = 'force-dynamic'
@@ -23,11 +23,10 @@ export async function POST(req: Request) {
 
   const { data: sub } = await supabase
     .from('subscriptions')
-    .select('plan, status')
+    .select('plan, status, trial_ends_at')
     .eq('user_id', user.id)
-    .eq('status', 'active')
     .maybeSingle()
-  const limit = siteLimitForPlan(sub?.plan)
+  const limit = siteLimitForPlan(effectivePlan(sub))
   if ((await countSitesForOwner(user.id)) >= limit) {
     return NextResponse.json(
       {

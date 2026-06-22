@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { getApp, getLatestDeployLog } from '@/lib/app-store'
+import { rateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params
   const app = await getApp(id, user.id)
   if (!app) return NextResponse.json({ error: 'App not found.' }, { status: 404 })
+
+  // Cost guard: each call is an Opus-4.8 request of up to 16K output tokens, so
+  // cap a single user to 20 assistant messages/minute (across all their apps)
+  // to stop runaway/scripted spend. Keyed by user, not app, so spinning up apps
+  // can't multiply the budget.
+  const rl = rateLimit(`assistant:${user.id}`, 20, 60_000)
+  if (!rl.ok)
+    return NextResponse.json(
+      { error: 'You are sending messages too quickly — please wait a moment.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    )
 
   if (!assistantConfigured())
     return NextResponse.json({ error: 'The AI assistant is not configured yet.' }, { status: 503 })
