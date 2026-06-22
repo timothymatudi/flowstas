@@ -50,12 +50,17 @@ const features = [
   { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
   { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
   { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
+  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
 ]
 
 const faqs = [
   {
     q: 'What kind of website can I publish?',
     a: 'Any static site. Paste a single HTML page, or upload a whole folder or .zip — HTML, CSS, JavaScript, images and fonts all work.',
+  },
+  {
+    q: 'Can I host a full app, not just a static site?',
+    a: 'Yes. Use “Deploy an app” to connect a GitHub, GitLab or Bitbucket repo and we build and run it for you — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node, or any repo with its own Dockerfile.',
   },
   {
     q: 'Where does my site go live?',
