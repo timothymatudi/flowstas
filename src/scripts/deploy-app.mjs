@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 // Flowstas app-deploy engine (Phase 1 of the compute platform).
 //
-// Takes a public GitHub repo of a full app and deploys it to a running app on
-// Fly.io — the same steps proven by hand in the Phase 0 spike, now codified so
-// Flowstas itself can drive them. This is the "build worker" logic; it must run
-// somewhere with `flyctl` + FLY_API_TOKEN (NOT inside a Vercel function).
+// Takes a public/private Git repo of a full app and deploys it to a running app
+// on Fly.io. This is the "build worker" logic; it must run somewhere with
+// `flyctl` + FLY_API_TOKEN (NOT inside a Vercel function).
 //
 // Usage:
 //   node scripts/deploy-app.mjs --repo <url> --name <fly-app-name> [--branch main]
 //
 // What it does:
-//   1. Shallow-clones the repo.
-//   2. Detects a Next.js app (package.json has "next").
+//   1. Shallow-clones the repo (GitHub / GitLab / Bitbucket / any git URL).
+//   2. Detects the framework and how to build + run it. Supported:
+//        - the repo's own Dockerfile (used as-is → ANY language: Python, Go, …)
+//        - Next.js, Nuxt, SvelteKit, Astro, Remix          (Node servers)
+//        - Vite / Create-React-App / Vue CLI / Gatsby        (static build)
+//        - generic Node (build+start / start only)
+//        - pure static sites (no build, just files)
 //   3. If there's no Dockerfile, generates one. Build-time env crashes are the
 //      #1 failure (apps read process.env.X! at module load), so we scan the repo
 //      for every process.env.NAME and feed a harmless placeholder for each, so
-//      `next build` passes. Real values are set later via `flyctl secrets`.
+//      the build passes. Real values are set later via `flyctl secrets`.
 //   4. Ensures the Fly app exists, then deploys with Fly's remote builder.
 //   5. Prints the live URL.
 
@@ -45,20 +49,23 @@ if (!repo || !name) {
 }
 
 // 1. Clone --------------------------------------------------------------------
-// Private repos pass a GitHub token via the GH_TOKEN env var (set by the worker).
-// We feed it to git through a credential helper that reads it from the
-// environment, so the token never appears in the command, the streamed build
-// logs, or the process list.
+// Private repos pass a token via the GH_TOKEN env var (set by the worker). We
+// feed it to git through a credential helper that reads it from the environment,
+// so the token never appears in the command, the streamed logs, or the process
+// list. The helper username is host-specific.
 const token = process.env.GH_TOKEN || ''
+function helperUserFor(repoUrl) {
+  if (/gitlab\.com/i.test(repoUrl)) return 'oauth2'
+  if (/bitbucket\.org/i.test(repoUrl)) return 'x-token-auth'
+  return 'x-access-token' // github + sensible default
+}
 const work = mkdtempSync(join(tmpdir(), 'flowstas-deploy-'))
 const src = join(work, 'src')
 const branchArg = branch ? `--branch ${branch} ` : ''
 console.log(`\n▶ Cloning ${repo}${branch ? ` (branch ${branch})` : ''}${token ? ' (private)' : ''} → ${src}`)
 if (token) {
-  // Run directly (not via run(), which echoes the command) so the helper config
-  // isn't printed. The token stays in $GH_TOKEN; git expands it only inside the
-  // helper subprocess.
-  const helper = `!f() { echo username=x-access-token; echo password=$GH_TOKEN; }; f`
+  const user = helperUserFor(repo)
+  const helper = `!f() { echo username=${user}; echo password=$GH_TOKEN; }; f`
   execSync(`git -c credential.helper='${helper}' clone --depth 1 ${branchArg}${repo} ${src}`, {
     stdio: 'inherit',
     env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
@@ -67,34 +74,27 @@ if (token) {
   run(`git clone --depth 1 ${branchArg}${repo} ${src}`)
 }
 
-// Some repos nest the app in a subfolder; pick the dir that has package.json.
+// Some repos nest the app in a subfolder; pick the dir that has a project file.
 function findAppRoot(dir) {
-  if (existsSync(join(dir, 'package.json'))) return dir
+  const marks = ['package.json', 'Dockerfile', 'index.html']
+  if (marks.some((m) => existsSync(join(dir, m)))) return dir
   for (const entry of readdirSync(dir)) {
     if (entry === '.git' || entry === 'node_modules') continue
     const p = join(dir, entry)
-    if (statSync(p).isDirectory() && existsSync(join(p, 'package.json'))) return p
+    if (statSync(p).isDirectory() && marks.some((m) => existsSync(join(p, m)))) return p
   }
   return dir
 }
 const appRoot = findAppRoot(src)
 console.log(`▶ App root: ${appRoot}`)
 
-// 2. Detect framework ---------------------------------------------------------
-const pkg = JSON.parse(readFileSync(join(appRoot, 'package.json'), 'utf8'))
-const deps = { ...pkg.dependencies, ...pkg.devDependencies }
-if (!deps.next) {
-  console.error('✗ Only Next.js apps are supported by this engine for now.')
-  process.exit(1)
-}
-console.log(`▶ Detected Next.js ${deps.next}`)
-
-// 3. Generate a Dockerfile (with placeholder build env) -----------------------
+// 2. Detect framework + how to build/run it -----------------------------------
 function scanEnvNames(dir) {
-  // Grep the source for process.env.NAME references.
+  // Grep the source for process.env.NAME references so the build doesn't crash
+  // on missing build-time env.
   try {
     const out = capture(
-      `grep -rhoE "process\\.env\\.[A-Z0-9_]+" ${dir} --include=*.ts --include=*.tsx --include=*.js --include=*.mjs 2>/dev/null | sort -u`
+      `grep -rhoE "process\\.env\\.[A-Z0-9_]+" ${dir} --include=*.ts --include=*.tsx --include=*.js --include=*.jsx --include=*.mjs --include=*.cjs 2>/dev/null | sort -u`
     )
     return [...new Set(out.split('\n').map((l) => l.replace('process.env.', '').trim()).filter(Boolean))]
   } catch {
@@ -111,23 +111,133 @@ function placeholderFor(envName) {
   return 'placeholder'
 }
 
-if (!existsSync(join(appRoot, 'Dockerfile'))) {
+const INTERNAL_PORT = 3000
+
+// Choose package manager from the lockfile so installs/builds match the project.
+function pmFor(dir) {
+  if (existsSync(join(dir, 'pnpm-lock.yaml'))) {
+    return { install: 'corepack enable && pnpm install --no-frozen-lockfile', run: 'pnpm run' }
+  }
+  if (existsSync(join(dir, 'yarn.lock'))) {
+    return { install: 'corepack enable && yarn install', run: 'yarn' }
+  }
+  return { install: 'npm install --no-audit --no-fund', run: 'npm run' }
+}
+
+// Returns the build/run plan for the detected framework, or null when the repo
+// already has a Dockerfile (we use that verbatim).
+function detectPlan() {
+  if (existsSync(join(appRoot, 'Dockerfile'))) return { kind: 'dockerfile' }
+
+  const hasPkg = existsSync(join(appRoot, 'package.json'))
+  if (!hasPkg) {
+    if (existsSync(join(appRoot, 'index.html'))) return { kind: 'static-nobuild', label: 'Static site' }
+    return null // can't tell — caller errors with guidance
+  }
+
+  const pkg = JSON.parse(readFileSync(join(appRoot, 'package.json'), 'utf8'))
+  const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+  const scripts = pkg.scripts || {}
+  const pm = pmFor(appRoot)
+  const has = (d) => Boolean(deps[d])
+
+  // --- Node-server frameworks (build, then run a long-lived server) ---
+  if (has('next'))
+    return { kind: 'server', label: `Next.js ${deps.next}`, build: `${pm.run} build`, start: `${pm.run} start`, pm }
+  if (has('nuxt') || has('nuxt3'))
+    return { kind: 'server', label: 'Nuxt', build: `${pm.run} build`, start: 'node .output/server/index.mjs', pm }
+  if (has('@sveltejs/kit'))
+    return { kind: 'server', label: 'SvelteKit', build: `${pm.run} build`, start: 'node build', pm }
+  if (has('@remix-run/server-runtime') || has('@remix-run/node') || has('@remix-run/serve'))
+    return { kind: 'server', label: 'Remix', build: `${pm.run} build`, start: `${pm.run} start`, pm }
+  if (has('astro')) {
+    if (has('@astrojs/node'))
+      return { kind: 'server', label: 'Astro (SSR)', build: `${pm.run} build`, start: 'node ./dist/server/entry.mjs', pm }
+    return { kind: 'static', label: 'Astro (static)', build: `${pm.run} build`, outDir: 'dist', pm }
+  }
+
+  // --- Static build frameworks (build to a folder, then serve it) ---
+  if (has('@angular/core')) return { kind: 'static', label: 'Angular', build: `${pm.run} build`, outDir: 'dist', pm }
+  if (has('gatsby')) return { kind: 'static', label: 'Gatsby', build: `${pm.run} build`, outDir: 'public', pm }
+  if (has('react-scripts')) return { kind: 'static', label: 'Create React App', build: `${pm.run} build`, outDir: 'build', pm }
+  if (has('@vue/cli-service')) return { kind: 'static', label: 'Vue CLI', build: `${pm.run} build`, outDir: 'dist', pm }
+  if (has('vite')) return { kind: 'static', label: 'Vite', build: `${pm.run} build`, outDir: 'dist', pm }
+
+  // --- Generic Node ---
+  if (scripts.build && scripts.start)
+    return { kind: 'server', label: 'Node app', build: `${pm.run} build`, start: `${pm.run} start`, pm }
+  if (scripts.start)
+    return { kind: 'server', label: 'Node app', build: null, start: `${pm.run} start`, pm }
+  if (scripts.build)
+    return { kind: 'static', label: 'Static build', build: `${pm.run} build`, outDir: 'dist', pm }
+
+  return null
+}
+
+// 3. Generate a Dockerfile (unless the repo ships its own) ---------------------
+const plan = detectPlan()
+if (!plan) {
+  console.error(
+    '✗ Could not detect how to build this app. Add a Dockerfile to your repo and Flowstas will use it as-is.'
+  )
+  process.exit(1)
+}
+
+if (plan.kind === 'dockerfile') {
+  console.log('▶ Detected a Dockerfile — using it as-is.')
+} else {
+  console.log(`▶ Detected ${plan.label}`)
   const envNames = scanEnvNames(appRoot)
   const envLines = envNames.map((n) => `ENV ${n}="${placeholderFor(n)}"`).join('\n')
-  console.log(`▶ No Dockerfile — generating one. Placeholder build env for: ${envNames.join(', ') || '(none)'}`)
-  const dockerfile = `# Auto-generated by Flowstas deploy engine.
-FROM node:20-slim AS app
+  if (envNames.length) console.log(`▶ Placeholder build env for: ${envNames.join(', ')}`)
+
+  let dockerfile
+  if (plan.kind === 'static-nobuild') {
+    // Pure static: no package.json, just serve the files.
+    console.log('▶ No build step — serving files directly.')
+    dockerfile = `# Auto-generated by Flowstas deploy engine.
+FROM node:20-slim
+WORKDIR /app
+RUN npm install -g serve
+COPY . .
+EXPOSE ${INTERNAL_PORT}
+CMD ["serve", "-s", ".", "-l", "${INTERNAL_PORT}"]
+`
+  } else if (plan.kind === 'static') {
+    dockerfile = `# Auto-generated by Flowstas deploy engine.
+FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --no-audit --no-fund
+RUN ${plan.pm.install}
 COPY . .
 ${envLines}
-RUN npm run build
-ENV NODE_ENV=production
-ENV PORT=3000
-EXPOSE 3000
-CMD ["npm", "run", "start"]
+RUN ${plan.build}
+
+FROM node:20-slim
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=build /app/${plan.outDir} ./public
+EXPOSE ${INTERNAL_PORT}
+CMD ["serve", "-s", "public", "-l", "${INTERNAL_PORT}"]
 `
+  } else {
+    // Node server.
+    const buildLine = plan.build ? `RUN ${plan.build}` : '# (no build step)'
+    dockerfile = `# Auto-generated by Flowstas deploy engine.
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+RUN ${plan.pm.install}
+COPY . .
+${envLines}
+${buildLine}
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=${INTERNAL_PORT}
+EXPOSE ${INTERNAL_PORT}
+CMD ["sh", "-c", "${plan.start}"]
+`
+  }
   writeFileSync(join(appRoot, 'Dockerfile'), dockerfile)
 }
 
@@ -139,7 +249,7 @@ if (!existsSync(join(appRoot, 'fly.toml'))) {
 primary_region = "lhr"
 [build]
 [http_service]
-  internal_port = 3000
+  internal_port = ${INTERNAL_PORT}
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
@@ -154,10 +264,6 @@ primary_region = "lhr"
 // 4. Ensure app exists, then deploy -------------------------------------------
 console.log(`\n▶ Ensuring Fly app "${name}" exists`)
 try {
-  // Capture stderr so we can tell "name already taken" (the expected re-deploy
-  // case) apart from a real failure (bad token, quota, name owned by another
-  // org). Swallowing every error here hid real failures behind a confusing
-  // deploy crash further down.
   run(`flyctl apps create ${name} --org personal`, { stdio: ['ignore', 'inherit', 'pipe'] })
 } catch (err) {
   const stderr = (err.stderr || '').toString()

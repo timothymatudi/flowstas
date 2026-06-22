@@ -33,7 +33,7 @@ const WORKER_TOKEN = process.env.WORKER_TOKEN || ''
 // Fly app names: lowercase letters, numbers, hyphens. We never pass user text to
 // a shell, but still validate so a bad name fails fast with a clear message.
 const VALID_NAME = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/
-const VALID_REPO = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/
+const VALID_REPO = /^https:\/\/(?:github\.com|gitlab\.com|bitbucket\.org)\/[\w.-]+\/[\w.-]+(?:\.git)?\/?$/
 const VALID_DOMAIN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/i
 const VALID_ENV_KEY = /^[A-Z][A-Z0-9_]*$/
 
@@ -190,7 +190,7 @@ const server = createServer(async (req, res) => {
 
   const { repo, branch, token } = payload
   if (!VALID_REPO.test(repo || '')) {
-    return sendJson(res, 400, { error: 'repo must be a https://github.com/owner/name URL' })
+    return sendJson(res, 400, { error: 'repo must be a https://{github.com|gitlab.com|bitbucket.org}/owner/name URL' })
   }
   if (branch && !/^[\w./-]{1,100}$/.test(branch)) {
     return sendJson(res, 400, { error: 'invalid branch name' })
