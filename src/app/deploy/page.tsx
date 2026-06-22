@@ -43,7 +43,7 @@ export default function DeployPage() {
   async function handleDeploy(e: React.FormEvent) {
     e.preventDefault()
     if (!repo.trim()) {
-      setError('Paste the link to your app’s GitHub repo first.')
+      setError('Paste the link to your app’s Git repo first.')
       return
     }
     setPhase('building')
@@ -136,7 +136,7 @@ export default function DeployPage() {
           <form onSubmit={handleDeploy} className="glass space-y-5 rounded-2xl p-6 shadow-premium">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">
-                Your GitHub repo
+                Your Git repo
               </label>
               <input
                 value={repo}
@@ -149,7 +149,8 @@ export default function DeployPage() {
                 className="input-modern"
               />
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Paste the link to your repository. We’ll auto-detect the framework (Next.js today).
+                GitHub, GitLab or Bitbucket. We auto-detect your framework — Next.js, Astro,
+                SvelteKit, Nuxt, Vite/React, plain Node, a static site, or your own Dockerfile.
               </p>
             </div>
 

@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic'
 // Builds can take a few minutes; allow the longest the platform permits.
 export const maxDuration = 300
 
-const VALID_REPO = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/
+// GitHub, GitLab, or Bitbucket repo URL (with or without a trailing .git).
+const VALID_REPO = /^https:\/\/(?:github\.com|gitlab\.com|bitbucket\.org)\/[\w.-]+\/[\w.-]+(?:\.git)?\/?$/
 
 // List the signed-in user's apps.
 export async function GET() {
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
   const githubToken = (body.githubToken || '').trim() || null
   if (!VALID_REPO.test(repo)) {
     return NextResponse.json(
-      { error: 'Paste a GitHub repo link, e.g. https://github.com/you/your-app.' },
+      { error: 'Paste a GitHub, GitLab, or Bitbucket repo link, e.g. https://github.com/you/your-app.' },
       { status: 400 }
     )
   }
