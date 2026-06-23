@@ -11,9 +11,10 @@ import remarkGfm from 'remark-gfm'
 // Anthropic message array; this component just stores it opaquely and replays it.
 
 const SUGGESTIONS = [
-  'Build me a website for my coffee shop',
-  'Make a simple portfolio site',
-  'Publish a site from a GitHub repo',
+  'Host my site from a GitHub repo',
+  'Deploy my app from a repo',
+  'Connect my own domain',
+  'Which plan do I need?',
 ]
 
 // What the agent server returns each turn.
@@ -161,7 +162,7 @@ export function GlobalAssistant() {
     <section>
       <h2 className="text-lg font-semibold text-foreground">AI Assistant</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tell me what you want — I’ll build and publish it for you, and ask before anything goes live.
+        Tell me what you want to host or deploy — I’ll set it up for you (and help with billing). I’ll ask before anything goes live.
       </p>
 
       {view.length > 0 && (
@@ -251,7 +252,7 @@ export function GlobalAssistant() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={busy}
-          placeholder="e.g. build me a one-page site for my bakery…"
+          placeholder="e.g. host github.com/me/my-site, or deploy my app…"
           className="input-modern flex-1"
         />
         <button type="submit" disabled={busy || !input.trim()} className="btn-primary rounded-lg px-4 py-2 text-sm disabled:opacity-50">
