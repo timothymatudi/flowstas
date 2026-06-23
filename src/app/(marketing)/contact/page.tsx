@@ -37,17 +37,22 @@ export default function ContactPage() {
     <main className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/40 pb-16 pt-24 lg:pb-24 lg:pt-32">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent via-background to-background" />
+        <div className="absolute inset-0 hero-mesh pointer-events-none -z-10" />
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              Get in Touch
+            <span className="inline-block mb-5 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-semibold uppercase tracking-wider text-primary">
+              Contact
+            </span>
+            <h1 className="font-display text-balance text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
+              <span className="text-foreground">Get in </span>
+              <span className="gradient-text">touch.</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
               Have a question or need help? We&apos;d love to hear from you. Our team is ready to assist.
             </p>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
       {/* Contact Content */}
@@ -62,7 +67,7 @@ export default function ContactPage() {
                     <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                       <Send className="h-8 w-8 text-green-600" />
                     </div>
-                    <h3 className="mb-2 text-2xl font-bold text-foreground">Message Sent!</h3>
+                    <h3 className="mb-2 font-display text-2xl font-bold text-foreground">Message Sent!</h3>
                     <p className="text-muted-foreground">
                       We&apos;ve received your message and will get back to you as soon as we can.
                     </p>
@@ -113,16 +118,16 @@ export default function ContactPage() {
             {/* Contact Info */}
             <div className="space-y-8 lg:col-span-2">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Contact Information</h2>
+                <h2 className="font-display text-2xl font-bold text-foreground">Contact Information</h2>
                 <p className="mt-2 text-muted-foreground">
                   Reach out through any of these channels and we&apos;ll respond as soon as possible.
                 </p>
               </div>
 
               <div className="space-y-6">
-                <div className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-6 shadow-premium transition-all hover:shadow-premium-lg">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-foreground/5">
-                    <Mail className="h-5 w-5 text-foreground" />
+                <div className="card-hover flex items-start gap-4 rounded-2xl border border-border/60 bg-card p-6 shadow-premium">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                    <Mail className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>

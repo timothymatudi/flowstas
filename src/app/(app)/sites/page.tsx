@@ -39,11 +39,11 @@ export default async function SitesPage() {
   )
 
   return (
-    <main className="min-h-screen bg-background p-6">
+    <main className="min-h-screen bg-background bg-grid p-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">My Sites</h1>
+            <h1 className="font-display text-3xl text-foreground">My Sites</h1>
             <p className="mt-1 text-muted-foreground">
               {sites.length} site{sites.length === 1 ? '' : 's'} published
             </p>
@@ -65,11 +65,11 @@ export default async function SitesPage() {
         ) : (
           <div className="mt-8 space-y-5">
             {data.map(({ site, subs, stats }) => (
-              <div key={site.id} className="glass-light rounded-2xl p-6">
+              <div key={site.id} className="glass-light card-hover rounded-2xl p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-semibold text-foreground">{site.name}</h2>
+                      <h2 className="font-display text-lg text-foreground">{site.name}</h2>
                       {site.hasPassword && (
                         <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                           🔒 Protected

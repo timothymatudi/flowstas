@@ -39,13 +39,13 @@ const trust = [
 const steps = [
   { step: '01', title: 'Bring it', description: 'Paste a site, upload files, import a URL, or connect a Git repo.', icon: MousePointerClick },
   { step: '02', title: 'We put it live', description: 'We host your site or build & run your app — with HTTPS.', icon: Rocket },
-  { step: '03', title: 'Go', description: 'Live at your own flowstas.com address, or connect your domain.', icon: Globe },
+  { step: '03', title: 'Go', description: 'Connect your own domain, or share the free flowstas.com address you get to start.', icon: Globe },
 ]
 
 const features = [
   { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.', href: '/publish' },
-  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Pick your own subdomain like yourname.flowstas.com and your site goes live there, with HTTPS on by default.', href: '/publish' },
-  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Connect your own domain', description: 'Point www.yourbusiness.com at your site and we handle the HTTPS certificate automatically.', href: '/publish' },
+  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'A free address to start', description: 'No domain yet? Get a free flowstas.com address to share right away — and connect your own domain anytime, with HTTPS on by default.', href: '/publish' },
+  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Use your own domain', description: 'Put your site on your own brand — point yourbusiness.com at it and we handle the HTTPS certificate automatically.', href: '/publish' },
   { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.', href: '/publish' },
   { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.', href: '/publish' },
   { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.', href: '/publish' },
@@ -63,7 +63,7 @@ const faqs = [
   },
   {
     q: 'Where does my site go live?',
-    a: 'You choose your own address like yourname.flowstas.com when you publish, and you can share it straight away — no servers to set up and no DNS to configure to get started.',
+    a: 'Connect your own domain (like yourbusiness.com) and we serve it over HTTPS automatically — no DNS hassle. Don’t have one yet? You also get a free flowstas.com address to share right away.',
   },
   {
     q: 'What happens to my contact-form messages?',

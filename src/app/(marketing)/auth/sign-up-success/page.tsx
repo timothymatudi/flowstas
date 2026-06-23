@@ -3,14 +3,15 @@ import { Mail, ArrowRight } from 'lucide-react'
 
 export default function SignUpSuccessPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background bg-grid bg-radial px-4">
-      <div className="w-full max-w-md text-center">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background bg-grid px-4">
+      <div className="absolute inset-0 hero-mesh pointer-events-none" />
+      <div className="relative z-10 w-full max-w-md text-center">
         {/* Icon */}
         <div className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-8 glow">
           <Mail className="w-10 h-10 text-white" />
         </div>
 
-        <h1 className="text-3xl font-bold text-foreground mb-4">Check your email</h1>
+        <h1 className="font-display text-3xl text-foreground mb-4">Check your email</h1>
         <p className="text-muted-foreground mb-8 leading-relaxed">
           We&apos;ve sent you a confirmation link. Click the link in your email to activate your account and start your 1-day free trial.
         </p>

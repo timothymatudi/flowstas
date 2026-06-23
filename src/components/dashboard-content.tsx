@@ -102,7 +102,7 @@ export default function DashboardContent({ user, subscription, profile, sitesCou
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+            <h1 className="font-display text-3xl text-foreground mb-1">
               Welcome back{profile?.full_name ? `, ${profile.full_name}` : ''}
             </h1>
             <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your account</p>
@@ -183,7 +183,7 @@ export default function DashboardContent({ user, subscription, profile, sitesCou
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Account Info */}
           <div className="lg:col-span-2 glass-light rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+            <h2 className="font-display text-xl text-foreground mb-6 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
               Account Information
             </h2>
@@ -220,7 +220,7 @@ export default function DashboardContent({ user, subscription, profile, sitesCou
 
           {/* Subscription Status */}
           <div className="glass-light rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+            <h2 className="font-display text-xl text-foreground mb-6 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-primary" />
               Subscription
             </h2>
@@ -251,12 +251,12 @@ export default function DashboardContent({ user, subscription, profile, sitesCou
 
         {/* Quick Actions */}
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">Quick Actions</h2>
+          <h2 className="font-display text-xl text-foreground mb-6">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: BarChart3, label: 'Publish a Site', href: '/publish', color: 'bg-blue-500/10 text-blue-500' },
               { icon: User, label: 'Edit Profile', href: '/dashboard/settings', color: 'bg-purple-500/10 text-purple-500' },
-              { icon: Settings, label: 'Settings', href: '/dashboard/settings', color: 'bg-gray-500/10 text-gray-400' },
+              { icon: Settings, label: 'Settings', href: '/dashboard/settings', color: 'bg-slate-500/10 text-slate-600' },
               { icon: CreditCard, label: 'Billing', href: '/dashboard/billing', color: 'bg-green-500/10 text-green-500' },
             ].map((action, index) => (
               <Link

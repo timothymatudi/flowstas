@@ -27,11 +27,11 @@ export default async function AppsPage() {
   const apps = await listApps(user.id)
 
   return (
-    <main className="min-h-screen bg-background bg-grid bg-radial p-6">
+    <main className="min-h-screen bg-background bg-grid p-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">My Apps</h1>
+            <h1 className="font-display text-3xl text-foreground">My Apps</h1>
             <p className="mt-1 text-muted-foreground">
               {apps.length} app{apps.length === 1 ? '' : 's'} deployed
             </p>
@@ -45,10 +45,10 @@ export default async function AppsPage() {
         </div>
 
         {apps.length === 0 ? (
-          <div className="mt-10 glass rounded-2xl p-10 text-center shadow-premium">
+          <div className="mt-10 glass-light rounded-2xl p-10 text-center">
             <p className="text-muted-foreground">
               No apps yet.{' '}
-              <Link href="/deploy" className="font-medium text-blue-600 hover:underline">
+              <Link href="/deploy" className="font-medium text-primary hover:underline">
                 Deploy your first one →
               </Link>
             </p>
@@ -56,11 +56,11 @@ export default async function AppsPage() {
         ) : (
           <div className="mt-8 space-y-5">
             {apps.map((app) => (
-              <div key={app.id} className="glass rounded-2xl p-6 shadow-premium">
+              <div key={app.id} className="glass-light card-hover rounded-2xl p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-semibold text-foreground">{app.name}</h2>
+                      <h2 className="font-display text-lg text-foreground">{app.name}</h2>
                       <StatusBadge status={app.status} />
                     </div>
                     {app.url ? (
@@ -68,7 +68,7 @@ export default async function AppsPage() {
                         href={app.customDomain ? `https://${app.customDomain}` : app.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-sm font-medium text-blue-600 hover:underline"
+                        className="text-sm font-medium text-primary hover:underline"
                       >
                         {app.customDomain || app.url.replace(/^https?:\/\//, '')} ↗
                       </a>

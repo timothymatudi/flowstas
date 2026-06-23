@@ -160,30 +160,30 @@ export function GlobalAssistant() {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-foreground">AI Assistant</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Tell me what you want to host or deploy — I’ll set it up for you (and help with billing). I’ll ask before anything goes live.
-      </p>
-
       {view.length > 0 && (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           {view.map((m, i) => {
             if (m.kind === 'user')
               return (
-                <div key={i} className="rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground">
+                <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-md gradient-primary px-4 py-2.5 text-sm text-white shadow-premium glow-sm">
                   <div className="whitespace-pre-wrap break-words">{m.text}</div>
                 </div>
               )
             if (m.kind === 'working')
               return (
-                <div key={i} className="rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm text-muted-foreground">
-                  Working…
+                <div key={i} className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-border/60 bg-background/80 px-4 py-3 text-sm text-muted-foreground shadow-premium">
+                  <span className="flex gap-1">
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary" />
+                  </span>
+                  Thinking…
                 </div>
               )
             if (m.kind === 'confirm')
               return (
-                <div key={i} className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-3">
-                  <p className="text-sm text-foreground">{m.summary}</p>
+                <div key={i} className="rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3.5 shadow-premium">
+                  <p className="text-sm font-medium text-foreground">{m.summary}</p>
                   {m.status === 'pending' ? (
                     <div className="mt-3 flex gap-2">
                       <button
@@ -212,7 +212,7 @@ export function GlobalAssistant() {
               )
             // assistant
             return (
-              <div key={i} className="group rounded-lg border border-border bg-secondary/50 px-3 py-2 text-foreground">
+              <div key={i} className="group mr-auto max-w-[92%] rounded-2xl rounded-bl-md border border-border/60 bg-background/80 px-4 py-3 text-foreground shadow-premium">
                 {m.text ? <AssistantMarkdown content={m.text} /> : <div className="text-sm text-muted-foreground">…</div>}
                 {m.text && (
                   <div className="mt-2 flex justify-end opacity-0 transition-opacity group-hover:opacity-100">
@@ -226,14 +226,14 @@ export function GlobalAssistant() {
       )}
 
       {view.length === 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => ask(s)}
               disabled={busy}
-              className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:bg-secondary disabled:opacity-50"
+              className="rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"
             >
               {s}
             </button>
@@ -246,7 +246,7 @@ export function GlobalAssistant() {
           e.preventDefault()
           ask(input)
         }}
-        className="mt-4 flex gap-2"
+        className="mt-5 flex gap-2"
       >
         <input
           value={input}
@@ -255,7 +255,7 @@ export function GlobalAssistant() {
           placeholder="e.g. host github.com/me/my-site, or deploy my app…"
           className="input-modern flex-1"
         />
-        <button type="submit" disabled={busy || !input.trim()} className="btn-primary rounded-lg px-4 py-2 text-sm disabled:opacity-50">
+        <button type="submit" disabled={busy || !input.trim()} className="btn-primary rounded-xl px-5 py-2 text-sm disabled:opacity-50">
           {busy ? '…' : 'Send'}
         </button>
       </form>
