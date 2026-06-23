@@ -43,13 +43,13 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
-  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Pick your own subdomain like yourname.flowstas.com and your site goes live there, with HTTPS on by default.' },
-  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Connect your own domain', description: 'Point www.yourbusiness.com at your site and we handle the HTTPS certificate automatically.' },
-  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
-  { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
-  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
-  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
+  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.', href: '/publish' },
+  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'Its own web address', description: 'Pick your own subdomain like yourname.flowstas.com and your site goes live there, with HTTPS on by default.', href: '/publish' },
+  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Connect your own domain', description: 'Point www.yourbusiness.com at your site and we handle the HTTPS certificate automatically.', href: '/publish' },
+  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.', href: '/publish' },
+  { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.', href: '/publish' },
+  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.', href: '/publish' },
+  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.', href: '/deploy' },
 ]
 
 const faqs = [
@@ -237,13 +237,20 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <div key={index} className="glass-light rounded-2xl p-8 card-hover">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.tint}`}>
+              <Link
+                key={index}
+                href={feature.href}
+                className="group glass-light rounded-2xl p-8 card-hover block"
+              >
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.tint} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
                   <feature.icon className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </div>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+                  Learn more <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -295,23 +302,36 @@ export default function HomePage() {
       {/* CTA */}
       <section className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="relative rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 gradient-primary opacity-90" />
-            <div className="absolute inset-0 bg-grid opacity-20" />
-            <div className="relative p-12 md:p-16 text-center">
-              <h2 className="font-display text-4xl md:text-5xl mb-6 text-white">
-                Put your site online today
+          <div className="relative rounded-[2rem] overflow-hidden shadow-premium-lg">
+            {/* layered, cooked background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#16207a] via-[#2647e8] to-[#00a3c4]" />
+            <div className="absolute inset-0 bg-grid opacity-[0.12]" />
+            <div className="absolute -top-28 -left-20 h-72 w-72 rounded-full bg-cyan-300/30 blur-3xl" />
+            <div className="absolute -bottom-28 -right-12 h-80 w-80 rounded-full bg-indigo-400/30 blur-3xl" />
+            <div className="absolute inset-x-0 top-0 h-px bg-white/25" />
+            <div className="relative px-8 py-16 md:py-20 text-center">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold uppercase tracking-wider mb-7">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" /> Live in under a minute
+              </span>
+              <h2 className="font-display text-4xl md:text-6xl mb-5 text-white tracking-tight leading-[1.0]">
+                Put it online today
               </h2>
-              <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-                Add your website and share a live link in under a minute.
+              <p className="text-lg md:text-xl text-white/75 mb-10 max-w-2xl mx-auto">
+                Bring your site or your repo — share a live link in under a minute.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/publish" className="bg-white text-gray-900 font-semibold px-8 py-4 rounded-xl hover:bg-white/90 transition-all flex items-center gap-2 group shadow-lg">
+                <Link
+                  href="/publish"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 font-semibold text-[#16207a] shadow-[0_10px_30px_-6px_rgba(255,255,255,0.45)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_44px_-6px_rgba(255,255,255,0.65)]"
+                >
                   Publish a site
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <Link href="/pricing" className="bg-white/10 backdrop-blur-sm text-white font-medium px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
-                  View Pricing
+                <Link
+                  href="/deploy"
+                  className="rounded-xl border border-white/25 bg-white/10 px-8 py-4 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/20"
+                >
+                  Deploy an app
                 </Link>
               </div>
             </div>

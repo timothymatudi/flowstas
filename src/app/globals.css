@@ -88,11 +88,13 @@
   body {
     @apply text-foreground antialiased;
     background-color: var(--background);
-    /* Warm "milk" haze — soft amber + faint violet over cream */
+    /* Cooked light mesh — soft brand blue / cyan / violet blooms over near-white,
+       a faint top sheen, fixed so it sits behind the whole page. */
     background-image:
-      radial-gradient(55rem 55rem at 82% -12%, rgba(124, 58, 237, 0.05), transparent 60%),
-      radial-gradient(48rem 48rem at -12% 8%, rgba(234, 160, 70, 0.07), transparent 58%),
-      radial-gradient(60rem 40rem at 50% 120%, rgba(234, 160, 70, 0.05), transparent 60%);
+      radial-gradient(60rem 50rem at 88% -10%, rgba(0, 163, 196, 0.10), transparent 58%),
+      radial-gradient(55rem 50rem at 8% -6%, rgba(59, 91, 255, 0.10), transparent 58%),
+      radial-gradient(50rem 45rem at 50% 118%, rgba(124, 58, 237, 0.07), transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 18%);
     background-attachment: fixed;
   }
 }

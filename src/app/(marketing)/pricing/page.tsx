@@ -15,12 +15,22 @@ export default function PricingPage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent via-background to-background" />
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="font-display text-balance text-4xl tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              Simple, transparent pricing
+            <span className="inline-block mb-4 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-semibold uppercase tracking-wider text-primary">
+              Pricing
+            </span>
+            <h1 className="font-display text-balance text-5xl tracking-tight text-foreground md:text-6xl lg:text-7xl leading-[0.98]">
+              Simple, <span className="gradient-text">transparent</span> pricing
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Publish your first site free — no credit card needed. Upgrade when you need more sites, and cancel anytime.
+              Publish your first site free — no credit card needed. Upgrade when you need more, cancel anytime.
             </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2.5 text-sm text-muted-foreground">
+              {['No credit card to start', 'Cancel anytime', 'Secure Stripe checkout'].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  <Check className="h-4 w-4 text-green-600" /> {t}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
