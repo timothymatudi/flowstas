@@ -109,7 +109,8 @@ The user's current resources:
 Apps: ${apps.length ? apps.map((a) => `"${a.name}" (${a.status})`).join(', ') : 'none yet'}
 Sites: ${sites.length ? sites.map((s) => `"${s.name}" @ ${s.subdomain}.flowstas.com`).join(', ') : 'none yet'}`
 
-  const client = new Anthropic()
+  // maxRetries rides out transient 429/529/connection blips (e.g. "Overloaded").
+  const client = new Anthropic({ maxRetries: 4 })
 
   // Manual agentic loop. Read tools run inline; the first mutating tool pauses
   // for confirmation. Bounded iterations cap cost.
@@ -177,11 +178,13 @@ Sites: ${sites.length ? sites.map((s) => `"${s.name}" @ ${s.subdomain}.flowstas.
       reply: "I've done several steps — tell me how you'd like to continue.",
     })
   } catch (e) {
-    if (e instanceof Anthropic.APIError)
+    if (e instanceof Anthropic.APIError) {
+      const busy = e.status === 429 || e.status === 529 || e.status === undefined || /overload/i.test(e.message || '')
       return NextResponse.json(
-        { error: `The assistant is unavailable right now (${e.status}).` },
-        { status: 502 }
+        { error: busy ? 'The assistant is busy right now — please try again in a moment.' : `The assistant hit a problem (${e.status}).` },
+        { status: busy ? 503 : 502 }
       )
+    }
     return NextResponse.json({ error: 'The assistant could not respond.' }, { status: 502 })
   }
 }

@@ -85,7 +85,7 @@ ${appsContext}
 Sites:
 ${sitesContext}`
 
-  const client = new Anthropic()
+  const client = new Anthropic({ maxRetries: 4 })
 
   // Open the stream up front so any immediate API error (auth, bad request) is
   // surfaced as a normal JSON error response before we commit to a 200 stream.
@@ -109,11 +109,13 @@ ${sitesContext}`
       messages: history.map((m) => ({ role: m.role, content: m.content })),
     })
   } catch (e) {
-    if (e instanceof Anthropic.APIError)
+    if (e instanceof Anthropic.APIError) {
+      const busy = e.status === 429 || e.status === 529 || e.status === undefined || /overload/i.test(e.message || '')
       return NextResponse.json(
-        { error: `The assistant is unavailable right now (${e.status}).` },
-        { status: 502 }
+        { error: busy ? 'The assistant is busy right now — please try again in a moment.' : `The assistant hit a problem (${e.status}).` },
+        { status: busy ? 503 : 502 }
       )
+    }
     return NextResponse.json({ error: 'The assistant could not respond.' }, { status: 502 })
   }
 
