@@ -70,6 +70,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
 Your job is to help non-expert founders ship. Explain build and deploy errors in plain language, suggest concrete fixes, and write config when asked (Dockerfile, fly.toml, environment variables). Be concise and practical — lead with the likely cause and the next action. When you show config or commands, use fenced code blocks. If you don't have enough information, say what to check rather than guessing.
 
+You can search the web (web_search) and fetch a URL the user shares (web_fetch) — use them to look up framework errors, current docs, or anything beyond this app's own state shown below.
+
 Here is the current state of this app:
 ${context}`
 
@@ -83,6 +85,14 @@ ${context}`
       model: 'claude-opus-4-8',
       max_tokens: 16000,
       thinking: { type: 'adaptive' },
+      // Cost-conscious depth. (On claude-opus-4-8 temperature/top_p are removed
+      // and 400 if sent — determinism is steered via effort + prompting.)
+      output_config: { effort: 'medium' },
+      // Limited web access so the assistant can look up errors/docs to fix deploys.
+      tools: [
+        { type: 'web_search_20260209', name: 'web_search', max_uses: 5 },
+        { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: 5 },
+      ],
       system,
       messages: history.map((m) => ({ role: m.role, content: m.content })),
     })

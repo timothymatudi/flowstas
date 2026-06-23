@@ -75,6 +75,8 @@ export async function POST(req: Request) {
 
 Your job is to help users publish sites and deploy apps. Answer platform-wide questions in plain language — how to get started, how to publish a site, how to deploy an app, why an app might be down, how to connect a custom domain. Be concise and practical: lead with the next action. Use fenced code blocks for any config or commands. If you don't have enough information, say what to check rather than guessing.
 
+You can search the web (web_search) and fetch a URL the user shares (web_fetch) to answer anything beyond the platform — current docs, framework errors, how-tos. Use the web when it genuinely helps; prefer the resource context below for questions about the user's own sites and apps.
+
 Here are the user's resources:
 
 Apps:
@@ -93,6 +95,16 @@ ${sitesContext}`
       model: 'claude-opus-4-8',
       max_tokens: 16000,
       thinking: { type: 'adaptive' },
+      // Cost-conscious depth (the user asked for modest token use). Note: on
+      // claude-opus-4-8 temperature/top_p are removed and 400 if sent, so
+      // determinism is steered via effort + prompting, not sampling params.
+      output_config: { effort: 'medium' },
+      // Give the assistant limited web access so it can answer anything, not
+      // just platform questions. Capped uses keep cost bounded.
+      tools: [
+        { type: 'web_search_20260209', name: 'web_search', max_uses: 5 },
+        { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: 5 },
+      ],
       system,
       messages: history.map((m) => ({ role: m.role, content: m.content })),
     })
