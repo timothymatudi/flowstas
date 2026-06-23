@@ -117,8 +117,11 @@ Sites: ${sites.length ? sites.map((s) => `"${s.name}" @ ${s.subdomain}.flowstas.
           output_config: { effort: 'medium' },
           tools: [
             ...CUSTOM_TOOLS,
-            { type: 'web_search_20260209', name: 'web_search', max_uses: 5 },
-            { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: 5 },
+            // Basic web_search variant on purpose: the _20260209 dynamic-filtering
+            // variant runs programmatic tool calling under the hood, which is
+            // incompatible with disable_parallel_tool_use (returns 400). The basic
+            // variant lets us keep one-action-at-a-time confirmation + web access.
+            { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
           ],
           tool_choice: { type: 'auto', disable_parallel_tool_use: true },
           system,
