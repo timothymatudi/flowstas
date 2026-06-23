@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import {
   ArrowRight,
   Rocket,
@@ -93,7 +92,7 @@ export default function HomePage() {
                 </span>
                 <span className="text-sm font-medium text-foreground">Host a site or deploy an app</span>
               </div>
-              <h1 className="font-display text-5xl md:text-6xl xl:text-7xl mb-6 leading-[1.04]">
+              <h1 className="font-display text-6xl md:text-7xl xl:text-8xl mb-6 leading-[0.95] tracking-tight">
                 <span className="text-foreground">Host your site. </span>
                 <span className="gradient-text">Deploy your app.</span>
               </h1>
@@ -125,55 +124,77 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
-      {/* Real example sites */}
+      {/* Two ways to ship */}
       <section className="py-20 border-y border-border bg-secondary/40">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <Eyebrow>Live on Flowstas</Eyebrow>
+            <Eyebrow>What you can ship</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-4 text-foreground">
-              Real sites &amp; apps, <span className="gradient-text">hosted here</span>
+              Two ways to <span className="gradient-text">go live</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              These are real sites hosted on Flowstas, live right now — tap any to open it. Full apps from a
-              GitHub, GitLab or Bitbucket repo run here too.
+              Host a static site, or deploy a full app from a repo — same one-click feel.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {examples.map((e) => (
-              <a
-                key={e.host}
-                href={`https://${e.host}`}
-                target="_blank"
-                rel="noreferrer"
-                className="glass-light rounded-2xl overflow-hidden card-hover block"
-              >
-                <div className="flex items-center gap-1.5 border-b border-border bg-secondary/70 px-3 py-2.5">
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Host a site — browser frame */}
+            <div className="glass-light rounded-2xl p-6 card-hover">
+              <div className="rounded-xl overflow-hidden border border-border shadow-premium">
+                <div className="flex items-center gap-1.5 bg-secondary/70 px-3 py-2.5 border-b border-border">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                  <span className="ml-2 truncate text-xs text-muted-foreground">{e.host}</span>
+                  <span className="ml-2 text-xs text-muted-foreground">yourname.flowstas.com</span>
                 </div>
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={e.img}
-                    alt={`${e.name} — a real site published on Flowstas`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover object-top"
-                  />
+                <div className="bg-background h-44 p-6 flex flex-col items-center justify-center text-center">
+                  <div className="h-3.5 w-40 rounded bg-foreground/80 mb-3" />
+                  <div className="h-2 w-52 rounded bg-muted-foreground/30 mb-1.5" />
+                  <div className="h-2 w-44 rounded bg-muted-foreground/30 mb-5" />
+                  <div className="h-8 w-28 rounded-lg gradient-primary" />
                 </div>
-                <div className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="font-semibold text-foreground">{e.name}</p>
-                    <p className="text-sm text-muted-foreground">{e.kind}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    Visit <ArrowRight className="h-4 w-4" />
-                  </span>
+              </div>
+              <h3 className="mt-5 text-xl font-semibold text-foreground">Host a site</h3>
+              <p className="mt-1 text-muted-foreground leading-relaxed">
+                Paste HTML, drop a zip, or import a URL — live at your own address with HTTPS in seconds.
+              </p>
+            </div>
+
+            {/* Deploy an app — live build log */}
+            <div className="glass-light rounded-2xl p-6 card-hover">
+              <div className="rounded-xl overflow-hidden border border-border shadow-premium">
+                <div className="flex items-center gap-1.5 bg-gray-900 px-3 py-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                  <span className="ml-2 text-xs text-gray-400">building your app…</span>
                 </div>
-              </a>
-            ))}
+                <div className="bg-gray-950 h-44 p-4 font-mono text-xs leading-relaxed text-gray-300 space-y-1">
+                  <p><span className="text-green-400">▸</span> Cloning your repo…</p>
+                  <p><span className="text-green-400">▸</span> Detected Next.js</p>
+                  <p><span className="text-green-400">▸</span> Building the container…</p>
+                  <p><span className="text-green-400">▸</span> Deploying…</p>
+                  <p className="text-green-400">✓ Live at yourapp.flowstas.com</p>
+                </div>
+              </div>
+              <h3 className="mt-5 text-xl font-semibold text-foreground">Deploy an app</h3>
+              <p className="mt-1 text-muted-foreground leading-relaxed">
+                Point us at a GitHub, GitLab or Bitbucket repo — we build the container and run it live.
+              </p>
+            </div>
           </div>
+
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            Real sites running on Flowstas:{' '}
+            {examples.map((e, i) => (
+              <span key={e.host}>
+                <a href={`https://${e.host}`} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
+                  {e.host}
+                </a>
+                {i < examples.length - 1 ? ' · ' : ''}
+              </span>
+            ))}
+          </p>
         </div>
       </section>
 
