@@ -38,9 +38,9 @@ const trust = [
 ]
 
 const steps = [
-  { step: '01', title: 'Add your site', description: 'Paste your HTML or upload your files.', icon: MousePointerClick },
-  { step: '02', title: 'Publish', description: 'One click and your site is live at its own link.', icon: Rocket },
-  { step: '03', title: 'Get messages', description: 'Visitors fill your contact form — you receive every message.', icon: MailCheck },
+  { step: '01', title: 'Bring it', description: 'Paste a site, upload files, import a URL, or connect a Git repo.', icon: MousePointerClick },
+  { step: '02', title: 'We put it live', description: 'We host your site or build & run your app — with HTTPS.', icon: Rocket },
+  { step: '03', title: 'Go', description: 'Live at your own flowstas.com address, or connect your domain.', icon: Globe },
 ]
 
 const features = [
@@ -91,19 +91,19 @@ export default function HomePage() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                 </span>
-                <span className="text-sm font-medium text-foreground">Your website, online in seconds</span>
+                <span className="text-sm font-medium text-foreground">Host a site or deploy an app</span>
               </div>
               <h1 className="font-display text-5xl md:text-6xl xl:text-7xl mb-6 leading-[1.04]">
-                <span className="text-foreground">Publish your website, </span>
-                <span className="gradient-text">get it live instantly.</span>
+                <span className="text-foreground">Host your site. </span>
+                <span className="gradient-text">Deploy your app.</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                No servers, no setup, no code. Paste your site or drop a zip — it goes live at the
-                <span className="font-semibold text-foreground"> yourname.flowstas.com</span> address you pick,
-                contact form and all.
+                Bring what you already have — paste a site, drop a zip, import a URL, or point us at a
+                <span className="font-semibold text-foreground"> GitHub, GitLab or Bitbucket</span> repo. We host or
+                build it and put it live with HTTPS at your own address.
               </p>
               <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2.5 text-sm text-muted-foreground">
-                {['Live in seconds', 'Automatic HTTPS', 'Free to start'].map((t) => (
+                {['Static or full-stack', 'Automatic HTTPS', 'Free to start'].map((t) => (
                   <li key={t} className="inline-flex items-center gap-1.5">
                     <Check className="h-4 w-4 text-green-600" /> {t}
                   </li>
@@ -117,8 +117,9 @@ export default function HomePage() {
             </div>
           </div>
           <p className="mt-10 text-center text-sm text-muted-foreground">
-            Prefer a bigger editor or to upload a whole folder?{' '}
-            <Link href="/publish" className="font-medium text-primary hover:underline">Open the full publish page</Link>
+            Want to upload a folder, import a URL, or{' '}
+            <Link href="/deploy" className="font-medium text-primary hover:underline">deploy a full app from a repo</Link>?{' '}
+            <Link href="/publish" className="font-medium text-primary hover:underline">Open the publish page</Link>.
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
@@ -128,12 +129,13 @@ export default function HomePage() {
       <section className="py-20 border-y border-border bg-secondary/40">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <Eyebrow>Real sites</Eyebrow>
+            <Eyebrow>Live on Flowstas</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-4 text-foreground">
-              Built &amp; published <span className="gradient-text">on Flowstas</span>
+              Real sites &amp; apps, <span className="gradient-text">hosted here</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Three real sites, live right now — each at its own flowstas.com address. Tap any to open it.
+              These are real sites hosted on Flowstas, live right now — tap any to open it. Full apps from a
+              GitHub, GitLab or Bitbucket repo run here too.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -183,7 +185,7 @@ export default function HomePage() {
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Live in <span className="gradient-text">3 simple steps</span>
             </h2>
-            <p className="text-lg text-muted-foreground">From your files to a live website in under a minute.</p>
+            <p className="text-lg text-muted-foreground">From your files or repo to a live site or app — in minutes.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10 md:gap-8 max-w-5xl mx-auto">
             {steps.map((item, index) => (
