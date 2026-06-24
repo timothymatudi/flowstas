@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getApp, setAppStatus, updateAppDeploy } from '@/lib/app-store'
+import { getApp, setAppStatus, updateAppDeploy, getAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
 
 export const dynamic = 'force-dynamic'
@@ -13,9 +13,9 @@ export const maxDuration = 300
 // this doesn't stream: it runs the worker to completion and records the outcome,
 // so the dashboard can simply refresh to show the new status.
 //
-// Note: a private repo's access token is never stored, so a redeploy can only
-// re-clone repos the worker can already reach. The worker keeps the app's saved
-// secrets, so those carry over.
+// Note: a private repo's clone token, if supplied at create time, is stored
+// encrypted (AES-256-GCM, key in APP_TOKEN_ENC_KEY) and re-supplied here so the
+// redeploy can re-clone. The worker also keeps the app's saved secrets.
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
   const {
@@ -39,6 +39,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   // Mark it building so the dashboard reflects the rebuild immediately.
   await setAppStatus(app.id, user.id, 'building')
 
+  // Re-supply the stored clone token (if any) so private repos can re-clone.
+  const githubToken = await getAppGithubToken(app.id)
+
   let res: Response
   try {
     res = await startDeploy({
@@ -46,6 +49,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       name: app.flyApp,
       branch: app.branch,
       buildEnv: app.buildEnv,
+      githubToken,
     })
   } catch (e) {
     const error = e instanceof Error ? e.message : 'Could not start the rebuild.'

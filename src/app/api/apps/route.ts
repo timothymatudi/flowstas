@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { appLimitForPlan, effectivePlan } from '@/lib/plan-limits'
-import { createApp, countAppsForOwner, updateAppDeploy, listApps } from '@/lib/app-store'
+import { createApp, countAppsForOwner, updateAppDeploy, listApps, setAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
 
 export const dynamic = 'force-dynamic'
@@ -87,6 +87,17 @@ export async function POST(req: Request) {
 
   // Record the app (status "building"), then kick off the worker.
   const app = await createApp(name || repo.split('/').pop() || 'app', repo, branch, user.id)
+
+  // For a private repo, persist the clone token (encrypted) so future redeploys
+  // and push-triggered builds can re-clone without re-prompting. Best-effort:
+  // never block the deploy if APP_TOKEN_ENC_KEY isn't configured.
+  if (githubToken) {
+    try {
+      await setAppGithubToken(app.id, user.id, githubToken)
+    } catch {
+      // token simply won't be stored; initial deploy still uses it live below
+    }
+  }
 
   let workerRes: Response
   try {

@@ -33,6 +33,38 @@ function newId() {
   return crypto.randomBytes(4).toString('hex')
 }
 
+// --- GitHub token at rest (AES-256-GCM) --------------------------------------
+// Private-repo deploys need a GitHub token to clone. We encrypt it at rest so a
+// redeploy (dashboard button or push webhook) can re-clone without re-prompting.
+// The key lives only in the APP_TOKEN_ENC_KEY env var (32 bytes, base64) — never
+// in the DB — so a DB leak alone can't decrypt stored tokens.
+function tokenEncKey(): Buffer {
+  const raw = process.env.APP_TOKEN_ENC_KEY
+  if (!raw) throw new Error('APP_TOKEN_ENC_KEY is not set — cannot encrypt GitHub tokens.')
+  const key = Buffer.from(raw, 'base64')
+  if (key.length !== 32) throw new Error('APP_TOKEN_ENC_KEY must decode to 32 bytes (base64).')
+  return key
+}
+
+// Returns base64(iv[12] | authTag[16] | ciphertext).
+function encryptToken(plain: string): string {
+  const iv = crypto.randomBytes(12)
+  const cipher = crypto.createCipheriv('aes-256-gcm', tokenEncKey(), iv)
+  const ct = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+  return Buffer.concat([iv, tag, ct]).toString('base64')
+}
+
+function decryptToken(stored: string): string {
+  const buf = Buffer.from(stored, 'base64')
+  const iv = buf.subarray(0, 12)
+  const tag = buf.subarray(12, 28)
+  const ct = buf.subarray(28)
+  const decipher = crypto.createDecipheriv('aes-256-gcm', tokenEncKey(), iv)
+  decipher.setAuthTag(tag)
+  return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8')
+}
+
 // A Fly app name: lowercase letters/digits/hyphens, globally unique. We prefix
 // "flowstas-" so customer apps are namespaced, add a slug from the name for
 // readability, and suffix the id to guarantee uniqueness.
@@ -130,6 +162,46 @@ export async function setAppBuildEnv(
     .update({ build_env: merged, updated_at: new Date().toISOString() })
     .eq('id', id)
   return true
+}
+
+// Store the encrypted GitHub token for an app the user owns, so private-repo
+// redeploys can re-clone. Pass null to clear it. Best-effort caller — encryption
+// requires APP_TOKEN_ENC_KEY; if that's unset this throws and the caller decides.
+export async function setAppGithubToken(
+  id: string,
+  ownerId: string,
+  token: string | null
+): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase.from('apps').select('owner_id').eq('id', id).maybeSingle()
+  if (!row || row.owner_id !== ownerId) return false
+  await supabase
+    .from('apps')
+    .update({
+      github_token_enc: token ? encryptToken(token) : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+  return true
+}
+
+// Decrypt and return an app's stored GitHub token, or null if none/invalid.
+// Looked up by app id only (the push webhook is HMAC-authed and has no owner
+// context); callers that act on a user's behalf must check ownership first.
+export async function getAppGithubToken(id: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('apps')
+    .select('github_token_enc')
+    .eq('id', id)
+    .maybeSingle()
+  const enc = data?.github_token_enc as string | undefined
+  if (!enc) return null
+  try {
+    return decryptToken(enc)
+  } catch {
+    return null
+  }
 }
 
 // Record the outcome of a build/deploy: live (with url) or error (with reason),

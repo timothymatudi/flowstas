@@ -16,12 +16,14 @@ create table if not exists public.apps (
   status        text not null default 'building', -- building | live | error | stopped
   last_error    text,                          -- short reason when status = error
   build_env     jsonb,                         -- real PUBLIC build-time env (NEXT_PUBLIC_* etc.) baked at build; not secrets
+  github_token_enc text,                        -- AES-256-GCM encrypted clone token for private repos (key in APP_TOKEN_ENC_KEY)
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
 
--- Add build_env to tables created before this column existed.
+-- Add columns to tables created before they existed.
 alter table public.apps add column if not exists build_env jsonb;
+alter table public.apps add column if not exists github_token_enc text;
 
 create index if not exists apps_owner_id_idx on public.apps(owner_id);
 
