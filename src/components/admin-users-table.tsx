@@ -15,6 +15,31 @@ function fmtDate(s: string | null) {
   return new Date(s).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+type Status = 'active' | 'suspended' | 'unconfirmed'
+function statusOf(u: AdminUserRow): Status {
+  if (u.suspended) return 'suspended'
+  return u.confirmed ? 'active' : 'unconfirmed'
+}
+
+type SortKey = 'name' | 'status' | 'sites' | 'apps' | 'joined' | 'lastSignIn'
+function sortValue(u: AdminUserRow, key: SortKey): string | number {
+  switch (key) {
+    case 'name': return (u.fullName || u.email).toLowerCase()
+    case 'status': return statusOf(u)
+    case 'sites': return u.sitesCount
+    case 'apps': return u.appsCount
+    case 'joined': return new Date(u.createdAt).getTime()
+    case 'lastSignIn': return u.lastSignInAt ? new Date(u.lastSignInAt).getTime() : 0
+  }
+}
+
+const STATUS_TABS: { value: Status | 'all'; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'active', label: 'Active' },
+  { value: 'suspended', label: 'Suspended' },
+  { value: 'unconfirmed', label: 'Unconfirmed' },
+]
+
 export function AdminUsersTable({
   users,
   currentAdminId,
@@ -27,14 +52,28 @@ export function AdminUsersTable({
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'err'; msg: string } | null>(null)
   const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<Status | 'all'>('all')
+  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'joined', dir: 'desc' })
 
-  const filtered = useMemo(() => {
+  function toggleSort(key: SortKey) {
+    setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }))
+  }
+
+  const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return users
-    return users.filter(
-      (u) => u.email.toLowerCase().includes(q) || (u.fullName || '').toLowerCase().includes(q)
-    )
-  }, [users, query])
+    const list = users.filter((u) => {
+      if (q && !(u.email.toLowerCase().includes(q) || (u.fullName || '').toLowerCase().includes(q))) return false
+      if (statusFilter !== 'all' && statusOf(u) !== statusFilter) return false
+      return true
+    })
+    const dir = sort.dir === 'asc' ? 1 : -1
+    return [...list].sort((a, b) => {
+      const av = sortValue(a, sort.key)
+      const bv = sortValue(b, sort.key)
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir
+      return String(av).localeCompare(String(bv)) * dir
+    })
+  }, [users, query, statusFilter, sort])
 
   function run(id: string, fn: () => Promise<{ ok: boolean; error?: string }>, okMsg: string) {
     setBusyId(id)
@@ -77,6 +116,23 @@ export function AdminUsersTable({
     run(u.id, () => adminDeleteUserAction(u.id), `${u.email} deleted.`)
   }
 
+  // A clickable, sortable column header.
+  function SortHeader({ label, sortKey, align = 'left' }: { label: string; sortKey: SortKey; align?: 'left' | 'right' }) {
+    const active = sort.key === sortKey
+    return (
+      <th className={`px-4 py-3 font-medium ${align === 'right' ? 'text-right' : ''}`}>
+        <button
+          onClick={() => toggleSort(sortKey)}
+          className={`inline-flex items-center gap-1 hover:text-foreground ${active ? 'text-foreground' : ''}`}
+          aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
+        >
+          {label}
+          <span className="text-[10px] leading-none">{active ? (sort.dir === 'asc' ? '▲' : '▼') : '↕'}</span>
+        </button>
+      </th>
+    )
+  }
+
   return (
     <div>
       {notice && (
@@ -91,16 +147,29 @@ export function AdminUsersTable({
         </div>
       )}
 
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name or email…"
-          className="w-full max-w-sm rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          className="w-full max-w-xs rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
         />
+        <div className="inline-flex rounded-lg border bg-background p-0.5">
+          {STATUS_TABS.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setStatusFilter(t.value)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                statusFilter === t.value ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
         <span className="shrink-0 text-xs text-muted-foreground">
-          {filtered.length} of {users.length}
+          {visible.length} of {users.length}
         </span>
       </div>
 
@@ -108,24 +177,24 @@ export function AdminUsersTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-muted-foreground">
-              <th className="px-4 py-3 font-medium">User</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Sites</th>
-              <th className="px-4 py-3 font-medium">Apps</th>
-              <th className="px-4 py-3 font-medium">Joined</th>
-              <th className="px-4 py-3 font-medium">Last sign-in</th>
+              <SortHeader label="User" sortKey="name" />
+              <SortHeader label="Status" sortKey="status" />
+              <SortHeader label="Sites" sortKey="sites" />
+              <SortHeader label="Apps" sortKey="apps" />
+              <SortHeader label="Joined" sortKey="joined" />
+              <SortHeader label="Last sign-in" sortKey="lastSignIn" />
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 && (
+            {visible.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
-                  No users match “{query}”.
+                  No users match your filters.
                 </td>
               </tr>
             )}
-            {filtered.map((u) => {
+            {visible.map((u) => {
               const isSelf = u.id === currentAdminId
               const rowBusy = busyId === u.id && isPending
               return (
