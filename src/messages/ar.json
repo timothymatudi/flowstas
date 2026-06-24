@@ -1,6 +1,13 @@
 {
-  "common": { "login": "تسجيل الدخول", "getStarted": "ابدأ الآن", "language": "اللغة" },
-  "nav": { "publishSite": "انشر موقعًا", "deployApp": "انشر تطبيقًا" },
+  "common": {
+    "login": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن",
+    "language": "اللغة"
+  },
+  "nav": {
+    "publishSite": "انشر موقعًا",
+    "deployApp": "انشر تطبيقًا"
+  },
   "landing": {
     "badge": "استضف موقعًا أو انشر تطبيقًا",
     "headlineLine1": "استضف موقعك.",
@@ -8,5 +15,11 @@
     "subheadline": "من ملفاتك أو مستودعك إلى موقع أو تطبيق مباشر — في دقائق.",
     "ctaPublish": "انشر موقعًا",
     "ctaDeploy": "انشر تطبيقًا"
+  },
+  "cookies": {
+    "message": "نستخدم ملفات تعريف الارتباط لتشغيل Flowstas، وبموافقتك لفهم الاستخدام.",
+    "accept": "قبول",
+    "reject": "رفض غير الضرورية",
+    "learnMore": "سياسة الخصوصية"
   }
 }

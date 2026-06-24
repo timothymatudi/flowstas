@@ -1,6 +1,13 @@
 {
-  "common": { "login": "登录", "getStarted": "开始使用", "language": "语言" },
-  "nav": { "publishSite": "发布网站", "deployApp": "部署应用" },
+  "common": {
+    "login": "登录",
+    "getStarted": "开始使用",
+    "language": "语言"
+  },
+  "nav": {
+    "publishSite": "发布网站",
+    "deployApp": "部署应用"
+  },
   "landing": {
     "badge": "托管网站或部署应用",
     "headlineLine1": "托管你的网站。",
@@ -8,5 +15,11 @@
     "subheadline": "从你的文件或代码库到上线的网站或应用——只需几分钟。",
     "ctaPublish": "发布网站",
     "ctaDeploy": "部署应用"
+  },
+  "cookies": {
+    "message": "我们使用 Cookie 以保证 Flowstas 正常运行，并在您同意后用于了解使用情况。",
+    "accept": "接受",
+    "reject": "拒绝非必要",
+    "learnMore": "隐私政策"
   }
 }

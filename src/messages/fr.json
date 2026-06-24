@@ -1,6 +1,13 @@
 {
-  "common": { "login": "Connexion", "getStarted": "Commencer", "language": "Langue" },
-  "nav": { "publishSite": "Publier un site", "deployApp": "Déployer une app" },
+  "common": {
+    "login": "Connexion",
+    "getStarted": "Commencer",
+    "language": "Langue"
+  },
+  "nav": {
+    "publishSite": "Publier un site",
+    "deployApp": "Déployer une app"
+  },
   "landing": {
     "badge": "Hébergez un site ou déployez une app",
     "headlineLine1": "Hébergez votre site.",
@@ -8,5 +15,11 @@
     "subheadline": "De vos fichiers ou votre dépôt à un site ou une app en ligne — en quelques minutes.",
     "ctaPublish": "Publier un site",
     "ctaDeploy": "Déployer une app"
+  },
+  "cookies": {
+    "message": "Nous utilisons des cookies pour faire fonctionner Flowstas et, avec votre consentement, pour analyser l'utilisation.",
+    "accept": "Accepter",
+    "reject": "Refuser les non essentiels",
+    "learnMore": "Politique de confidentialité"
   }
 }

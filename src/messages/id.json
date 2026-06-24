@@ -1,6 +1,13 @@
 {
-  "common": { "login": "Masuk", "getStarted": "Mulai", "language": "Bahasa" },
-  "nav": { "publishSite": "Terbitkan situs", "deployApp": "Terapkan aplikasi" },
+  "common": {
+    "login": "Masuk",
+    "getStarted": "Mulai",
+    "language": "Bahasa"
+  },
+  "nav": {
+    "publishSite": "Terbitkan situs",
+    "deployApp": "Terapkan aplikasi"
+  },
   "landing": {
     "badge": "Hosting situs atau terapkan aplikasi",
     "headlineLine1": "Hosting situs Anda.",
@@ -8,5 +15,11 @@
     "subheadline": "Dari file atau repositori Anda ke situs atau aplikasi langsung — dalam hitungan menit.",
     "ctaPublish": "Terbitkan situs",
     "ctaDeploy": "Terapkan aplikasi"
+  },
+  "cookies": {
+    "message": "Kami menggunakan cookie agar Flowstas berfungsi dan, dengan persetujuan Anda, untuk memahami penggunaan.",
+    "accept": "Terima",
+    "reject": "Tolak yang tidak penting",
+    "learnMore": "Kebijakan privasi"
   }
 }

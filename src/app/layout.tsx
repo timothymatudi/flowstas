@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { localeMeta, type Locale } from '@/i18n/locales'
 import { CurrencyProvider, CURRENCY_COOKIE } from '@/components/currency-provider'
 import { currencyForCountry, isCurrency } from '@/lib/currency'
+import { CookieConsent, CONSENT_COOKIE } from '@/components/cookie-consent'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -80,6 +81,9 @@ export default async function RootLayout({
       ? savedCurrency
       : currencyForCountry(headerStore.get('x-vercel-ip-country'))
 
+  // GDPR: only load non-essential analytics once the visitor has accepted.
+  const analyticsAllowed = cookieStore.get(CONSENT_COOKIE)?.value === 'accepted'
+
   return (
     // suppressHydrationWarning: the bootstrap script mutates <html>'s class
     // before hydration, which is an intentional, expected SSR/client mismatch.
@@ -89,7 +93,8 @@ export default async function RootLayout({
           <CurrencyProvider initialCurrency={initialCurrency}>
             {children}
             <Toaster />
-            <Analytics />
+            <CookieConsent />
+            {analyticsAllowed && <Analytics />}
           </CurrencyProvider>
         </NextIntlClientProvider>
       </body>
