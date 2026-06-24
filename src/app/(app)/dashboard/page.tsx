@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DashboardContent from '@/components/dashboard-content'
+import { AdminOverview } from '@/components/admin-overview'
+import { isAdminEmail, getPlatformStats } from '@/lib/admin'
 import { listSites, listSubmissions } from '@/lib/site-store'
 import { listApps } from '@/lib/app-store'
 
@@ -11,6 +13,12 @@ export default async function DashboardPage() {
 
   if (!user) {
     redirect('/auth/login')
+  }
+
+  // Admins get a platform control panel instead of the personal onboarding.
+  if (isAdminEmail(user.email)) {
+    const stats = await getPlatformStats()
+    return <AdminOverview stats={stats} adminName={user.email ?? 'Admin'} />
   }
 
   // Get subscription data

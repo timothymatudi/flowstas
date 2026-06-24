@@ -88,6 +88,54 @@ export async function listAllUsers(): Promise<AdminUserRow[]> {
   return rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 }
 
+export interface PlatformStats {
+  users: { total: number; active: number; suspended: number; unconfirmed: number }
+  sites: number
+  apps: number
+  subscriptions: { paying: number; trialing: number; byPlan: { label: string; count: number }[] }
+  recentSignups: { id: string; email: string; createdAt: string }[]
+}
+
+// Platform-wide numbers for the admin overview dashboard.
+export async function getPlatformStats(): Promise<PlatformStats> {
+  const supabase = createAdminClient()
+  const allUsers = await listAllUsers()
+
+  const [{ count: siteCount }, { count: appCount }, subs] = await Promise.all([
+    supabase.from('sites').select('id', { count: 'exact', head: true }),
+    supabase.from('apps').select('id', { count: 'exact', head: true }),
+    supabase.from('subscriptions').select('plan, status'),
+  ])
+
+  const rows = subs.data ?? []
+  const paying = rows.filter((r) => r.status === 'active' && r.plan && r.plan !== 'trial').length
+  const trialing = rows.filter((r) => r.status === 'trialing').length
+  const planMap = new Map<string, number>()
+  for (const r of rows) {
+    const label = `${r.plan ?? 'none'} · ${r.status ?? 'none'}`
+    planMap.set(label, (planMap.get(label) ?? 0) + 1)
+  }
+
+  return {
+    users: {
+      total: allUsers.length,
+      active: allUsers.filter((u) => !u.suspended && u.confirmed).length,
+      suspended: allUsers.filter((u) => u.suspended).length,
+      unconfirmed: allUsers.filter((u) => !u.suspended && !u.confirmed).length,
+    },
+    sites: siteCount ?? 0,
+    apps: appCount ?? 0,
+    subscriptions: {
+      paying,
+      trialing,
+      byPlan: [...planMap.entries()]
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count),
+    },
+    recentSignups: allUsers.slice(0, 5).map((u) => ({ id: u.id, email: u.email, createdAt: u.createdAt })),
+  }
+}
+
 // One account's basic profile/status for the drill-down page, or null if the
 // id doesn't exist. (Site/app counts come from listSites/listApps separately.)
 export async function getUserBasic(
