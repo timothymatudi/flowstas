@@ -26,7 +26,8 @@ import {
   Globe,
   Server,
   Boxes,
-  Sparkles
+  Sparkles,
+  Users
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -34,9 +35,10 @@ interface DashboardNavProps {
   user: User
   profile: { full_name: string | null; avatar_url: string | null } | null
   subscription: { plan: string; status: string } | null
+  isAdmin?: boolean
 }
 
-const navItems = [
+const baseNavItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/publish', label: 'Publish a Site', icon: Rocket },
   { href: '/sites', label: 'My Sites', icon: Globe },
@@ -47,9 +49,13 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
-export function DashboardNav({ user, profile, subscription }: DashboardNavProps) {
+// Admins get an extra Users section appended to the nav.
+const adminNavItems = [{ href: '/admin/users', label: 'Users', icon: Users }]
+
+export function DashboardNav({ user, profile, subscription, isAdmin }: DashboardNavProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const navItems = isAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems
 
   async function handleSignOut() {
     const supabase = createClient()
