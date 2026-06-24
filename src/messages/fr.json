@@ -25,5 +25,29 @@
   "seo": {
     "title": "Flowstas — Publiez votre site en quelques secondes",
     "description": "Collez du HTML ou déposez un zip et votre site est en ligne — sa propre adresse, HTTPS, un formulaire de contact et votre domaine."
+  },
+  "pricing": {
+    "eyebrow": "Tarifs",
+    "title": "Des tarifs simples et transparents",
+    "subtitle": "Publiez votre premier site gratuitement — sans carte bancaire. Passez à un plan supérieur au besoin, annulez à tout moment.",
+    "badge1": "Sans carte pour commencer",
+    "badge2": "Annulez à tout moment",
+    "badge3": "Paiement sécurisé via Stripe",
+    "backToPlans": "Retour aux plans",
+    "includesTitle": "Chaque plan comprend",
+    "inc1": "Un site gratuit pour commencer — sans carte",
+    "inc2": "Connectez votre propre domaine, HTTPS inclus",
+    "inc3": "Collecte des messages du formulaire de contact",
+    "inc4": "Paiements sécurisés via Stripe",
+    "inc5": "Sans frais d'installation, annulez à tout moment",
+    "inc6": "Assistance par e-mail",
+    "faqTitle": "Questions sur les tarifs",
+    "faqSubtitle": "Les réponses honnêtes avant de choisir un plan.",
+    "q1": "Y a-t-il vraiment un plan gratuit ?",
+    "a1": "Oui. Vous pouvez publier 1 site gratuitement, sans carte bancaire. Commencez et mettez-le en ligne, puis passez à un plan supérieur uniquement si nécessaire.",
+    "q2": "Puis-je annuler à tout moment ?",
+    "a2": "Oui. Les plans sont mensuels et sans engagement — annulez à tout moment depuis votre page de facturation et gardez l'accès jusqu'à la fin de la période.",
+    "q3": "Que se passe-t-il si j'atteins la limite de mon plan ?",
+    "a3": "Vos sites et apps en ligne continuent de fonctionner. Pour en ajouter, passez simplement à un plan supérieur — rien de déjà publié ne se déconnecte."
   }
 }

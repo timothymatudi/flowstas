@@ -25,5 +25,29 @@
   "seo": {
     "title": "Flowstas — Publish your website in seconds",
     "description": "Paste HTML or drop a zip and your site is live — its own address, HTTPS, a contact form, and your own custom domain."
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "title": "Simple, transparent pricing",
+    "subtitle": "Publish your first site free — no credit card needed. Upgrade when you need more, cancel anytime.",
+    "badge1": "No credit card to start",
+    "badge2": "Cancel anytime",
+    "badge3": "Secure Stripe checkout",
+    "backToPlans": "Back to plans",
+    "includesTitle": "Every plan includes",
+    "inc1": "A free site to start — no card needed",
+    "inc2": "Connect your own domain, with HTTPS included",
+    "inc3": "Contact-form message capture",
+    "inc4": "Secure payments via Stripe",
+    "inc5": "No setup fees, cancel anytime",
+    "inc6": "Email support",
+    "faqTitle": "Pricing questions",
+    "faqSubtitle": "The honest answers before you pick a plan.",
+    "q1": "Is there really a free plan?",
+    "a1": "Yes. You can publish 1 site for free, with no credit card required. Start building and go live, then upgrade only if you need more.",
+    "q2": "Can I cancel anytime?",
+    "a2": "Yes. Plans are month-to-month with no contracts — cancel any time from your billing page and you keep access until the period ends.",
+    "q3": "What if I hit my plan limit?",
+    "a3": "Your live sites and apps keep running. To add more, just upgrade to a higher plan — nothing already published goes offline."
   }
 }

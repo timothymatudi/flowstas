@@ -25,5 +25,29 @@
   "seo": {
     "title": "Flowstas — Publica tu sitio web en segundos",
     "description": "Pega HTML o sube un zip y tu sitio estará en línea — con su propia dirección, HTTPS, formulario de contacto y tu dominio."
+  },
+  "pricing": {
+    "eyebrow": "Precios",
+    "title": "Precios simples y transparentes",
+    "subtitle": "Publica tu primer sitio gratis — sin tarjeta de crédito. Mejora cuando necesites más, cancela cuando quieras.",
+    "badge1": "Sin tarjeta para empezar",
+    "badge2": "Cancela cuando quieras",
+    "badge3": "Pago seguro con Stripe",
+    "backToPlans": "Volver a los planes",
+    "includesTitle": "Todos los planes incluyen",
+    "inc1": "Un sitio gratis para empezar — sin tarjeta",
+    "inc2": "Conecta tu propio dominio, con HTTPS incluido",
+    "inc3": "Captura de mensajes del formulario de contacto",
+    "inc4": "Pagos seguros con Stripe",
+    "inc5": "Sin cuotas de instalación, cancela cuando quieras",
+    "inc6": "Soporte por correo",
+    "faqTitle": "Preguntas sobre precios",
+    "faqSubtitle": "Respuestas honestas antes de elegir un plan.",
+    "q1": "¿De verdad hay un plan gratis?",
+    "a1": "Sí. Puedes publicar 1 sitio gratis, sin tarjeta de crédito. Empieza y publícalo, y mejora solo si necesitas más.",
+    "q2": "¿Puedo cancelar cuando quiera?",
+    "a2": "Sí. Los planes son mensuales y sin contratos — cancela cuando quieras desde tu página de facturación y mantienes el acceso hasta el final del periodo.",
+    "q3": "¿Y si llego al límite de mi plan?",
+    "a3": "Tus sitios y apps en vivo siguen funcionando. Para añadir más, mejora a un plan superior — nada de lo ya publicado se desconecta."
   }
 }

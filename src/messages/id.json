@@ -25,5 +25,29 @@
   "seo": {
     "title": "Flowstas — Terbitkan situs Anda dalam hitungan detik",
     "description": "Tempel HTML atau jatuhkan zip dan situs Anda langsung aktif — alamat sendiri, HTTPS, formulir kontak, dan domain Anda."
+  },
+  "pricing": {
+    "eyebrow": "Harga",
+    "title": "Harga sederhana dan transparan",
+    "subtitle": "Terbitkan situs pertama Anda gratis — tanpa kartu kredit. Tingkatkan saat butuh lebih, batalkan kapan saja.",
+    "badge1": "Tanpa kartu untuk memulai",
+    "badge2": "Batalkan kapan saja",
+    "badge3": "Checkout aman via Stripe",
+    "backToPlans": "Kembali ke paket",
+    "includesTitle": "Setiap paket mencakup",
+    "inc1": "Situs gratis untuk memulai — tanpa kartu",
+    "inc2": "Hubungkan domain Anda sendiri, dengan HTTPS",
+    "inc3": "Pengumpulan pesan formulir kontak",
+    "inc4": "Pembayaran aman via Stripe",
+    "inc5": "Tanpa biaya pemasangan, batalkan kapan saja",
+    "inc6": "Dukungan email",
+    "faqTitle": "Pertanyaan tentang harga",
+    "faqSubtitle": "Jawaban jujur sebelum Anda memilih paket.",
+    "q1": "Apakah benar ada paket gratis?",
+    "a1": "Ya. Anda bisa menerbitkan 1 situs gratis, tanpa kartu kredit. Mulai dan tayangkan, lalu tingkatkan hanya jika butuh lebih.",
+    "q2": "Bisakah saya membatalkan kapan saja?",
+    "a2": "Ya. Paket bersifat bulanan tanpa kontrak — batalkan kapan saja dari halaman tagihan dan akses tetap ada hingga periode berakhir.",
+    "q3": "Bagaimana jika saya mencapai batas paket?",
+    "a3": "Situs dan aplikasi Anda yang aktif tetap berjalan. Untuk menambah, cukup tingkatkan ke paket lebih tinggi — yang sudah terbit tidak akan offline."
   }
 }

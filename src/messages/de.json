@@ -25,5 +25,29 @@
   "seo": {
     "title": "Flowstas — Veröffentliche deine Website in Sekunden",
     "description": "Füge HTML ein oder lade ein ZIP hoch und deine Website ist live — eigene Adresse, HTTPS, Kontaktformular und deine Domain."
+  },
+  "pricing": {
+    "eyebrow": "Preise",
+    "title": "Einfache, transparente Preise",
+    "subtitle": "Veröffentliche deine erste Website kostenlos — ohne Kreditkarte. Upgrade bei Bedarf, jederzeit kündbar.",
+    "badge1": "Ohne Karte starten",
+    "badge2": "Jederzeit kündbar",
+    "badge3": "Sichere Zahlung über Stripe",
+    "backToPlans": "Zurück zu den Plänen",
+    "includesTitle": "Jeder Plan enthält",
+    "inc1": "Eine kostenlose Website zum Start — ohne Karte",
+    "inc2": "Verbinde deine eigene Domain, inkl. HTTPS",
+    "inc3": "Erfassung von Kontaktformular-Nachrichten",
+    "inc4": "Sichere Zahlungen über Stripe",
+    "inc5": "Keine Einrichtungsgebühren, jederzeit kündbar",
+    "inc6": "E-Mail-Support",
+    "faqTitle": "Fragen zu den Preisen",
+    "faqSubtitle": "Die ehrlichen Antworten, bevor du einen Plan wählst.",
+    "q1": "Gibt es wirklich einen kostenlosen Plan?",
+    "a1": "Ja. Du kannst 1 Website kostenlos veröffentlichen, ohne Kreditkarte. Leg los und geh live, und upgrade nur, wenn du mehr brauchst.",
+    "q2": "Kann ich jederzeit kündigen?",
+    "a2": "Ja. Die Pläne sind monatlich und ohne Vertrag — kündige jederzeit auf deiner Abrechnungsseite und behalte den Zugang bis zum Periodenende.",
+    "q3": "Was, wenn ich mein Planlimit erreiche?",
+    "a3": "Deine Live-Websites und -Apps laufen weiter. Für mehr einfach auf einen höheren Plan upgraden — nichts bereits Veröffentlichtes geht offline."
   }
 }
