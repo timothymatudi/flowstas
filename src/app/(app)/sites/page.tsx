@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { listSites, listSubmissions, getViewStats, type ViewStats } from '@/lib/site-store'
+import { listSites, listAllSites, listSubmissions, getViewStats, type ViewStats } from '@/lib/site-store'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminEmail, ownerEmailMap } from '@/lib/admin'
 import { DeleteSiteButton } from '@/components/delete-site-button'
 import { ManageSite } from '@/components/manage-site'
 
@@ -29,7 +30,11 @@ export default async function SitesPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const sites = await listSites(user.id)
+  const admin = isAdminEmail(user.email)
+  const sites: Array<Awaited<ReturnType<typeof listSites>>[number] & { ownerId?: string }> = admin
+    ? await listAllSites()
+    : await listSites(user.id)
+  const emails = admin ? await ownerEmailMap() : null
   const data = await Promise.all(
     sites.map(async (site) => ({
       site,
@@ -43,9 +48,16 @@ export default async function SitesPage() {
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl text-foreground">My Sites</h1>
+            <h1 className="font-display text-3xl text-foreground">
+              {admin ? 'All Sites' : 'My Sites'}
+              {admin && (
+                <span className="ml-2 align-middle rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  Admin
+                </span>
+              )}
+            </h1>
             <p className="mt-1 text-muted-foreground">
-              {sites.length} site{sites.length === 1 ? '' : 's'} published
+              {sites.length} site{sites.length === 1 ? '' : 's'} {admin ? 'across all users' : 'published'}
             </p>
           </div>
           <Link href="/publish" className="btn-primary">
@@ -87,6 +99,11 @@ export default async function SitesPage() {
                     {site.customDomain && (
                       <p className="text-xs text-muted-foreground">also at {site.subdomain}.flowstas.com</p>
                     )}
+                    {admin && site.ownerId && (
+                      <p className="mt-0.5 text-xs text-amber-700">
+                        owner: {emails?.get(site.ownerId) || site.ownerId}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -96,17 +113,23 @@ export default async function SitesPage() {
                     <span className="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-foreground">
                       {subs.length} message{subs.length === 1 ? '' : 's'}
                     </span>
-                    <DeleteSiteButton id={site.id} name={site.name} />
+                    {(!admin || site.ownerId === user.id) && (
+                      <DeleteSiteButton id={site.id} name={site.name} />
+                    )}
                   </div>
                 </div>
 
-                <ManageSite
-                  id={site.id}
-                  name={site.name}
-                  subdomain={site.subdomain}
-                  customDomain={site.customDomain}
-                  hasPassword={site.hasPassword}
-                />
+                {/* Manage controls act as the owner; admins view others'
+                    sites read-only. */}
+                {(!admin || site.ownerId === user.id) && (
+                  <ManageSite
+                    id={site.id}
+                    name={site.name}
+                    subdomain={site.subdomain}
+                    customDomain={site.customDomain}
+                    hasPassword={site.hasPassword}
+                  />
+                )}
 
                 {subs.length > 0 && (
                   <div className="mt-4 divide-y divide-border border-t border-border">

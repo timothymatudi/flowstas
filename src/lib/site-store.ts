@@ -562,6 +562,27 @@ export async function listSites(ownerId?: string): Promise<SiteMeta[]> {
   }))
 }
 
+// Admin-only: every site across all owners, newest first, tagged with its
+// owner id so the dashboard can label whose site it is.
+export async function listAllSites(): Promise<Array<SiteMeta & { ownerId: string }>> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('sites')
+    .select('id, name, created_at, file_count, subdomain, custom_domain, password_hash, owner_id')
+    .order('created_at', { ascending: false })
+  if (error || !data) return []
+  return data.map((row) => ({
+    id: row.id,
+    name: row.name,
+    createdAt: row.created_at,
+    fileCount: row.file_count,
+    subdomain: row.subdomain ?? row.id,
+    customDomain: row.custom_domain ?? null,
+    hasPassword: !!row.password_hash,
+    ownerId: row.owner_id ?? '',
+  }))
+}
+
 export async function listSubmissions(id: string): Promise<Submission[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

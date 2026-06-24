@@ -155,6 +155,14 @@ export async function listApps(ownerId: string): Promise<AppMeta[]> {
   return (data ?? []).map(rowToMeta)
 }
 
+// Admin-only: every app across all owners, newest first, tagged with its
+// owner id so the dashboard can label whose app it is.
+export async function listAllApps(): Promise<Array<AppMeta & { ownerId: string }>> {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('apps').select('*').order('created_at', { ascending: false })
+  return (data ?? []).map((row) => ({ ...rowToMeta(row), ownerId: (row.owner_id as string) ?? '' }))
+}
+
 // Find apps deployed from a given repo (any owner). Used by the GitHub webhook
 // to know which app(s) to redeploy when code is pushed. Repo match is
 // case-insensitive and ignores a trailing ".git" or slash.

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { listApps, type AppMeta } from '@/lib/app-store'
+import { listApps, listAllApps, type AppMeta } from '@/lib/app-store'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminEmail, ownerEmailMap } from '@/lib/admin'
 import { ManageApp } from '@/components/manage-app'
 
 export const dynamic = 'force-dynamic'
@@ -24,16 +25,27 @@ export default async function AppsPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const apps = await listApps(user.id)
+  const admin = isAdminEmail(user.email)
+  const apps: Array<AppMeta & { ownerId?: string }> = admin
+    ? await listAllApps()
+    : await listApps(user.id)
+  const emails = admin ? await ownerEmailMap() : null
 
   return (
     <main className="min-h-screen bg-background bg-grid p-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl text-foreground">My Apps</h1>
+            <h1 className="font-display text-3xl text-foreground">
+              {admin ? 'All Apps' : 'My Apps'}
+              {admin && (
+                <span className="ml-2 align-middle rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  Admin
+                </span>
+              )}
+            </h1>
             <p className="mt-1 text-muted-foreground">
-              {apps.length} app{apps.length === 1 ? '' : 's'} deployed
+              {apps.length} app{apps.length === 1 ? '' : 's'} {admin ? 'across all users' : 'deployed'}
             </p>
           </div>
           <Link
@@ -79,13 +91,20 @@ export default async function AppsPage() {
                       {app.repo.replace('https://github.com/', '')}
                       {app.branch ? ` · ${app.branch}` : ''}
                     </p>
+                    {admin && app.ownerId && (
+                      <p className="mt-0.5 text-xs text-amber-700">
+                        owner: {emails?.get(app.ownerId) || app.ownerId}
+                      </p>
+                    )}
                     {app.status === 'error' && app.lastError && (
                       <p className="mt-1 text-xs text-red-500">{app.lastError}</p>
                     )}
                   </div>
                 </div>
 
-                <ManageApp app={app} />
+                {/* Manage controls act as the owner; only show them for the
+                    viewer's own apps (admins view others' apps read-only). */}
+                {(!admin || app.ownerId === user.id) && <ManageApp app={app} />}
               </div>
             ))}
           </div>
