@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { AdminUserRow } from '@/lib/admin'
 import {
@@ -25,6 +26,15 @@ export function AdminUsersTable({
   const [isPending, startTransition] = useTransition()
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'err'; msg: string } | null>(null)
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return users
+    return users.filter(
+      (u) => u.email.toLowerCase().includes(q) || (u.fullName || '').toLowerCase().includes(q)
+    )
+  }, [users, query])
 
   function run(id: string, fn: () => Promise<{ ok: boolean; error?: string }>, okMsg: string) {
     setBusyId(id)
@@ -81,6 +91,19 @@ export function AdminUsersTable({
         </div>
       )}
 
+      <div className="mb-4 flex items-center gap-3">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name or email…"
+          className="w-full max-w-sm rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+        <span className="shrink-0 text-xs text-muted-foreground">
+          {filtered.length} of {users.length}
+        </span>
+      </div>
+
       <div className="overflow-x-auto rounded-2xl border bg-card">
         <table className="w-full text-sm">
           <thead>
@@ -95,7 +118,14 @@ export function AdminUsersTable({
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => {
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                  No users match “{query}”.
+                </td>
+              </tr>
+            )}
+            {filtered.map((u) => {
               const isSelf = u.id === currentAdminId
               const rowBusy = busyId === u.id && isPending
               return (
@@ -122,6 +152,12 @@ export function AdminUsersTable({
                   <td className="px-4 py-3 text-muted-foreground">{fmtDate(u.lastSignInAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/users/${u.id}`}
+                        className="rounded-lg border px-2.5 py-1 text-xs font-medium hover:bg-muted"
+                      >
+                        View
+                      </Link>
                       <button
                         onClick={() => onResetPassword(u)}
                         disabled={rowBusy}

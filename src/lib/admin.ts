@@ -87,3 +87,24 @@ export async function listAllUsers(): Promise<AdminUserRow[]> {
   )
   return rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 }
+
+// One account's basic profile/status for the drill-down page, or null if the
+// id doesn't exist. (Site/app counts come from listSites/listApps separately.)
+export async function getUserBasic(
+  id: string
+): Promise<Omit<AdminUserRow, 'sitesCount' | 'appsCount'> | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.auth.admin.getUserById(id)
+  const u = data?.user
+  if (error || !u) return null
+  const bannedUntil = (u as User & { banned_until?: string }).banned_until
+  return {
+    id: u.id,
+    email: u.email ?? '(no email)',
+    fullName: (u.user_metadata?.full_name as string) ?? null,
+    createdAt: u.created_at,
+    lastSignInAt: u.last_sign_in_at ?? null,
+    confirmed: Boolean(u.email_confirmed_at),
+    suspended: Boolean(bannedUntil && new Date(bannedUntil) > new Date()),
+  }
+}
