@@ -54,6 +54,15 @@ export function IntroOverlay() {
     // The bootstrap script already decided whether to play and set this class.
     if (!document.documentElement.classList.contains('intro-active')) return
 
+    // Mark it seen as soon as it starts, so repeat visits skip the intro even
+    // if the visitor leaves before it finishes (dismiss() also writes this, but
+    // only after the 3s animation — too late if they navigate away first).
+    try {
+      localStorage.setItem(SEEN_KEY, '1')
+    } catch {
+      // localStorage unavailable (private mode) — the intro just replays.
+    }
+
     setTag(TAGLINE[currentLang()])
     setShow(true)
 
