@@ -27,7 +27,10 @@ import {
   Server,
   Boxes,
   Sparkles,
-  Users
+  Users,
+  MailCheck,
+  BarChart3,
+  Lock
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -42,6 +45,9 @@ const baseNavItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/publish', label: 'Publish a Site', icon: Rocket },
   { href: '/sites', label: 'My Sites', icon: Globe },
+  { href: '/messages', label: 'Messages', icon: MailCheck },
+  { href: '/visitors', label: 'Visitors', icon: BarChart3 },
+  { href: '/passwords', label: 'Password Protect', icon: Lock },
   { href: '/deploy', label: 'Deploy an App', icon: Server },
   { href: '/apps', label: 'My Apps', icon: Boxes },
   { href: '/assistant', label: 'AI Assistant', icon: Sparkles },

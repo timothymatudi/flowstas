@@ -5,7 +5,15 @@ import {
   unlockCookieName,
   unlockToken,
   recordView,
+  logVisit,
 } from '@/lib/site-store'
+
+// Coarse device class from the User-Agent, for the visitors page.
+function deviceFromUA(ua: string): string {
+  if (/iPad|Tablet/i.test(ua)) return 'Tablet'
+  if (/Mobi|Android|iPhone/i.test(ua)) return 'Mobile'
+  return 'Desktop'
+}
 
 // A simple, clean password gate shown for protected sites.
 function passwordGateHtml(id: string, status: 'bad' | 'rate' | null): string {
@@ -61,6 +69,14 @@ export async function serveSite(id: string, reqPath: string, req: Request): Prom
 
   if (file.isHtml) {
     await recordView(id)
+    // Append a per-visit row so the owner can see who visited (best-effort).
+    const ref = req.headers.get('referer')
+    await logVisit(id, {
+      path: '/' + reqPath.replace(/^\/+/, ''),
+      referrer: ref && !/flowstas\.com/i.test(ref) ? ref : null,
+      country: req.headers.get('x-vercel-ip-country') || null,
+      device: deviceFromUA(req.headers.get('user-agent') || ''),
+    })
     const sent = new URL(req.url).searchParams.get('sent') === '1'
     const html = renderSite(new TextDecoder().decode(file.bytes), { id, sent })
     return new Response(html, { headers: { 'Content-Type': file.contentType } })

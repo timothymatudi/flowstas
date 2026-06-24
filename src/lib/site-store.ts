@@ -184,6 +184,58 @@ export async function recordView(id: string): Promise<void> {
   await supabase.rpc('flowstas_record_view', { p_site: id })
 }
 
+// One recorded page view, with the little context we can see server-side.
+export interface Visit {
+  id: string
+  createdAt: string
+  path: string | null
+  referrer: string | null
+  country: string | null
+  device: string | null
+}
+
+// Append one visit to the per-visit log. Best-effort: if the site_visits table
+// hasn't been provisioned yet (scripts/add-visits.sql), this quietly no-ops so
+// serving a site is never blocked by analytics.
+export async function logVisit(
+  id: string,
+  meta: { path?: string | null; referrer?: string | null; country?: string | null; device?: string | null }
+): Promise<void> {
+  const supabase = createAdminClient()
+  try {
+    await supabase.from('site_visits').insert({
+      site_id: id,
+      path: meta.path ?? null,
+      referrer: meta.referrer ?? null,
+      country: meta.country ?? null,
+      device: meta.device ?? null,
+    })
+  } catch {
+    // ignore — analytics must never break the site
+  }
+}
+
+// Recent visits for a site, newest first. Returns [] if the log table is
+// missing so the visitors page degrades gracefully to daily counts.
+export async function listVisits(id: string, limit = 50): Promise<Visit[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('site_visits')
+    .select('id, created_at, path, referrer, country, device')
+    .eq('site_id', id)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error || !data) return []
+  return data.map((row) => ({
+    id: String(row.id),
+    createdAt: row.created_at,
+    path: row.path ?? null,
+    referrer: row.referrer ?? null,
+    country: row.country ?? null,
+    device: row.device ?? null,
+  }))
+}
+
 export interface ViewStats {
   total: number
   days: { day: string; views: number }[] // last 7 days, oldest first

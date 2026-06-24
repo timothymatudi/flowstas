@@ -47,9 +47,9 @@ const features = [
   { icon: Rocket, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
   { icon: Globe, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'A free address to start', description: 'No domain yet? Get a free flowstas.com address to share right away — and connect your own domain anytime, with HTTPS on by default.' },
   { icon: Link2, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Use your own domain', description: 'Put your site on your own brand — point yourbusiness.com at it and we handle the HTTPS certificate automatically.' },
-  { icon: MailCheck, href: '/sites', tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
-  { icon: BarChart3, href: '/sites', tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
-  { icon: Lock, href: '/sites', tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
+  { icon: MailCheck, href: '/messages', tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
+  { icon: BarChart3, href: '/visitors', tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'See who looked at your sites — total views, a 7-day trend and a recent-visits log.' },
+  { icon: Lock, href: '/passwords', tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
   { icon: Server, href: '/deploy', tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
 ]
 
