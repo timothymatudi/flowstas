@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Check, Loader2, Lock, ChevronDown, Rocket, ArrowUpRight } from 'lucide-react'
 
 // "Connect your app" on-ramp: paste a GitHub repo, hit deploy, and watch the
@@ -12,16 +13,18 @@ import { Check, Loader2, Lock, ChevronDown, Rocket, ArrowUpRight } from 'lucide-
 
 type Phase = 'idle' | 'building' | 'live' | 'error'
 
-// Stages we show the user, matched against substrings the build engine prints
-// (scripts/deploy-app.mjs emits "▶ Cloning", "▶ Detected Next.js", etc.).
-const STAGES = [
-  { label: 'Cloning your repository', match: /cloning/i },
-  { label: 'Detecting your framework', match: /detected/i },
-  { label: 'Preparing the build', match: /dockerfile|app root|ensuring/i },
-  { label: 'Building & going live', match: /deploying/i },
-]
-
 export default function DeployPage() {
+  const t = useTranslations('deployPage')
+
+  // Stages we show the user, matched against substrings the build engine prints
+  // (scripts/deploy-app.mjs emits "▶ Cloning", "▶ Detected Next.js", etc.).
+  const STAGES = [
+    { label: t('stageCloning'), match: /cloning/i },
+    { label: t('stageDetecting'), match: /detected/i },
+    { label: t('stagePreparing'), match: /dockerfile|app root|ensuring/i },
+    { label: t('stageBuilding'), match: /deploying/i },
+  ]
+
   const [name, setName] = useState('')
   const [repo, setRepo] = useState('')
   const [branch, setBranch] = useState('')
@@ -43,7 +46,7 @@ export default function DeployPage() {
   async function handleDeploy(e: React.FormEvent) {
     e.preventDefault()
     if (!repo.trim()) {
-      setError('Paste the link to your app’s Git repo first.')
+      setError(t('errNeedRepo'))
       return
     }
     setPhase('building')
@@ -65,11 +68,11 @@ export default function DeployPage() {
       const contentType = res.headers.get('content-type') || ''
       if (!res.ok && contentType.includes('application/json')) {
         const data = await res.json()
-        if (data.needsAuth) setErrorLink({ href: '/auth/login', label: 'Log in' })
-        else if (data.needsUpgrade) setErrorLink({ href: '/pricing', label: 'View plans' })
-        throw new Error(data.error || 'Could not start the deploy.')
+        if (data.needsAuth) setErrorLink({ href: '/auth/login', label: t('logIn') })
+        else if (data.needsUpgrade) setErrorLink({ href: '/pricing', label: t('viewPlans') })
+        throw new Error(data.error || t('errCouldNotStart'))
       }
-      if (!res.body) throw new Error('No build output received.')
+      if (!res.body) throw new Error(t('errNoOutput'))
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -102,12 +105,12 @@ export default function DeployPage() {
         setPhase('live')
       } else {
         setPhase('error')
-        setError(result?.error || 'The build failed — open the build logs to see what happened.')
+        setError(result?.error || t('errBuildFailed'))
         setShowLogs(true)
       }
     } catch (err) {
       setPhase('error')
-      setError(err instanceof Error ? err.message : 'Could not deploy your app.')
+      setError(err instanceof Error ? err.message : t('errCouldNotDeploy'))
     }
   }
 
@@ -120,14 +123,13 @@ export default function DeployPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl gradient-primary glow-sm">
             <Rocket className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Deploy your app</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
           <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            Point us at your GitHub repo — we build it and put it live on the internet. Just a
-            simple website?{' '}
+            {t('subtitle1')}{' '}
             <Link href="/publish" className="font-medium text-primary hover:underline">
-              Publish a site
+              {t('publishLink')}
             </Link>{' '}
-            instead.
+            {t('subtitle2')}
           </p>
         </div>
 
@@ -136,7 +138,7 @@ export default function DeployPage() {
           <form onSubmit={handleDeploy} className="glass space-y-5 rounded-2xl p-6 shadow-premium">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">
-                Your Git repo
+                {t('repoLabel')}
               </label>
               <input
                 value={repo}
@@ -149,8 +151,7 @@ export default function DeployPage() {
                 className="input-modern"
               />
               <p className="mt-1.5 text-xs text-muted-foreground">
-                GitHub, GitLab or Bitbucket. We auto-detect your framework — Next.js, Astro,
-                SvelteKit, Nuxt, Vite/React, plain Node, a static site, or your own Dockerfile.
+                {t('repoHelp')}
               </p>
             </div>
 
@@ -164,7 +165,7 @@ export default function DeployPage() {
                 className="h-4 w-4 rounded border-border accent-primary"
               />
               <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-              My repository is private
+              {t('privateRepoLabel')}
             </label>
             {isPrivate && (
               <div className="-mt-1">
@@ -172,14 +173,14 @@ export default function DeployPage() {
                   value={githubToken}
                   onChange={(e) => setGithubToken(e.target.value)}
                   type="password"
-                  placeholder="GitHub access token (ghp_… or github_pat_…)"
+                  placeholder={t('tokenPlaceholder')}
                   autoComplete="off"
                   spellCheck={false}
                   disabled={building}
                   className="input-modern font-mono text-sm"
                 />
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  A read-only token. Used once to fetch your code — never stored.
+                  {t('tokenHelp')}
                 </p>
               </div>
             )}
@@ -194,18 +195,18 @@ export default function DeployPage() {
                 <ChevronDown
                   className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
                 />
-                Optional settings
+                {t('optionalSettings')}
               </button>
               {showAdvanced && (
                 <div className="mt-3 space-y-4">
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-foreground">
-                      App name
+                      {t('appNameLabel')}
                     </label>
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Defaults to your repo name"
+                      placeholder={t('appNamePlaceholder')}
                       autoComplete="off"
                       disabled={building}
                       className="input-modern"
@@ -213,7 +214,7 @@ export default function DeployPage() {
                   </div>
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-foreground">
-                      Branch
+                      {t('branchLabel')}
                     </label>
                     <input
                       value={branch}
@@ -242,10 +243,10 @@ export default function DeployPage() {
             <button type="submit" disabled={building} className="btn-primary w-full rounded-xl py-4">
               {building ? (
                 <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Building your app…
+                  <Loader2 className="h-4 w-4 animate-spin" /> {t('buildingApp')}
                 </span>
               ) : (
-                'Deploy my app →'
+                t('deployCta')
               )}
             </button>
           </form>
@@ -293,14 +294,14 @@ export default function DeployPage() {
               className="mt-4 flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showLogs ? 'rotate-180' : ''}`} />
-              {showLogs ? 'Hide' : 'Show'} build logs
+              {showLogs ? t('hideLogs') : t('showLogs')}
             </button>
             {showLogs && (
               <pre
                 ref={logBox}
                 className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-xl bg-gray-900 p-4 font-mono text-xs leading-relaxed text-gray-200"
               >
-                {logs || 'Starting…'}
+                {logs || t('starting')}
               </pre>
             )}
           </div>
@@ -312,17 +313,17 @@ export default function DeployPage() {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15">
               <Check className="h-7 w-7 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">Your app is live 🎉</h2>
-            <p className="mt-1 text-sm text-muted-foreground">It’s running on the internet right now.</p>
+            <h2 className="text-xl font-bold text-foreground">{t('liveTitle')} 🎉</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('liveSubtitle')}</p>
             <a href={liveUrl} target="_blank" rel="noreferrer" className="btn-primary mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl py-4">
-              Visit your app <ArrowUpRight className="h-4 w-4" />
+              {t('visitApp')} <ArrowUpRight className="h-4 w-4" />
             </a>
             {appId && (
               <Link
                 href="/apps"
                 className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-border bg-card py-3 text-sm font-medium text-foreground hover:bg-secondary"
               >
-                Manage app — add secrets, a custom domain & more
+                {t('manageApp')}
               </Link>
             )}
           </div>

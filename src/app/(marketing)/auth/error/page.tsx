@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
 
 export default function AuthErrorPage() {
+  const t = useTranslations('authError')
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background bg-grid px-4">
       <div className="absolute inset-0 hero-mesh pointer-events-none" />
@@ -10,9 +12,9 @@ export default function AuthErrorPage() {
           <AlertTriangle className="w-10 h-10 text-destructive" />
         </div>
 
-        <h1 className="font-display text-3xl text-foreground mb-4">Authentication Error</h1>
+        <h1 className="font-display text-3xl text-foreground mb-4">{t('title')}</h1>
         <p className="text-muted-foreground mb-8">
-          Something went wrong during authentication. This could be due to an expired link or invalid credentials.
+          {t('description')}
         </p>
 
         <Link
@@ -20,7 +22,7 @@ export default function AuthErrorPage() {
           className="btn-primary inline-flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Login
+          {t('backToLogin')}
         </Link>
       </div>
     </div>

@@ -6,8 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslations } from 'next-intl'
 
 export default function ResetPasswordPage() {
+  const t = useTranslations('authReset')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -43,30 +45,30 @@ export default function ResetPasswordPage() {
 
         <div className="glass rounded-2xl p-8 shadow-premium-lg glow">
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl text-foreground mb-2">Forgot your password?</h1>
+            <h1 className="font-display text-2xl text-foreground mb-2">{t('title')}</h1>
             <p className="text-muted-foreground">
-              Remember it?{' '}
+              {t('rememberIt')}{' '}
               <Link href="/auth/login" className="text-primary hover:underline font-medium">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>
 
           {sent ? (
             <div className="rounded-lg bg-green-500/10 border border-green-500/20 px-4 py-4 text-sm text-green-600">
-              <p className="font-medium">Check your email</p>
+              <p className="font-medium">{t('checkEmail')}</p>
               <p className="mt-1">
-                We sent a password reset link to <strong>{email}</strong>.
+                {t('sentLinkPrefix')} <strong>{email}</strong>{t('sentLinkSuffix')}
               </p>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">{t('emailLabel')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -79,7 +81,7 @@ export default function ResetPasswordPage() {
                 </div>
               )}
               <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-                {loading ? 'Sending...' : 'Send reset link'}
+                {loading ? t('sending') : t('sendResetLink')}
               </Button>
             </form>
           )}

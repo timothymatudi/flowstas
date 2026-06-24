@@ -4,9 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 import { Loader2, ArrowRight, Mail, Lock } from 'lucide-react'
 
 export default function LoginPage() {
+  const t = useTranslations('authLogin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -48,20 +50,20 @@ export default function LoginPage() {
         {/* Card */}
         <div className="glass rounded-2xl p-8 shadow-premium-lg glow">
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl text-foreground mb-2">Welcome back</h1>
-            <p className="text-muted-foreground">Sign in to continue to your dashboard</p>
+            <h1 className="font-display text-2xl text-foreground mb-2">{t('welcomeBack')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Email</label>
+              <label className="text-sm font-medium text-foreground">{t('email')}</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   className="input-modern pl-12"
                   required
                 />
@@ -70,9 +72,9 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label className="text-sm font-medium text-foreground">{t('password')}</label>
                 <Link href="/auth/reset-password" className="text-sm text-primary hover:underline font-medium">
-                  Forgot password?
+                  {t('forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
@@ -81,7 +83,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t('passwordPlaceholder')}
                   className="input-modern pl-12"
                   required
                 />
@@ -103,7 +105,7 @@ export default function LoginPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {t('signIn')}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -112,19 +114,19 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-muted-foreground text-sm">
-              Don&apos;t have an account?{' '}
+              {t('noAccount')}{' '}
               <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
-                Start free trial
+                {t('startFreeTrial')}
               </Link>
             </p>
           </div>
         </div>
 
         <p className="text-center text-muted-foreground text-xs mt-6">
-          By signing in, you agree to our{' '}
-          <Link href="/terms" className="hover:underline">Terms</Link>
-          {' '}and{' '}
-          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+          {t('termsPrefix')}{' '}
+          <Link href="/terms" className="hover:underline">{t('terms')}</Link>
+          {' '}{t('and')}{' '}
+          <Link href="/privacy" className="hover:underline">{t('privacyPolicy')}</Link>
         </p>
       </div>
     </div>

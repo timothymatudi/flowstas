@@ -4,9 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 import { Loader2, ArrowRight, Mail, Lock, User, Sparkles } from 'lucide-react'
 
 export default function SignUpPage() {
+  const t = useTranslations('authSignup')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -58,25 +60,25 @@ export default function SignUpPage() {
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">1-Day Free Trial</span>
+              <span className="text-sm font-medium text-primary">{t('trialBadge')}</span>
             </div>
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl text-foreground mb-2">Create your account</h1>
-            <p className="text-muted-foreground">Start your free trial today, no credit card required</p>
+            <h1 className="font-display text-2xl text-foreground mb-2">{t('createAccount')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
 
           <form onSubmit={handleSignUp} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Full Name</label>
+              <label className="text-sm font-medium text-foreground">{t('fullName')}</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="John Doe"
+                  placeholder={t('fullNamePlaceholder')}
                   className="input-modern pl-12"
                   required
                 />
@@ -84,14 +86,14 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Email</label>
+              <label className="text-sm font-medium text-foreground">{t('email')}</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   className="input-modern pl-12"
                   required
                 />
@@ -99,14 +101,14 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Password</label>
+              <label className="text-sm font-medium text-foreground">{t('password')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create a strong password"
+                  placeholder={t('passwordPlaceholder')}
                   className="input-modern pl-12"
                   minLength={6}
                   required
@@ -129,7 +131,7 @@ export default function SignUpPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Start Free Trial
+                  {t('startFreeTrial')}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -138,19 +140,19 @@ export default function SignUpPage() {
 
           <div className="mt-6 text-center">
             <p className="text-muted-foreground text-sm">
-              Already have an account?{' '}
+              {t('haveAccount')}{' '}
               <Link href="/auth/login" className="text-primary hover:underline font-medium">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>
         </div>
 
         <p className="text-center text-muted-foreground text-xs mt-6">
-          By signing up, you agree to our{' '}
-          <Link href="/terms" className="hover:underline">Terms</Link>
-          {' '}and{' '}
-          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+          {t('termsPrefix')}{' '}
+          <Link href="/terms" className="hover:underline">{t('terms')}</Link>
+          {' '}{t('and')}{' '}
+          <Link href="/privacy" className="hover:underline">{t('privacyPolicy')}</Link>
         </p>
       </div>
     </div>

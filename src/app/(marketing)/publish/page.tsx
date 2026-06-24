@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { SAMPLE_TEMPLATE } from '@/lib/sample-site'
 import { TEMPLATES } from '@/lib/templates'
 import { DNS_CNAME_TARGET, DNS_A_RECORD } from '@/lib/domain-dns'
@@ -51,6 +52,7 @@ async function readDrop(items: DataTransferItemList): Promise<Picked[]> {
 }
 
 export default function PublishPage() {
+  const t = useTranslations('publishPage')
   const [mode, setMode] = useState<Mode>('paste')
   const [name, setName] = useState('')
   const [html, setHtml] = useState('')
@@ -79,14 +81,14 @@ export default function PublishPage() {
       const res = await fetch('/api/sites', { method: 'POST', body, headers })
       const data = await res.json()
       if (!res.ok) {
-        if (data.needsAuth) setErrorLink({ href: '/auth/login', label: 'Log in' })
-        else if (data.needsUpgrade) setErrorLink({ href: '/pricing', label: 'View plans' })
-        throw new Error(data.error || 'Could not publish')
+        if (data.needsAuth) setErrorLink({ href: '/auth/login', label: t('logIn') })
+        else if (data.needsUpgrade) setErrorLink({ href: '/pricing', label: t('viewPlans') })
+        throw new Error(data.error || t('couldNotPublish'))
       }
       setLiveUrl(data.url)
       setSiteId(data.id ?? null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not publish')
+      setError(err instanceof Error ? err.message : t('couldNotPublish'))
     } finally {
       setLoading(false)
     }
@@ -95,7 +97,7 @@ export default function PublishPage() {
   function handlePaste(e: React.FormEvent) {
     e.preventDefault()
     if (!html.trim()) {
-      setError('Add some HTML for your site first — or click "Use a sample site".')
+      setError(t('errNeedHtml'))
       return
     }
     publish(JSON.stringify({ name, html }), { 'Content-Type': 'application/json' })
@@ -104,7 +106,7 @@ export default function PublishPage() {
   function handleImport(e: React.FormEvent) {
     e.preventDefault()
     if (!importUrl.trim()) {
-      setError('Paste the address of the site you want to import first.')
+      setError(t('errNeedImportUrl'))
       return
     }
     publish(JSON.stringify({ name, importUrl }), { 'Content-Type': 'application/json' })
@@ -113,7 +115,7 @@ export default function PublishPage() {
   function handleGithub(e: React.FormEvent) {
     e.preventDefault()
     if (!repoUrl.trim()) {
-      setError('Paste the link to your GitHub repo first.')
+      setError(t('errNeedRepo'))
       return
     }
     publish(JSON.stringify({ name, repoUrl }), { 'Content-Type': 'application/json' })
@@ -122,7 +124,7 @@ export default function PublishPage() {
   function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     if (picked.length === 0) {
-      setError('Drop, choose a folder, or pick a .zip of your website first.')
+      setError(t('errNeedFiles'))
       return
     }
     const fd = new FormData()
@@ -154,7 +156,7 @@ export default function PublishPage() {
     try {
       const items = await readDrop(e.dataTransfer.items)
       if (items.length === 0) {
-        setError('Could not read what you dropped — try the folder or .zip picker instead.')
+        setError(t('errDropFailed'))
         return
       }
       setPicked(items)
@@ -166,7 +168,7 @@ export default function PublishPage() {
   async function connectOwnDomain(e: React.FormEvent) {
     e.preventDefault()
     if (!siteId || !ownDomain.trim()) {
-      setDomainError('Enter the domain you own first, e.g. www.yourbusiness.com.')
+      setDomainError(t('errNeedDomain'))
       return
     }
     setDomainBusy(true)
@@ -178,10 +180,10 @@ export default function PublishPage() {
         body: JSON.stringify({ customDomain: ownDomain }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not connect that domain.')
+      if (!res.ok) throw new Error(data.error || t('errConnectDomain'))
       setConnectedDomain(ownDomain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''))
     } catch (err) {
-      setDomainError(err instanceof Error ? err.message : 'Could not connect that domain.')
+      setDomainError(err instanceof Error ? err.message : t('errConnectDomain'))
     } finally {
       setDomainBusy(false)
     }
@@ -207,12 +209,12 @@ export default function PublishPage() {
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
             🎉
           </div>
-          <h1 className="text-center text-2xl font-bold text-gray-900">Your site is live!</h1>
+          <h1 className="text-center text-2xl font-bold text-gray-900">{t('liveTitle')}</h1>
 
           {/* The subdomain is only a preview — the real home is the user's domain. */}
           <div className="mt-6 rounded-xl border border-gray-200 p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-              Temporary preview link
+              {t('tempPreviewLabel')}
             </p>
             <a
               href={liveUrl}
@@ -226,41 +228,34 @@ export default function PublishPage() {
 
           {/* Connect your own domain — the headline address. */}
           <div className="mt-4 rounded-xl border border-gray-200 p-4">
-            <p className="text-sm font-semibold text-gray-900">Put it on your own domain</p>
+            <p className="text-sm font-semibold text-gray-900">{t('ownDomainTitle')}</p>
             {connectedDomain ? (
               <div className="mt-2 space-y-2 text-sm text-gray-600">
                 <p className="font-medium text-green-700">
-                  ✓ {connectedDomain} is connected — now point it to us:
+                  ✓ {t('domainConnected', { domain: connectedDomain })}
                 </p>
                 <ul className="list-disc space-y-1 pl-5 text-xs text-gray-500">
                   <li>
-                    At your domain provider, add a <span className="font-medium text-gray-700">CNAME</span>{' '}
-                    record from <span className="font-mono text-gray-700">{connectedDomain}</span> to{' '}
-                    <span className="font-mono text-gray-700">{DNS_CNAME_TARGET}</span>.
+                    {t('dnsCname', { domain: connectedDomain, target: DNS_CNAME_TARGET })}
                   </li>
                   <li>
-                    For a root domain (no “www”), add an{' '}
-                    <span className="font-medium text-gray-700">A</span> record to{' '}
-                    <span className="font-mono text-gray-700">{DNS_A_RECORD}</span> instead.
+                    {t('dnsARecord', { record: DNS_A_RECORD })}
                   </li>
                 </ul>
                 <p className="text-xs text-gray-400">
-                  Your secure address ({connectedDomain}) goes live automatically once it points to us —
-                  usually within an hour.
+                  {t('secureGoLive', { domain: connectedDomain })}
                 </p>
               </div>
             ) : (
               <form onSubmit={connectOwnDomain} className="mt-2">
                 <p className="mb-2 text-xs text-gray-500">
-                  Already own a domain? Connect it so visitors see{' '}
-                  <span className="font-medium text-gray-700">yourbusiness.com</span> instead of the
-                  preview link.
+                  {t('alreadyOwnDomain')}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <input
                     value={ownDomain}
                     onChange={(e) => setOwnDomain(e.target.value)}
-                    placeholder="www.yourbusiness.com"
+                    placeholder={t('domainPlaceholder')}
                     className="min-w-[180px] flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
                   />
                   <button
@@ -268,7 +263,7 @@ export default function PublishPage() {
                     disabled={domainBusy}
                     className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
                   >
-                    {domainBusy ? 'Connecting…' : 'Connect'}
+                    {domainBusy ? t('connecting') : t('connect')}
                   </button>
                 </div>
                 {domainError && <p className="mt-2 text-xs text-red-600">{domainError}</p>}
@@ -281,13 +276,13 @@ export default function PublishPage() {
               onClick={reset}
               className="flex-1 rounded-xl border border-gray-200 px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
             >
-              Publish another
+              {t('publishAnother')}
             </button>
             <Link
               href="/sites"
               className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-center font-medium text-gray-700 hover:bg-gray-50"
             >
-              See my sites &amp; messages
+              {t('seeMySites')}
             </Link>
           </div>
         </div>
@@ -298,10 +293,9 @@ export default function PublishPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-3xl font-bold text-gray-900">Publish a website</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
         <p className="mt-2 text-gray-500">
-          Put your site online in one click. Its contact form captures every message straight to
-          your dashboard.
+          {t('subtitle')}
         </p>
 
         <div className="mt-6 inline-flex rounded-xl bg-gray-100 p-1">
@@ -310,51 +304,51 @@ export default function PublishPage() {
             onClick={() => { setMode('paste'); setError(null) }}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${mode === 'paste' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
           >
-            Paste HTML
+            {t('tabPaste')}
           </button>
           <button
             type="button"
             onClick={() => { setMode('upload'); setError(null) }}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${mode === 'upload' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
           >
-            Upload folder or .zip
+            {t('tabUpload')}
           </button>
           <button
             type="button"
             onClick={() => { setMode('import'); setError(null) }}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${mode === 'import' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
           >
-            Import from URL
+            {t('tabImport')}
           </button>
           <button
             type="button"
             onClick={() => { setMode('templates'); setError(null) }}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${mode === 'templates' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
           >
-            Start from a template
+            {t('tabTemplates')}
           </button>
           <button
             type="button"
             onClick={() => { setMode('github'); setError(null) }}
             className={`rounded-lg px-4 py-2 text-sm font-medium ${mode === 'github' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
           >
-            From GitHub
+            {t('tabGithub')}
           </button>
         </div>
 
         {mode === 'github' ? (
           <form onSubmit={handleGithub} className="mt-4 space-y-5 rounded-2xl bg-white p-6 shadow-sm">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Site name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('siteNameLabel')}</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Leave blank to use the repo name"
+                placeholder={t('siteNamePlaceholderRepo')}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Public GitHub repo</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('publicRepoLabel')}</label>
               <input
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
@@ -363,10 +357,9 @@ export default function PublishPage() {
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
               <p className="mt-2 text-xs text-gray-400">
-                We pull the repo and publish its files as-is. Best for static sites (HTML, CSS, JS) —
-                we don’t run a build step. Add{' '}
-                <code className="rounded bg-gray-100 px-1 py-0.5">/tree/branch</code> to the link for a
-                specific branch.
+                {t('githubHelp1')}{' '}
+                <code className="rounded bg-gray-100 px-1 py-0.5">/tree/branch</code>{' '}
+                {t('githubHelp2')}
               </p>
             </div>
             {error && (
@@ -384,14 +377,13 @@ export default function PublishPage() {
               disabled={loading}
               className="w-full rounded-xl bg-gray-900 px-6 py-4 font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
             >
-              {loading ? 'Publishing from GitHub…' : 'Publish from GitHub →'}
+              {loading ? t('publishingGithub') : t('publishGithubCta')}
             </button>
           </form>
         ) : mode === 'templates' ? (
           <div className="mt-4 space-y-4 rounded-2xl bg-white p-6 shadow-sm">
             <p className="text-sm text-gray-500">
-              No files? Pick a starting point — we’ll drop it into the editor so you can change the
-              words and publish.
+              {t('templatesIntro')}
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {TEMPLATES.map((tpl) => (
@@ -409,7 +401,7 @@ export default function PublishPage() {
                   <div className="text-3xl">{tpl.emoji}</div>
                   <div className="mt-2 font-semibold text-gray-900">{tpl.name}</div>
                   <div className="text-sm text-gray-500">{tpl.tagline}</div>
-                  <div className="mt-3 text-sm font-medium text-blue-600">Customize &amp; publish →</div>
+                  <div className="mt-3 text-sm font-medium text-blue-600">{t('customizePublish')}</div>
                 </button>
               ))}
             </div>
@@ -417,16 +409,16 @@ export default function PublishPage() {
         ) : mode === 'import' ? (
           <form onSubmit={handleImport} className="mt-4 space-y-5 rounded-2xl bg-white p-6 shadow-sm">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Site name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('siteNameLabel')}</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Leave blank to use the site’s name"
+                placeholder={t('siteNamePlaceholderSite')}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Website address to import</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('importUrlLabel')}</label>
               <input
                 value={importUrl}
                 onChange={(e) => setImportUrl(e.target.value)}
@@ -435,8 +427,7 @@ export default function PublishPage() {
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
               <p className="mt-2 text-xs text-gray-400">
-                We snapshot the page and serve it as your site. Its images and styles keep loading
-                from the original address.
+                {t('importHelp')}
               </p>
             </div>
             {error && (
@@ -454,23 +445,23 @@ export default function PublishPage() {
               disabled={loading}
               className="w-full rounded-xl bg-gray-900 px-6 py-4 font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
             >
-              {loading ? 'Importing…' : 'Import &amp; publish →'}
+              {loading ? t('importing') : t('importCta')}
             </button>
           </form>
         ) : mode === 'paste' ? (
           <form onSubmit={handlePaste} className="mt-4 space-y-5 rounded-2xl bg-white p-6 shadow-sm">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Site name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('siteNameLabel')}</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My business site"
+                placeholder={t('siteNamePlaceholderBusiness')}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
             </div>
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">Your website HTML</label>
+                <label className="block text-sm font-medium text-gray-700">{t('htmlLabel')}</label>
                 <button
                   type="button"
                   onClick={() => {
@@ -479,7 +470,7 @@ export default function PublishPage() {
                   }}
                   className="text-sm font-medium text-blue-600 hover:underline"
                 >
-                  Use a sample site
+                  {t('useSample')}
                 </button>
               </div>
               <textarea
@@ -505,26 +496,25 @@ export default function PublishPage() {
               disabled={loading}
               className="w-full rounded-xl bg-gray-900 px-6 py-4 font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
             >
-              {loading ? 'Publishing…' : 'Publish my site →'}
+              {loading ? t('publishing') : t('publishCta')}
             </button>
           </form>
         ) : (
           <form onSubmit={handleUpload} className="mt-4 space-y-5 rounded-2xl bg-white p-6 shadow-sm">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Site name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('siteNameLabel')}</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My business site"
+                placeholder={t('siteNamePlaceholderBusiness')}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 outline-none focus:border-gray-900"
               />
             </div>
 
             <p className="text-sm text-gray-500">
-              Upload your whole site — HTML, CSS, images and all. Drag the folder straight in, or use
-              the pickers. We serve{' '}
-              <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">index.html</code> as the home
-              page.
+              {t('uploadIntro1')}{' '}
+              <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">index.html</code>{' '}
+              {t('uploadIntro2')}
             </p>
 
             <div
@@ -537,23 +527,23 @@ export default function PublishPage() {
             >
               <p className="text-3xl">📂</p>
               <p className="mt-2 text-sm font-medium text-gray-700">
-                Drag &amp; drop your website folder here
+                {t('dropHere')}
               </p>
-              <p className="mt-1 text-xs text-gray-400">…or choose it manually</p>
+              <p className="mt-1 text-xs text-gray-400">{t('orChooseManually')}</p>
               <div className="mx-auto mt-4 grid max-w-sm grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => folderInput.current?.click()}
                   className="rounded-xl border border-dashed border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-white"
                 >
-                  📁 Choose a folder
+                  📁 {t('chooseFolder')}
                 </button>
                 <button
                   type="button"
                   onClick={() => zipInput.current?.click()}
                   className="rounded-xl border border-dashed border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-white"
                 >
-                  🗜️ Choose a .zip
+                  🗜️ {t('chooseZip')}
                 </button>
               </div>
             </div>
@@ -578,8 +568,8 @@ export default function PublishPage() {
             {picked.length > 0 && (
               <p className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-600">
                 {picked.length === 1 && /\.zip$/i.test(picked[0].path)
-                  ? `Selected zip: ${picked[0].file.name}`
-                  : `Ready to publish ${picked.length} file${picked.length === 1 ? '' : 's'}.`}
+                  ? t('selectedZip', { name: picked[0].file.name })
+                  : t('readyToPublish', { count: picked.length })}
               </p>
             )}
             {error && (
@@ -597,7 +587,7 @@ export default function PublishPage() {
               disabled={loading}
               className="w-full rounded-xl bg-gray-900 px-6 py-4 font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
             >
-              {loading ? 'Publishing…' : 'Publish my site →'}
+              {loading ? t('publishing') : t('publishCta')}
             </button>
           </form>
         )}

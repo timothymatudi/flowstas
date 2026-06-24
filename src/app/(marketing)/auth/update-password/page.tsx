@@ -7,8 +7,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslations } from 'next-intl'
 
 export default function UpdatePasswordPage() {
+  const t = useTranslations('authUpdate')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,7 +20,7 @@ export default function UpdatePasswordPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) {
-      setError('Passwords do not match')
+      setError(t('passwordsNoMatch'))
       return
     }
     setLoading(true)
@@ -46,12 +48,12 @@ export default function UpdatePasswordPage() {
 
         <div className="glass rounded-2xl p-8 shadow-premium-lg glow">
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl text-foreground mb-2">Set new password</h1>
-            <p className="text-muted-foreground">Choose a strong password for your account.</p>
+            <h1 className="font-display text-2xl text-foreground mb-2">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
           <form onSubmit={onSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="password">New password</Label>
+              <Label htmlFor="password">{t('newPassword')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -63,7 +65,7 @@ export default function UpdatePasswordPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="confirm">Confirm password</Label>
+              <Label htmlFor="confirm">{t('confirmPassword')}</Label>
               <Input
                 id="confirm"
                 type="password"
@@ -80,7 +82,7 @@ export default function UpdatePasswordPage() {
               </div>
             )}
             <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-              {loading ? 'Updating...' : 'Update password'}
+              {loading ? t('updating') : t('updatePassword')}
             </Button>
           </form>
         </div>
