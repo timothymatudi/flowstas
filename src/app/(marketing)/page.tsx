@@ -44,13 +44,13 @@ const steps = [
 ]
 
 const features = [
-  { icon: Rocket, tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
-  { icon: Globe, tint: 'bg-primary/10 text-primary', title: 'A free address to start', description: 'No domain yet? Get a free flowstas.com address to share right away — and connect your own domain anytime, with HTTPS on by default.' },
-  { icon: Link2, tint: 'bg-primary/10 text-primary', title: 'Use your own domain', description: 'Put your site on your own brand — point yourbusiness.com at it and we handle the HTTPS certificate automatically.' },
-  { icon: MailCheck, tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
-  { icon: BarChart3, tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
-  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
-  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
+  { icon: Rocket, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
+  { icon: Globe, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'A free address to start', description: 'No domain yet? Get a free flowstas.com address to share right away — and connect your own domain anytime, with HTTPS on by default.' },
+  { icon: Link2, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Use your own domain', description: 'Put your site on your own brand — point yourbusiness.com at it and we handle the HTTPS certificate automatically.' },
+  { icon: MailCheck, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
+  { icon: BarChart3, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'A simple view count per site in your dashboard, so you know what people are looking at.' },
+  { icon: Lock, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
+  { icon: Server, href: '/deploy', tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
 ]
 
 const faqs = [
@@ -239,16 +239,17 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <div
+              <Link
                 key={index}
-                className="group glass-light rounded-2xl p-8 card-hover"
+                href={feature.href}
+                className="group glass-light rounded-2xl p-8 card-hover block focus:outline-none focus:ring-2 focus:ring-primary/40"
               >
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.tint} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
                   <feature.icon className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
