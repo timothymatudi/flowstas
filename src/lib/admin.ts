@@ -108,7 +108,11 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   ])
 
   const rows = subs.data ?? []
-  const paying = rows.filter((r) => r.status === 'active' && r.plan && r.plan !== 'trial').length
+  // "Paying" = an active subscription on a real paid plan (free/trial don't count).
+  const FREE_PLANS = new Set(['trial', 'free'])
+  const paying = rows.filter(
+    (r) => r.status === 'active' && r.plan && !FREE_PLANS.has(r.plan.toLowerCase())
+  ).length
   const trialing = rows.filter((r) => r.status === 'trialing').length
   const planMap = new Map<string, number>()
   for (const r of rows) {
