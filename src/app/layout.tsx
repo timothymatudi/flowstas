@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
+import { cookies, headers } from 'next/headers'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale } from 'next-intl/server'
 import { Toaster } from '@/components/ui/sonner'
 import { localeMeta, type Locale } from '@/i18n/locales'
+import { CurrencyProvider, CURRENCY_COOKIE } from '@/components/currency-provider'
+import { currencyForCountry, isCurrency } from '@/lib/currency'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -67,15 +70,27 @@ export default async function RootLayout({
 }>) {
   const locale = (await getLocale()) as Locale
   const dir = localeMeta[locale]?.dir ?? 'ltr'
+
+  // Initial display currency: the visitor's saved choice, else inferred from
+  // their country (geo header), else the default.
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()])
+  const savedCurrency = cookieStore.get(CURRENCY_COOKIE)?.value
+  const initialCurrency =
+    savedCurrency && isCurrency(savedCurrency)
+      ? savedCurrency
+      : currencyForCountry(headerStore.get('x-vercel-ip-country'))
+
   return (
     // suppressHydrationWarning: the bootstrap script mutates <html>'s class
     // before hydration, which is an intentional, expected SSR/client mismatch.
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <NextIntlClientProvider>
-          {children}
-          <Toaster />
-          <Analytics />
+          <CurrencyProvider initialCurrency={initialCurrency}>
+            {children}
+            <Toaster />
+            <Analytics />
+          </CurrencyProvider>
         </NextIntlClientProvider>
       </body>
     </html>

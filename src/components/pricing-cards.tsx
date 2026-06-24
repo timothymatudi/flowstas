@@ -2,6 +2,8 @@
 
 import { Check, Sparkles, ArrowRight } from 'lucide-react'
 import { PRODUCTS, type SubscriptionProduct } from '@/lib/products'
+import { useCurrency } from '@/components/currency-provider'
+import { formatMoney } from '@/lib/currency'
 
 interface PricingCardsProps {
   onSelectPlan: (productId: string) => void
@@ -31,9 +33,10 @@ function PricingCard({
   onSelect: () => void
   isPopular?: boolean
 }) {
-  // Whole pounds show as "10"; anything with pence shows as "10.50".
-  const pounds = product.priceInCents / 100
-  const price = Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2)
+  // Show the price in the visitor's chosen currency (converted from the GBP
+  // base). The actual charge uses the same currency at checkout.
+  const { currency } = useCurrency()
+  const price = formatMoney(product.priceInCents, currency)
 
   return (
     <div
@@ -59,7 +62,6 @@ function PricingCard({
 
       <div className="mb-8">
         <div className="flex items-baseline gap-1">
-          <span className="text-sm font-medium text-muted-foreground">£</span>
           <span className="text-5xl font-bold tracking-tight gradient-text">{price}</span>
           <span className="text-muted-foreground">/{product.interval}</span>
         </div>

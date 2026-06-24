@@ -9,17 +9,19 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Loader2 } from 'lucide-react'
 
 import { startCheckoutSession } from '@/app/actions/stripe'
+import { useCurrency } from '@/components/currency-provider'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 export default function Checkout({ productId }: { productId: string }) {
+  const { currency } = useCurrency()
   const fetchClientSecret = useCallback(async () => {
-    const clientSecret = await startCheckoutSession(productId)
+    const clientSecret = await startCheckoutSession(productId, currency)
     if (!clientSecret) {
       throw new Error('Failed to create checkout session')
     }
     return clientSecret
-  }, [productId])
+  }, [productId, currency])
 
   return (
     <div id="checkout" className="w-full min-h-[400px]">

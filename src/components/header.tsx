@@ -7,6 +7,7 @@ import { Menu, X, Sparkles, LayoutDashboard, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { CurrencySwitcher } from '@/components/currency-switcher'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -82,6 +83,7 @@ export default function Header() {
             user never sees "Sign In" (and vice-versa). */}
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
+          <CurrencySwitcher />
           {authed === true && (
             <>
               <Button asChild className="btn-primary rounded-xl">
