@@ -90,7 +90,7 @@ export async function POST(req: Request) {
 
   let workerRes: Response
   try {
-    workerRes = await startDeploy({ repo, name: app.flyApp, branch, githubToken })
+    workerRes = await startDeploy({ repo, name: app.flyApp, branch, githubToken, buildEnv: app.buildEnv })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Could not start the build.'
     await updateAppDeploy(app.id, { ok: false, error: message }, message)

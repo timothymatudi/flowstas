@@ -15,9 +15,13 @@ create table if not exists public.apps (
   custom_domain text,                          -- theirname.com, once attached
   status        text not null default 'building', -- building | live | error | stopped
   last_error    text,                          -- short reason when status = error
+  build_env     jsonb,                         -- real PUBLIC build-time env (NEXT_PUBLIC_* etc.) baked at build; not secrets
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
+
+-- Add build_env to tables created before this column existed.
+alter table public.apps add column if not exists build_env jsonb;
 
 create index if not exists apps_owner_id_idx on public.apps(owner_id);
 

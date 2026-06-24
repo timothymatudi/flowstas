@@ -40,12 +40,18 @@ export async function startDeploy(opts: {
   // GitHub access token for a private repo. Used by the worker for the clone
   // only; never persisted by Flowstas.
   githubToken?: string | null
+  // Real build-time env to bake into the image. ONLY client-side PUBLIC values
+  // (NEXT_PUBLIC_*, VITE_*, …) belong here — they get inlined into the browser
+  // bundle at build time, so a placeholder would ship broken. Server secrets are
+  // never sent here; they stay placeholders at build and are set as Fly secrets.
+  buildEnv?: Record<string, string> | null
 }): Promise<Response> {
   const base = process.env.FLOWSTAS_WORKER_URL
   const token = process.env.WORKER_TOKEN
   if (!base || !token) {
     throw new Error('Build worker is not configured (FLOWSTAS_WORKER_URL / WORKER_TOKEN).')
   }
+  const hasBuildEnv = opts.buildEnv && Object.keys(opts.buildEnv).length > 0
   return fetch(`${base.replace(/\/$/, '')}/deploy`, {
     method: 'POST',
     headers: {
@@ -57,6 +63,7 @@ export async function startDeploy(opts: {
       name: opts.name,
       ...(opts.branch ? { branch: opts.branch } : {}),
       ...(opts.githubToken ? { token: opts.githubToken } : {}),
+      ...(hasBuildEnv ? { buildEnv: opts.buildEnv } : {}),
     }),
   })
 }

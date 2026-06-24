@@ -114,6 +114,39 @@ function placeholderFor(envName) {
   return 'placeholder'
 }
 
+// Real build-time env values supplied by the worker (FLOWSTAS_BUILD_ENV, a JSON
+// map). These are only ever client-side PUBLIC values (NEXT_PUBLIC_*, VITE_*,
+// etc.) that get inlined into the browser bundle at build time, so a placeholder
+// would be frozen into the shipped app and break it. Server secrets are NOT sent
+// here — they stay placeholders at build and are set as real Fly runtime secrets.
+let BUILD_ENV = {}
+try {
+  const parsed = JSON.parse(process.env.FLOWSTAS_BUILD_ENV || '{}')
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) BUILD_ENV = parsed
+} catch {
+  BUILD_ENV = {}
+}
+
+// Escape a value so it is safe inside a double-quoted Dockerfile ENV instruction.
+function dockerEnvValue(v) {
+  return String(v)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\$/g, '\\$')
+    .replace(/\r?\n/g, ' ')
+}
+
+// Resolve the build-time value for an env name: the real value when the worker
+// provided one (public vars), otherwise a harmless placeholder so the build
+// doesn't crash on `process.env.X!` at module load.
+function buildEnvValueFor(name) {
+  const real = BUILD_ENV[name]
+  if (real != null && String(real) !== '') {
+    return { value: dockerEnvValue(real), real: true }
+  }
+  return { value: placeholderFor(name), real: false }
+}
+
 const INTERNAL_PORT = 3000
 
 // Choose package manager from the lockfile so installs/builds match the project.
@@ -208,8 +241,12 @@ if (plan.kind === 'dockerfile') {
 } else {
   console.log(`▶ Detected ${plan.label}`)
   const envNames = scanEnvNames(appRoot)
-  const envLines = envNames.map((n) => `ENV ${n}="${placeholderFor(n)}"`).join('\n')
-  if (envNames.length) console.log(`▶ Placeholder build env for: ${envNames.join(', ')}`)
+  const resolvedEnv = envNames.map((n) => ({ name: n, ...buildEnvValueFor(n) }))
+  const envLines = resolvedEnv.map((e) => `ENV ${e.name}="${e.value}"`).join('\n')
+  const realNames = resolvedEnv.filter((e) => e.real).map((e) => e.name)
+  const placeholderNames = resolvedEnv.filter((e) => !e.real).map((e) => e.name)
+  if (realNames.length) console.log(`▶ Real build env baked for: ${realNames.join(', ')}`)
+  if (placeholderNames.length) console.log(`▶ Placeholder build env for: ${placeholderNames.join(', ')}`)
 
   let dockerfile
   if (plan.kind === 'static-nobuild') {

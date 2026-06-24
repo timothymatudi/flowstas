@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getApp } from '@/lib/app-store'
+import { getApp, setAppBuildEnv } from '@/lib/app-store'
 import { setAppSecrets, appLifecycle, workerConfigured } from '@/lib/build-worker'
 
 export const dynamic = 'force-dynamic'
 
 const KEY_RE = /^[A-Z][A-Z0-9_]*$/
+
+// Client-side PUBLIC env prefixes: frameworks inline these into the browser
+// bundle at BUILD time, so the real value must be baked into the build (a Fly
+// runtime secret can't reach the browser). These aren't secrets — they ship in
+// the browser — so it's safe to persist them. Covers Next, Vite, SvelteKit/
+// Astro, CRA, Gatsby, Expo, Nuxt and Vue CLI.
+const PUBLIC_ENV_RE =
+  /^(NEXT_PUBLIC_|VITE_|PUBLIC_|REACT_APP_|GATSBY_|EXPO_PUBLIC_|NUXT_PUBLIC_|VUE_APP_)/
 
 // POST /api/apps/[id]/secrets — set env vars/secrets on the owner's Fly app.
 // Secret values are written straight to Fly; we never persist them in our DB.
@@ -56,6 +64,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   const result = await setAppSecrets(app.flyApp, clean)
+
+  // Persist the PUBLIC (client-inlined) vars so the next build can bake the real
+  // values into the browser bundle. Runtime Fly secrets can't fix these because
+  // frameworks freeze them in at build time. Best-effort: a failure here doesn't
+  // fail the secrets call (they're still set as runtime secrets).
+  const publicEnv: Record<string, string> = {}
+  for (const [key, value] of Object.entries(clean)) {
+    if (PUBLIC_ENV_RE.test(key)) publicEnv[key] = value
+  }
+  if (Object.keys(publicEnv).length > 0) {
+    try {
+      await setAppBuildEnv(app.id, user.id, publicEnv)
+    } catch {
+      // non-fatal — values are still set as runtime secrets
+    }
+  }
 
   // Restart so the new secrets take effect now. If it fails, the values are
   // still saved and will apply on the next deploy — so we don't fail the call.

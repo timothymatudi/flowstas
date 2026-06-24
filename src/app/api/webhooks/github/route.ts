@@ -54,7 +54,12 @@ export async function POST(req: NextRequest) {
     if (pushedBranch && tracked && pushedBranch !== tracked) continue
 
     try {
-      const res = await startDeploy({ repo: app.repo, name: app.flyApp, branch: app.branch })
+      const res = await startDeploy({
+        repo: app.repo,
+        name: app.flyApp,
+        branch: app.branch,
+        buildEnv: app.buildEnv,
+      })
       if (!res.ok || !res.body) {
         await updateAppDeploy(app.id, { ok: false, error: `worker ${res.status}` }, '')
         continue

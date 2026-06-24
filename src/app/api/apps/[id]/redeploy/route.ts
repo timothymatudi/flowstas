@@ -41,7 +41,12 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   let res: Response
   try {
-    res = await startDeploy({ repo: app.repo, name: app.flyApp, branch: app.branch })
+    res = await startDeploy({
+      repo: app.repo,
+      name: app.flyApp,
+      branch: app.branch,
+      buildEnv: app.buildEnv,
+    })
   } catch (e) {
     const error = e instanceof Error ? e.message : 'Could not start the rebuild.'
     await updateAppDeploy(app.id, { ok: false, error }, error)

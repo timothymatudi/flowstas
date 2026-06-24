@@ -20,6 +20,11 @@ export interface AppMeta {
   customDomain: string | null
   status: AppStatus
   lastError: string | null
+  // Real client-side PUBLIC build-time env (NEXT_PUBLIC_*, VITE_*, …) that must
+  // be baked into the build so browser bundles aren't frozen to placeholders.
+  // These are not secrets (they ship in the browser), so we persist them; server
+  // secrets are never stored here — they live only as Fly runtime secrets.
+  buildEnv: Record<string, string> | null
   createdAt: string
   updatedAt: string
 }
@@ -53,6 +58,7 @@ function rowToMeta(row: Record<string, unknown>): AppMeta {
     customDomain: (row.custom_domain as string) ?? null,
     status: row.status as AppStatus,
     lastError: (row.last_error as string) ?? null,
+    buildEnv: (row.build_env as Record<string, string>) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   }
@@ -95,9 +101,35 @@ export async function createApp(
     customDomain: null,
     status: 'building',
     lastError: null,
+    buildEnv: null,
     createdAt: now,
     updatedAt: now,
   }
+}
+
+// Persist the app's PUBLIC build-time env (client-side values that must be baked
+// into the build, e.g. NEXT_PUBLIC_*). Merges with any existing values so a
+// partial update doesn't drop previously saved keys. Returns false if the app
+// doesn't exist or isn't the caller's. Server secrets must NOT be passed here.
+export async function setAppBuildEnv(
+  id: string,
+  ownerId: string,
+  env: Record<string, string>
+): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { data: row } = await supabase
+    .from('apps')
+    .select('owner_id, build_env')
+    .eq('id', id)
+    .maybeSingle()
+  if (!row || row.owner_id !== ownerId) return false
+  const existing = (row.build_env as Record<string, string>) ?? {}
+  const merged = { ...existing, ...env }
+  await supabase
+    .from('apps')
+    .update({ build_env: merged, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  return true
 }
 
 // Record the outcome of a build/deploy: live (with url) or error (with reason),

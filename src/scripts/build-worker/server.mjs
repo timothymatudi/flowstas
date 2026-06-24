@@ -188,7 +188,7 @@ const server = createServer(async (req, res) => {
     return sendJson(res, 404, { error: 'not found' })
   }
 
-  const { repo, branch, token } = payload
+  const { repo, branch, token, buildEnv } = payload
   if (!VALID_REPO.test(repo || '')) {
     return sendJson(res, 400, { error: 'repo must be a https://{github.com|gitlab.com|bitbucket.org}/owner/name URL' })
   }
@@ -200,6 +200,23 @@ const server = createServer(async (req, res) => {
   if (token != null && !/^[A-Za-z0-9_]{20,300}$/.test(token)) {
     return sendJson(res, 400, { error: 'invalid token' })
   }
+  // Optional real build-time env (PUBLIC client-side values only, e.g.
+  // NEXT_PUBLIC_*/VITE_*) the engine bakes into the image so client bundles get
+  // real values instead of placeholders. Passed via env, never argv.
+  let buildEnvJson = ''
+  if (buildEnv != null) {
+    if (typeof buildEnv !== 'object' || Array.isArray(buildEnv)) {
+      return sendJson(res, 400, { error: 'buildEnv must be an object of KEY: value' })
+    }
+    const clean = {}
+    for (const [k, v] of Object.entries(buildEnv)) {
+      if (!VALID_ENV_KEY.test(k)) {
+        return sendJson(res, 400, { error: `invalid buildEnv key: ${k}` })
+      }
+      clean[k] = v == null ? '' : String(v)
+    }
+    if (Object.keys(clean).length) buildEnvJson = JSON.stringify(clean)
+  }
 
   // Stream the build as it happens so the website can show live logs.
   res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' })
@@ -208,7 +225,12 @@ const server = createServer(async (req, res) => {
   if (branch) args.push('--branch', branch)
 
   const child = spawn(process.execPath, args, {
-    env: { ...process.env, FORCE_COLOR: '0', ...(token ? { GH_TOKEN: token } : {}) },
+    env: {
+      ...process.env,
+      FORCE_COLOR: '0',
+      ...(token ? { GH_TOKEN: token } : {}),
+      ...(buildEnvJson ? { FLOWSTAS_BUILD_ENV: buildEnvJson } : {}),
+    },
   })
 
   child.stdout.on('data', (d) => res.write(d))
