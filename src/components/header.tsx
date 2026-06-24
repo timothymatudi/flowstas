@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Menu, X, Sparkles, LayoutDashboard, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { LanguageSwitcher } from '@/components/language-switcher'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -80,6 +81,7 @@ export default function Header() {
         {/* Render the auth buttons only once we know the session, so a logged-in
             user never sees "Sign In" (and vice-versa). */}
         <div className="hidden items-center gap-3 md:flex">
+          <LanguageSwitcher />
           {authed === true && (
             <>
               <Button asChild className="btn-primary rounded-xl">

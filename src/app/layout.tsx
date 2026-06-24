@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale } from 'next-intl/server'
 import { Toaster } from '@/components/ui/sonner'
+import { localeMeta, type Locale } from '@/i18n/locales'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -57,19 +60,23 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = (await getLocale()) as Locale
+  const dir = localeMeta[locale]?.dir ?? 'ltr'
   return (
     // suppressHydrationWarning: the bootstrap script mutates <html>'s class
     // before hydration, which is an intentional, expected SSR/client mismatch.
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col font-sans antialiased">
-        {children}
-        <Toaster />
-        <Analytics />
+        <NextIntlClientProvider>
+          {children}
+          <Toaster />
+          <Analytics />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

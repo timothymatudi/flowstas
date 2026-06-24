@@ -1,0 +1,12 @@
+{
+  "common": { "login": "Masuk", "getStarted": "Mulai", "language": "Bahasa" },
+  "nav": { "publishSite": "Terbitkan situs", "deployApp": "Terapkan aplikasi" },
+  "landing": {
+    "badge": "Hosting situs atau terapkan aplikasi",
+    "headlineLine1": "Hosting situs Anda.",
+    "headlineLine2": "Terapkan aplikasi Anda.",
+    "subheadline": "Dari file atau repositori Anda ke situs atau aplikasi langsung — dalam hitungan menit.",
+    "ctaPublish": "Terbitkan situs",
+    "ctaDeploy": "Terapkan aplikasi"
+  }
+}

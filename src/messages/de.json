@@ -1,0 +1,12 @@
+{
+  "common": { "login": "Anmelden", "getStarted": "Loslegen", "language": "Sprache" },
+  "nav": { "publishSite": "Website veröffentlichen", "deployApp": "App bereitstellen" },
+  "landing": {
+    "badge": "Website hosten oder App bereitstellen",
+    "headlineLine1": "Hoste deine Website.",
+    "headlineLine2": "Stelle deine App bereit.",
+    "subheadline": "Von deinen Dateien oder deinem Repository zur Live-Website oder -App — in Minuten.",
+    "ctaPublish": "Website veröffentlichen",
+    "ctaDeploy": "App bereitstellen"
+  }
+}

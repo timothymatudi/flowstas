@@ -1,0 +1,12 @@
+{
+  "common": { "login": "Connexion", "getStarted": "Commencer", "language": "Langue" },
+  "nav": { "publishSite": "Publier un site", "deployApp": "Déployer une app" },
+  "landing": {
+    "badge": "Hébergez un site ou déployez une app",
+    "headlineLine1": "Hébergez votre site.",
+    "headlineLine2": "Déployez votre app.",
+    "subheadline": "De vos fichiers ou votre dépôt à un site ou une app en ligne — en quelques minutes.",
+    "ctaPublish": "Publier un site",
+    "ctaDeploy": "Déployer une app"
+  }
+}

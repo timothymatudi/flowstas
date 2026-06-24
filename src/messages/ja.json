@@ -1,0 +1,12 @@
+{
+  "common": { "login": "ログイン", "getStarted": "はじめる", "language": "言語" },
+  "nav": { "publishSite": "サイトを公開", "deployApp": "アプリをデプロイ" },
+  "landing": {
+    "badge": "サイトをホスト、またはアプリをデプロイ",
+    "headlineLine1": "サイトをホスト。",
+    "headlineLine2": "アプリをデプロイ。",
+    "subheadline": "ファイルやリポジトリから、公開済みのサイトやアプリへ — 数分で。",
+    "ctaPublish": "サイトを公開",
+    "ctaDeploy": "アプリをデプロイ"
+  }
+}

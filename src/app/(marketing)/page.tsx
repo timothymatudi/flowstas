@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import {
   ArrowRight,
   Rocket,
@@ -76,6 +77,7 @@ const faqs = [
 ]
 
 export default function HomePage() {
+  const t = useTranslations('landing')
   return (
     <div className="relative overflow-hidden">
       {/* Hero */}
@@ -90,11 +92,11 @@ export default function HomePage() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                 </span>
-                <span className="text-sm font-medium text-foreground">Host a site or deploy an app</span>
+                <span className="text-sm font-medium text-foreground">{t('badge')}</span>
               </div>
               <h1 className="font-display text-6xl md:text-7xl xl:text-8xl mb-6 leading-[0.95] tracking-tight">
-                <span className="text-foreground">Host your site. </span>
-                <span className="gradient-text">Deploy your app.</span>
+                <span className="text-foreground">{t('headlineLine1')} </span>
+                <span className="gradient-text">{t('headlineLine2')}</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 Bring what you already have — paste a site, drop a zip, import a URL, or point us at a
@@ -206,7 +208,7 @@ export default function HomePage() {
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
               Live in <span className="gradient-text">3 simple steps</span>
             </h2>
-            <p className="text-lg text-muted-foreground">From your files or repo to a live site or app — in minutes.</p>
+            <p className="text-lg text-muted-foreground">{t('subheadline')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10 md:gap-8 max-w-5xl mx-auto">
             {steps.map((item, index) => (

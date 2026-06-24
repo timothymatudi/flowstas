@@ -1,0 +1,12 @@
+{
+  "common": { "login": "登录", "getStarted": "开始使用", "language": "语言" },
+  "nav": { "publishSite": "发布网站", "deployApp": "部署应用" },
+  "landing": {
+    "badge": "托管网站或部署应用",
+    "headlineLine1": "托管你的网站。",
+    "headlineLine2": "部署你的应用。",
+    "subheadline": "从你的文件或代码库到上线的网站或应用——只需几分钟。",
+    "ctaPublish": "发布网站",
+    "ctaDeploy": "部署应用"
+  }
+}

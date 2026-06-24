@@ -1,0 +1,12 @@
+{
+  "common": { "login": "Entrar", "getStarted": "Começar", "language": "Idioma" },
+  "nav": { "publishSite": "Publicar um site", "deployApp": "Implantar um app" },
+  "landing": {
+    "badge": "Hospede um site ou implante um app",
+    "headlineLine1": "Hospede seu site.",
+    "headlineLine2": "Implante seu app.",
+    "subheadline": "Dos seus arquivos ou repositório para um site ou app no ar — em minutos.",
+    "ctaPublish": "Publicar um site",
+    "ctaDeploy": "Implantar um app"
+  }
+}

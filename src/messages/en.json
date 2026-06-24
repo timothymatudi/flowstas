@@ -1,0 +1,12 @@
+{
+  "common": { "login": "Login", "getStarted": "Get started", "language": "Language" },
+  "nav": { "publishSite": "Publish a Site", "deployApp": "Deploy an App" },
+  "landing": {
+    "badge": "Host a site or deploy an app",
+    "headlineLine1": "Host your site.",
+    "headlineLine2": "Deploy your app.",
+    "subheadline": "From your files or repo to a live site or app — in minutes.",
+    "ctaPublish": "Publish a site",
+    "ctaDeploy": "Deploy an app"
+  }
+}
