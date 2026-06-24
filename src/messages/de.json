@@ -21,5 +21,9 @@
     "accept": "Akzeptieren",
     "reject": "Nicht notwendige ablehnen",
     "learnMore": "Datenschutz"
+  },
+  "seo": {
+    "title": "Flowstas — Veröffentliche deine Website in Sekunden",
+    "description": "Füge HTML ein oder lade ein ZIP hoch und deine Website ist live — eigene Adresse, HTTPS, Kontaktformular und deine Domain."
   }
 }

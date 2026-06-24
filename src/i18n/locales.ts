@@ -27,3 +27,9 @@ export const localeMeta: Record<Locale, { label: string; dir: 'ltr' | 'rtl' }> =
 export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value)
 }
+
+// Open Graph locale codes (language_TERRITORY) for og:locale meta.
+export const ogLocale: Record<Locale, string> = {
+  en: 'en_US', es: 'es_ES', zh: 'zh_CN', hi: 'hi_IN', ar: 'ar_AR', pt: 'pt_BR',
+  fr: 'fr_FR', de: 'de_DE', ja: 'ja_JP', ru: 'ru_RU', id: 'id_ID', bn: 'bn_BD',
+}

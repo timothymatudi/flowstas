@@ -21,5 +21,9 @@
     "accept": "接受",
     "reject": "拒绝非必要",
     "learnMore": "隐私政策"
+  },
+  "seo": {
+    "title": "Flowstas — 几秒内发布你的网站",
+    "description": "粘贴 HTML 或上传 zip，你的网站即刻上线——拥有自己的网址、HTTPS、联系表单和自定义域名。"
   }
 }

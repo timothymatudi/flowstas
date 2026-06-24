@@ -21,5 +21,9 @@
     "accept": "Aceptar",
     "reject": "Rechazar no esenciales",
     "learnMore": "Política de privacidad"
+  },
+  "seo": {
+    "title": "Flowstas — Publica tu sitio web en segundos",
+    "description": "Pega HTML o sube un zip y tu sitio estará en línea — con su propia dirección, HTTPS, formulario de contacto y tu dominio."
   }
 }

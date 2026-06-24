@@ -21,5 +21,9 @@
     "accept": "Terima",
     "reject": "Tolak yang tidak penting",
     "learnMore": "Kebijakan privasi"
+  },
+  "seo": {
+    "title": "Flowstas — Terbitkan situs Anda dalam hitungan detik",
+    "description": "Tempel HTML atau jatuhkan zip dan situs Anda langsung aktif — alamat sendiri, HTTPS, formulir kontak, dan domain Anda."
   }
 }

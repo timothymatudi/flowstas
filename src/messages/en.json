@@ -21,5 +21,9 @@
     "accept": "Accept",
     "reject": "Reject non-essential",
     "learnMore": "Privacy policy"
+  },
+  "seo": {
+    "title": "Flowstas — Publish your website in seconds",
+    "description": "Paste HTML or drop a zip and your site is live — its own address, HTTPS, a contact form, and your own custom domain."
   }
 }

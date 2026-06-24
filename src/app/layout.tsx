@@ -2,45 +2,48 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { cookies, headers } from 'next/headers'
 import { NextIntlClientProvider } from 'next-intl'
-import { getLocale } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { Toaster } from '@/components/ui/sonner'
-import { localeMeta, type Locale } from '@/i18n/locales'
+import { localeMeta, ogLocale, type Locale } from '@/i18n/locales'
 import { CurrencyProvider, CURRENCY_COOKIE } from '@/components/currency-provider'
 import { currencyForCountry, isCurrency } from '@/lib/currency'
 import { CookieConsent, CONSENT_COOKIE } from '@/components/cookie-consent'
 import './globals.css'
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://flowstas.com'),
-  title: {
-    default: 'Flowstas | Publish your website in seconds',
-    template: '%s | Flowstas',
-  },
-  description: 'Publish your website in seconds — paste HTML or drop a zip and it goes live at its own address with HTTPS, a contact form, and your own custom domain. No servers, no setup.',
-  keywords: [
-    'website hosting',
-    'publish a website',
-    'static site hosting',
-    'website builder',
-    'contact form',
-    'small business website',
-  ],
-  applicationName: 'Flowstas',
-  authors: [{ name: 'Flowstas' }],
-  generator: 'v0.app',
-  openGraph: {
-    type: 'website',
-    url: 'https://flowstas.com',
-    siteName: 'Flowstas',
-    title: 'Flowstas | Publish your website in seconds',
-    description: 'Paste HTML or drop a zip and your site is live — its own address, HTTPS, a contact form, and your own custom domain.',
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Flowstas | Publish your website in seconds',
-    description: 'Publish your website in seconds and collect messages from visitors.',
-  },
+// Localized SEO: title/description and og:locale follow the visitor's language.
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = (await getLocale()) as Locale
+  const t = await getTranslations('seo')
+  const title = t('title')
+  const description = t('description')
+  return {
+    metadataBase: new URL('https://flowstas.com'),
+    title: { default: title, template: '%s | Flowstas' },
+    description,
+    keywords: [
+      'website hosting',
+      'publish a website',
+      'static site hosting',
+      'website builder',
+      'contact form',
+      'small business website',
+    ],
+    applicationName: 'Flowstas',
+    authors: [{ name: 'Flowstas' }],
+    generator: 'v0.app',
+    openGraph: {
+      type: 'website',
+      url: 'https://flowstas.com',
+      siteName: 'Flowstas',
+      title,
+      description,
+      locale: ogLocale[locale] ?? 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   robots: {
     index: true,
     follow: true,
@@ -61,7 +64,8 @@ export const metadata: Metadata = {
       },
     ],
     apple: '/apple-icon.png',
-  },
+    },
+  }
 }
 
 export default async function RootLayout({
