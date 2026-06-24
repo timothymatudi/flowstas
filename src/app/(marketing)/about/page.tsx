@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { Users, Target, Award, TrendingUp } from 'lucide-react'
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -8,37 +9,21 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   )
 }
 
-const stats = [
-  { value: 'Automatic HTTPS', label: 'On every site' },
-  { value: 'Live in seconds', label: 'Publish instantly' },
-  { value: 'Free to start', label: 'No card required' },
-  { value: 'Cancel anytime', label: 'No lock-in' },
-]
-
-const values = [
-  {
-    icon: Users,
-    title: 'Customer First',
-    description: 'Everything we build starts with understanding our customers\' needs and challenges.',
-  },
-  {
-    icon: Target,
-    title: 'Simplicity',
-    description: 'We believe powerful tools should be easy to use. No complexity, no confusion.',
-  },
-  {
-    icon: Award,
-    title: 'Excellence',
-    description: 'We hold ourselves to the highest standards in everything we do.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Innovation',
-    description: 'We constantly push boundaries to deliver cutting-edge solutions.',
-  },
-]
+const valueIcons = [Users, Target, Award, TrendingUp]
 
 export default function AboutPage() {
+  const t = useTranslations('about')
+  const stats = [
+    { value: t('s1v'), label: t('s1l') },
+    { value: t('s2v'), label: t('s2l') },
+    { value: t('s3v'), label: t('s3l') },
+    { value: t('s4v'), label: t('s4l') },
+  ]
+  const values = valueIcons.map((icon, i) => ({
+    icon,
+    title: t(`v${i + 1}t`),
+    description: t(`v${i + 1}d`),
+  }))
   return (
     <main className="min-h-screen">
       {/* Hero */}
@@ -46,13 +31,13 @@ export default function AboutPage() {
         <div className="absolute inset-0 hero-mesh pointer-events-none -z-10" />
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <Eyebrow>About us</Eyebrow>
+            <Eyebrow>{t('eyebrow')}</Eyebrow>
             <h1 className="font-display text-balance text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
-              <span className="text-foreground">The simplest way to </span>
-              <span className="gradient-text">go live.</span>
+              <span className="text-foreground">{t('titleA')}</span>
+              <span className="gradient-text">{t('titleB')}</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              We are a small UK product that makes it simple to publish a website and host your apps, without the usual setup or jargon.
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -77,17 +62,11 @@ export default function AboutPage() {
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">Our Story</h2>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">{t('storyTitle')}</h2>
             <div className="mt-8 space-y-6 text-lg leading-relaxed text-muted-foreground">
-              <p>
-                Flowstas is a new, independent product built in the UK. It started from a simple frustration: getting a website online or running a small app shouldn&apos;t mean wrestling with servers, build configs, and DNS for a whole weekend.
-              </p>
-              <p>
-                So we set out to build something more direct. Paste in your site or connect a repo, choose a name, and publish, with HTTPS handled for you. No agency, no complicated setup.
-              </p>
-              <p>
-                We&apos;re early, and we&apos;re building Flowstas in the open. The roadmap is shaped by the people who use it, and we&apos;d rather grow carefully and earn your trust than overpromise. If you try it, we&apos;d genuinely love your feedback.
-              </p>
+              <p>{t('story1')}</p>
+              <p>{t('story2')}</p>
+              <p>{t('story3')}</p>
             </div>
           </div>
         </div>
@@ -97,10 +76,10 @@ export default function AboutPage() {
       <section className="border-t border-border/40 bg-secondary/40 py-16 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <Eyebrow>What we stand for</Eyebrow>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">Our Values</h2>
+            <Eyebrow>{t('valuesEyebrow')}</Eyebrow>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">{t('valuesTitle')}</h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              The principles that guide everything we do.
+              {t('valuesSubtitle')}
             </p>
           </div>
           <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">

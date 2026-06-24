@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Mail, Send, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { submitContact } from '@/app/actions/contact'
 
 export default function ContactPage() {
+  const t = useTranslations('contact')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -26,10 +28,10 @@ export default function ContactPage() {
     })
     setLoading(false)
     if (result.error) {
-      toast.error('Could not send your message. Please try again.')
+      toast.error(t('toastError'))
       return
     }
-    toast.success("Message sent! We'll get back to you as soon as we can.")
+    toast.success(t('toastSuccess'))
     setSubmitted(true)
   }
 
@@ -41,14 +43,14 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-block mb-5 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-semibold uppercase tracking-wider text-primary">
-              Contact
+              {t('eyebrow')}
             </span>
             <h1 className="font-display text-balance text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
-              <span className="text-foreground">Get in </span>
-              <span className="gradient-text">touch.</span>
+              <span className="text-foreground">{t('titleA')}</span>
+              <span className="gradient-text">{t('titleB')}</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Have a question or need help? We&apos;d love to hear from you. Our team is ready to assist.
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -67,37 +69,37 @@ export default function ContactPage() {
                     <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                       <Send className="h-8 w-8 text-green-600" />
                     </div>
-                    <h3 className="mb-2 font-display text-2xl font-bold text-foreground">Message Sent!</h3>
+                    <h3 className="mb-2 font-display text-2xl font-bold text-foreground">{t('sentTitle')}</h3>
                     <p className="text-muted-foreground">
-                      We&apos;ve received your message and will get back to you as soon as we can.
+                      {t('sentBody')}
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+                        <Label htmlFor="firstName" className="text-sm font-medium">{t('firstName')}</Label>
                         <Input id="firstName" name="firstName" placeholder="John" required className="h-12 rounded-xl border-border/60 bg-background" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                        <Label htmlFor="lastName" className="text-sm font-medium">{t('lastName')}</Label>
                         <Input id="lastName" name="lastName" placeholder="Doe" required className="h-12 rounded-xl border-border/60 bg-background" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                      <Label htmlFor="email" className="text-sm font-medium">{t('email')}</Label>
                       <Input id="email" name="email" type="email" placeholder="john@example.com" required className="h-12 rounded-xl border-border/60 bg-background" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-sm font-medium">Subject</Label>
-                      <Input id="subject" name="subject" placeholder="How can we help?" required className="h-12 rounded-xl border-border/60 bg-background" />
+                      <Label htmlFor="subject" className="text-sm font-medium">{t('subject')}</Label>
+                      <Input id="subject" name="subject" placeholder={t('phSubject')} required className="h-12 rounded-xl border-border/60 bg-background" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="message" className="text-sm font-medium">Message</Label>
+                      <Label htmlFor="message" className="text-sm font-medium">{t('message')}</Label>
                       <Textarea
                         id="message"
                         name="message"
-                        placeholder="Tell us more about your question..."
+                        placeholder={t('phMessage')}
                         rows={5}
                         required
                         className="rounded-xl border-border/60 bg-background resize-none"
@@ -105,9 +107,9 @@ export default function ContactPage() {
                     </div>
                     <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl text-base shadow-premium hover:shadow-premium-lg">
                       {loading ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('sending')}</>
                       ) : (
-                        'Send Message'
+                        t('send')
                       )}
                     </Button>
                   </form>
@@ -118,9 +120,9 @@ export default function ContactPage() {
             {/* Contact Info */}
             <div className="space-y-8 lg:col-span-2">
               <div>
-                <h2 className="font-display text-2xl font-bold text-foreground">Contact Information</h2>
+                <h2 className="font-display text-2xl font-bold text-foreground">{t('infoTitle')}</h2>
                 <p className="mt-2 text-muted-foreground">
-                  Reach out through any of these channels and we&apos;ll respond as soon as possible.
+                  {t('infoSubtitle')}
                 </p>
               </div>
 
@@ -130,7 +132,7 @@ export default function ContactPage() {
                     <Mail className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">Email</h3>
+                    <h3 className="font-semibold text-foreground">{t('emailLabel')}</h3>
                     <p className="mt-1 text-muted-foreground">support@flowstas.com</p>
                   </div>
                 </div>
