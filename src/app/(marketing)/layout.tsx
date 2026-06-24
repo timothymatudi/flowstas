@@ -10,7 +10,13 @@ const introBootstrap = `(function(){try{
   var force=/[?&]intro=/.test(location.search);
   var seen=false;try{seen=localStorage.getItem('flowstas-intro-seen')==='1'}catch(e){}
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(force||(!seen&&!reduce))document.documentElement.classList.add('intro-active');
+  if(force||(!seen&&!reduce)){
+    document.documentElement.classList.add('intro-active');
+    // Record "seen" right now (before paint) so repeat visits skip the intro
+    // even if the visitor navigates away before it finishes. A forced replay
+    // (?intro=) does not consume the flag.
+    if(!force){try{localStorage.setItem('flowstas-intro-seen','1')}catch(e){}}
+  }
 }catch(e){}})();`
 
 // Layout for public marketing + auth pages (/, /pricing, /about, /contact,
