@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import crypto from 'node:crypto'
 import { createClient } from '@/lib/supabase/server'
-import { authorizeUrl, githubOAuthConfigured } from '@/lib/github-connection'
+import {
+  authorizeUrl,
+  githubOAuthConfigured,
+  canonicalCallbackUrl,
+  stateCookieDomain,
+} from '@/lib/github-connection'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,15 +28,18 @@ export async function GET(req: Request) {
   const returnTo = new URL(req.url).searchParams.get('returnTo') || '/deploy'
 
   const state = crypto.randomBytes(16).toString('hex')
-  const redirectUri = `${origin}/api/github/callback`
+  const redirectUri = canonicalCallbackUrl(origin)
   const res = NextResponse.redirect(authorizeUrl(redirectUri, state))
   // httpOnly cookie holds the CSRF state + return target; verified on callback.
+  // Domain is shared across apex + www so the callback can read it after the
+  // apex→www redirect.
   res.cookies.set('gh_oauth_state', `${state}:${returnTo}`, {
     httpOnly: true,
     secure: origin.startsWith('https'),
     sameSite: 'lax',
     path: '/',
     maxAge: 600,
+    domain: stateCookieDomain(new URL(req.url).host),
   })
   return res
 }

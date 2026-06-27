@@ -17,6 +17,25 @@ import { encryptSecret, decryptSecret } from '@/lib/token-crypto'
 
 export const GITHUB_OAUTH_SCOPE = 'repo'
 
+// The OAuth callback URL must EXACTLY match the one registered on the GitHub app,
+// and must stay stable across the apex/www split (flowstas.com redirects to
+// www.flowstas.com). We canonicalize to the bare domain (strip a leading "www.")
+// so a single registered callback — https://flowstas.com/api/github/callback —
+// works no matter which host the user is on. Both the authorize step and the
+// token exchange must pass this identical value.
+export function canonicalCallbackUrl(origin: string): string {
+  return `${origin.replace('://www.', '://')}/api/github/callback`
+}
+
+// Share the CSRF state cookie across apex + www, since the callback can land on a
+// different host than the connect request after the apex→www redirect. Returns a
+// cookie Domain for real flowstas.com hosts, or undefined (host-only) elsewhere
+// (e.g. localhost) where a shared domain would be invalid.
+export function stateCookieDomain(host: string): string | undefined {
+  const h = host.split(':')[0]
+  return h === 'flowstas.com' || h.endsWith('.flowstas.com') ? '.flowstas.com' : undefined
+}
+
 export function githubOAuthConfigured(): boolean {
   return Boolean(process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET)
 }

@@ -7,14 +7,17 @@ export const dynamic = 'force-dynamic'
 // GET /api/github/status — is this user connected to GitHub, and as whom?
 // Also reports whether the feature is configured server-side at all.
 export async function GET() {
+  // `available` reflects whether the server is configured for GitHub Connect at
+  // all — independent of who's asking — so even a logged-out visitor sees the
+  // Connect button (clicking it sends them through login, then GitHub).
+  const available = githubOAuthConfigured()
+
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ connected: false, available: false })
 
-  const available = githubOAuthConfigured()
-  const conn = available ? await getConnection(user.id) : null
+  const conn = available && user ? await getConnection(user.id) : null
   return NextResponse.json({
     available,
     connected: Boolean(conn),

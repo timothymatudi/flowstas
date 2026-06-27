@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { exchangeCode, saveConnection } from '@/lib/github-connection'
+import {
+  exchangeCode,
+  saveConnection,
+  canonicalCallbackUrl,
+  stateCookieDomain,
+} from '@/lib/github-connection'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,11 +29,12 @@ export async function GET(req: Request) {
     ? decodeURIComponent(match[1]).split(':')
     : []
 
+  const cookieDomain = stateCookieDomain(url.host)
   const fail = (reason: string) => {
     const dest = new URL(returnTo || '/deploy', origin)
     dest.searchParams.set('github', reason)
     const r = NextResponse.redirect(dest)
-    r.cookies.set('gh_oauth_state', '', { path: '/', maxAge: 0 })
+    r.cookies.set('gh_oauth_state', '', { path: '/', maxAge: 0, domain: cookieDomain })
     return r
   }
 
@@ -36,7 +42,8 @@ export async function GET(req: Request) {
   if (!code || !state || !savedState || state !== savedState) return fail('invalid')
 
   try {
-    const { token, login, scope } = await exchangeCode(code, `${origin}/api/github/callback`)
+    // redirect_uri must match the one used at authorize time exactly.
+    const { token, login, scope } = await exchangeCode(code, canonicalCallbackUrl(origin))
     await saveConnection(user.id, token, login, scope)
   } catch {
     return fail('failed')
@@ -45,6 +52,6 @@ export async function GET(req: Request) {
   const dest = new URL(returnTo || '/deploy', origin)
   dest.searchParams.set('github', 'connected')
   const res = NextResponse.redirect(dest)
-  res.cookies.set('gh_oauth_state', '', { path: '/', maxAge: 0 })
+  res.cookies.set('gh_oauth_state', '', { path: '/', maxAge: 0, domain: cookieDomain })
   return res
 }
