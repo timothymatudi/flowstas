@@ -13,7 +13,7 @@ import { importFromUrl } from '@/lib/import-url'
 import { importFromGithub } from '@/lib/import-github'
 import { siteLimitForPlan, appLimitForPlan } from '@/lib/plan-limits'
 import { workerConfigured, startDeploy, parseResult } from '@/lib/build-worker'
-import { resolveCloneToken } from '@/lib/github-connection'
+import { resolveCloneTokenForRepo } from '@/lib/clone-token'
 
 // GitHub / GitLab / Bitbucket repo URL (mirrors the deploy API's validation).
 const VALID_REPO = /^https:\/\/(?:github\.com|gitlab\.com|bitbucket\.org)\/[\w.-]+\/[\w.-]+(?:\.git)?\/?$/
@@ -236,9 +236,10 @@ export async function executeTool(
         const name = String(input.name ?? '').trim() || repo.split('/').pop() || 'app'
         const branch = String(input.branch ?? '').trim() || null
         const manualToken = String(input.github_token ?? '').trim() || null
-        // Manual token if given, else the user's connected GitHub account (so a
-        // private github.com repo deploys with nothing extra to supply).
-        const githubToken = await resolveCloneToken(ctx.userId, repo, manualToken)
+        // Manual token if given, else the user's connected account for the repo's
+        // host (GitHub / GitLab / Bitbucket), so a private repo deploys with
+        // nothing extra to supply.
+        const githubToken = await resolveCloneTokenForRepo(ctx.userId, repo, manualToken)
 
         const app = await createApp(name, repo, branch, ctx.userId)
         // Persist an explicitly supplied clone token (encrypted) so future

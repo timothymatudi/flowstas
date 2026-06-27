@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { appLimitForPlan, effectivePlan } from '@/lib/plan-limits'
 import { createApp, countAppsForOwner, updateAppDeploy, listApps, setAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
-import { resolveCloneToken } from '@/lib/github-connection'
+import { resolveCloneTokenForRepo } from '@/lib/clone-token'
 
 export const dynamic = 'force-dynamic'
 // Builds can take a few minutes; allow the longest the platform permits.
@@ -68,9 +68,10 @@ export async function POST(req: Request) {
       { status: 400 }
     )
   }
-  // Manual token wins; otherwise fall back to the user's connected GitHub account
-  // (github.com repos only). Either way this is what we clone with.
-  const githubToken = await resolveCloneToken(user.id, repo, manualToken)
+  // Manual token wins; otherwise fall back to the user's connected account for
+  // the repo's host (GitHub / GitLab / Bitbucket). Either way this is what we
+  // clone with.
+  const githubToken = await resolveCloneTokenForRepo(user.id, repo, manualToken)
 
   // Each plan caps how many running apps you can have.
   const { data: sub } = await supabase
