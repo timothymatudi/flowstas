@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'node:crypto'
 import { listAppsByRepo, updateAppDeploy, getAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult } from '@/lib/build-worker'
-import { resolveCloneToken } from '@/lib/github-connection'
+import { resolveCloneTokenForRepo } from '@/lib/clone-token'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -56,10 +56,12 @@ export async function POST(req: NextRequest) {
 
     try {
       // Prefer the app's stored clone token; otherwise use the owner's connected
-      // GitHub account so private-repo auto-deploys keep working after a push.
+      // account for the repo's host so private-repo auto-deploys keep working
+      // after a push. (This webhook only fires for github.com repos, so in
+      // practice that resolves to the GitHub connection.)
       const githubToken =
         (await getAppGithubToken(app.id)) ??
-        (await resolveCloneToken(app.ownerId, app.repo, null))
+        (await resolveCloneTokenForRepo(app.ownerId, app.repo, null))
       const res = await startDeploy({
         repo: app.repo,
         name: app.flyApp,

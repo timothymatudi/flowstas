@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getApp, setAppStatus, updateAppDeploy, getAppGithubToken, setAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
-import { resolveCloneToken } from '@/lib/github-connection'
+import { resolveCloneTokenForRepo } from '@/lib/clone-token'
 
 export const dynamic = 'force-dynamic'
 // A rebuild is a full build; allow the longest the platform permits.
@@ -70,12 +70,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
   }
   // Token to clone with, in order: a freshly supplied one, the app's stored clone
-  // token, then the user's connected GitHub account (github.com repos only). So a
-  // connected user can redeploy a private repo with nothing extra to enter.
+  // token, then the user's connected account for the repo's host (GitHub / GitLab
+  // / Bitbucket). So a connected user can redeploy a private repo with nothing
+  // extra to enter.
   const githubToken =
     newToken ??
     (await getAppGithubToken(app.id)) ??
-    (await resolveCloneToken(user.id, app.repo, null))
+    (await resolveCloneTokenForRepo(user.id, app.repo, null))
 
   let res: Response
   try {

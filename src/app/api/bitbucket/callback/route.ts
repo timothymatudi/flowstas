@@ -1,0 +1,57 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import {
+  exchangeCode,
+  saveConnection,
+  canonicalCallbackUrl,
+  stateCookieDomain,
+} from '@/lib/bitbucket-connection'
+
+export const dynamic = 'force-dynamic'
+
+// GET /api/bitbucket/callback — Bitbucket redirects here after the user
+// authorizes. We verify the CSRF state, swap the code for a token, store it
+// (encrypted), and send the user back where they started with ?bitbucket=connected.
+export async function GET(req: Request) {
+  const url = new URL(req.url)
+  const origin = url.origin
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return NextResponse.redirect(new URL('/auth/login', origin))
+
+  const code = url.searchParams.get('code')
+  const state = url.searchParams.get('state')
+  const cookie = req.headers.get('cookie') || ''
+  const match = cookie.match(/(?:^|;\s*)bb_oauth_state=([^;]+)/)
+  const [savedState, returnTo = '/deploy'] = match
+    ? decodeURIComponent(match[1]).split(':')
+    : []
+
+  const cookieDomain = stateCookieDomain(url.host)
+  const fail = (reason: string) => {
+    const dest = new URL(returnTo || '/deploy', origin)
+    dest.searchParams.set('bitbucket', reason)
+    const r = NextResponse.redirect(dest)
+    r.cookies.set('bb_oauth_state', '', { path: '/', maxAge: 0, domain: cookieDomain })
+    return r
+  }
+
+  if (url.searchParams.get('error')) return fail('denied')
+  if (!code || !state || !savedState || state !== savedState) return fail('invalid')
+
+  try {
+    // redirect_uri must match the one used at authorize time exactly.
+    const { token, login, scope } = await exchangeCode(code, canonicalCallbackUrl(origin))
+    await saveConnection(user.id, token, login, scope)
+  } catch {
+    return fail('failed')
+  }
+
+  const dest = new URL(returnTo || '/deploy', origin)
+  dest.searchParams.set('bitbucket', 'connected')
+  const res = NextResponse.redirect(dest)
+  res.cookies.set('bb_oauth_state', '', { path: '/', maxAge: 0, domain: cookieDomain })
+  return res
+}
