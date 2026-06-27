@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'node:crypto'
 import { listAppsByRepo, updateAppDeploy, getAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult } from '@/lib/build-worker'
+import { resolveCloneToken } from '@/lib/github-connection'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -54,7 +55,11 @@ export async function POST(req: NextRequest) {
     if (pushedBranch && tracked && pushedBranch !== tracked) continue
 
     try {
-      const githubToken = await getAppGithubToken(app.id)
+      // Prefer the app's stored clone token; otherwise use the owner's connected
+      // GitHub account so private-repo auto-deploys keep working after a push.
+      const githubToken =
+        (await getAppGithubToken(app.id)) ??
+        (await resolveCloneToken(app.ownerId, app.repo, null))
       const res = await startDeploy({
         repo: app.repo,
         name: app.flyApp,

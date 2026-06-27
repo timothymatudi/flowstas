@@ -7,12 +7,13 @@ import {
   setCustomDomain,
   countSitesForOwner,
 } from '@/lib/site-store'
-import { listApps, createApp, updateAppDeploy, countAppsForOwner } from '@/lib/app-store'
+import { listApps, createApp, updateAppDeploy, countAppsForOwner, setAppGithubToken } from '@/lib/app-store'
 import { TEMPLATES } from '@/lib/templates'
 import { importFromUrl } from '@/lib/import-url'
 import { importFromGithub } from '@/lib/import-github'
 import { siteLimitForPlan, appLimitForPlan } from '@/lib/plan-limits'
 import { workerConfigured, startDeploy, parseResult } from '@/lib/build-worker'
+import { resolveCloneToken } from '@/lib/github-connection'
 
 // GitHub / GitLab / Bitbucket repo URL (mirrors the deploy API's validation).
 const VALID_REPO = /^https:\/\/(?:github\.com|gitlab\.com|bitbucket\.org)\/[\w.-]+\/[\w.-]+(?:\.git)?\/?$/
@@ -234,9 +235,22 @@ export async function executeTool(
           }
         const name = String(input.name ?? '').trim() || repo.split('/').pop() || 'app'
         const branch = String(input.branch ?? '').trim() || null
-        const githubToken = String(input.github_token ?? '').trim() || null
+        const manualToken = String(input.github_token ?? '').trim() || null
+        // Manual token if given, else the user's connected GitHub account (so a
+        // private github.com repo deploys with nothing extra to supply).
+        const githubToken = await resolveCloneToken(ctx.userId, repo, manualToken)
 
         const app = await createApp(name, repo, branch, ctx.userId)
+        // Persist an explicitly supplied clone token (encrypted) so future
+        // redeploys + push-triggered rebuilds can re-clone. (A connection token is
+        // re-resolved from the user's account each time, so we don't store it.)
+        if (manualToken) {
+          try {
+            await setAppGithubToken(app.id, ctx.userId, manualToken)
+          } catch {
+            // best-effort; the initial deploy below still uses the live token
+          }
+        }
         let res: Response
         try {
           res = await startDeploy({ repo, name: app.flyApp, branch, githubToken })

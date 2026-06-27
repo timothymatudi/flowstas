@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { appLimitForPlan, effectivePlan } from '@/lib/plan-limits'
 import { createApp, countAppsForOwner, updateAppDeploy, listApps, setAppGithubToken } from '@/lib/app-store'
 import { startDeploy, parseResult, workerConfigured } from '@/lib/build-worker'
+import { resolveCloneToken } from '@/lib/github-connection'
 
 export const dynamic = 'force-dynamic'
 // Builds can take a few minutes; allow the longest the platform permits.
@@ -52,21 +53,24 @@ export async function POST(req: Request) {
   const repo = (body.repo || '').trim()
   const name = (body.name || '').trim()
   const branch = (body.branch || '').trim() || null
-  // For private repos the user supplies a GitHub token. We pass it straight to
-  // the worker for the clone and never store it.
-  const githubToken = (body.githubToken || '').trim() || null
+  // A manual token is optional now: if the user has connected their GitHub
+  // account, private github.com repos clone automatically with no token here.
+  const manualToken = (body.githubToken || '').trim() || null
   if (!VALID_REPO.test(repo)) {
     return NextResponse.json(
       { error: 'Paste a GitHub, GitLab, or Bitbucket repo link, e.g. https://github.com/you/your-app.' },
       { status: 400 }
     )
   }
-  if (githubToken && !/^[A-Za-z0-9_]{20,300}$/.test(githubToken)) {
+  if (manualToken && !/^[A-Za-z0-9_]{20,300}$/.test(manualToken)) {
     return NextResponse.json(
       { error: 'That doesn’t look like a valid GitHub access token.' },
       { status: 400 }
     )
   }
+  // Manual token wins; otherwise fall back to the user's connected GitHub account
+  // (github.com repos only). Either way this is what we clone with.
+  const githubToken = await resolveCloneToken(user.id, repo, manualToken)
 
   // Each plan caps how many running apps you can have.
   const { data: sub } = await supabase

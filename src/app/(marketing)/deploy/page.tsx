@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Check, Loader2, Lock, ChevronDown, Rocket, ArrowUpRight } from 'lucide-react'
+import { Check, Loader2, Lock, ChevronDown, Rocket, ArrowUpRight, Github } from 'lucide-react'
 
 // "Connect your app" on-ramp: paste a GitHub repo, hit deploy, and watch the
 // build happen as clean steps. This is the compute sibling of /publish (static
@@ -31,6 +31,59 @@ export default function DeployPage() {
   const [githubToken, setGithubToken] = useState('')
   const [isPrivate, setIsPrivate] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+
+  // GitHub connection: once connected, the user can deploy any of their repos —
+  // public or private — by picking from a list, with no token to paste.
+  const [gh, setGh] = useState<{ available: boolean; connected: boolean; login: string | null }>({
+    available: false,
+    connected: false,
+    login: null,
+  })
+  const [repos, setRepos] = useState<
+    { fullName: string; url: string; private: boolean; defaultBranch: string }[]
+  >([])
+  const [reposLoading, setReposLoading] = useState(false)
+  const [ghNotice, setGhNotice] = useState<string | null>(null)
+
+  // Reflect the OAuth callback outcome (?github=…) as a one-line notice.
+  useEffect(() => {
+    const status = new URLSearchParams(window.location.search).get('github')
+    if (!status) return
+    const map: Record<string, string> = {
+      connected: 'GitHub connected — pick a repo or paste a URL to deploy.',
+      denied: 'GitHub connection was cancelled.',
+      invalid: 'Could not verify the GitHub connection. Please try again.',
+      failed: 'Connecting to GitHub failed. Please try again.',
+      unavailable: 'GitHub connect isn’t set up on this server yet.',
+    }
+    setGhNotice(map[status] ?? null)
+  }, [])
+
+  // Load connection status on mount; if connected, pull the repo list.
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/github/status')
+        const data = await res.json()
+        if (!active) return
+        setGh(data)
+        if (data.connected) {
+          setReposLoading(true)
+          const r = await fetch('/api/github/repos')
+          const rd = await r.json()
+          if (active && Array.isArray(rd.repos)) setRepos(rd.repos)
+        }
+      } catch {
+        // leave defaults; the paste box still works
+      } finally {
+        if (active) setReposLoading(false)
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
   const [showLogs, setShowLogs] = useState(false)
   const [phase, setPhase] = useState<Phase>('idle')
   const [logs, setLogs] = useState('')
@@ -61,7 +114,14 @@ export default function DeployPage() {
       const res = await fetch('/api/apps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, repo, branch, githubToken: isPrivate ? githubToken : '' }),
+        // When connected, the server uses your GitHub connection automatically;
+        // only send a manual token when you're not connected and opted into one.
+        body: JSON.stringify({
+          name,
+          repo,
+          branch,
+          githubToken: !gh.connected && isPrivate ? githubToken : '',
+        }),
       })
 
       // Non-streaming error (auth, plan limit, bad repo) comes back as JSON.
@@ -136,6 +196,66 @@ export default function DeployPage() {
         {/* Form — hidden once we're live so the success card stands alone */}
         {phase !== 'live' && (
           <form onSubmit={handleDeploy} className="glass space-y-5 rounded-2xl p-6 shadow-premium">
+            {ghNotice && (
+              <div className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs text-foreground">
+                {ghNotice}
+              </div>
+            )}
+            {/* GitHub connection — deploy any repo (public or private) with no token */}
+            {gh.available && !gh.connected && (
+              <a
+                href="/api/github/connect?returnTo=/deploy"
+                className="flex items-center justify-center gap-2 rounded-xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background hover:opacity-90"
+              >
+                <Github className="h-4 w-4" />
+                Connect GitHub
+              </a>
+            )}
+            {gh.available && !gh.connected && (
+              <p className="-mt-2 text-center text-xs text-muted-foreground">
+                Connect once to deploy any of your repos — public or private — without
+                pasting a token.
+              </p>
+            )}
+            {gh.connected && (
+              <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2 text-sm font-medium text-green-800">
+                    <Github className="h-4 w-4" />
+                    Connected as @{gh.login}
+                  </span>
+                  <a href="/api/github/connect?returnTo=/deploy" className="text-xs font-medium text-green-700 hover:underline">
+                    Switch
+                  </a>
+                </div>
+                {repos.length > 0 && (
+                  <select
+                    disabled={building}
+                    value={repo}
+                    onChange={(e) => {
+                      const r = repos.find((x) => x.url === e.target.value)
+                      setRepo(e.target.value)
+                      if (r) setBranch(r.defaultBranch || '')
+                    }}
+                    className="input-modern mt-3"
+                  >
+                    <option value="">Pick a repo to deploy…</option>
+                    {repos.map((r) => (
+                      <option key={r.url} value={r.url}>
+                        {r.fullName}
+                        {r.private ? ' (private)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="mt-2 text-xs text-green-700">
+                  {reposLoading
+                    ? 'Loading your repositories…'
+                    : 'Pick a repo above, or paste any repo URL below — private repos just work.'}
+                </p>
+              </div>
+            )}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">
                 {t('repoLabel')}
@@ -155,19 +275,22 @@ export default function DeployPage() {
               </p>
             </div>
 
-            {/* Private repo: keep the scary token field tucked away */}
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
-              <input
-                type="checkbox"
-                checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
-                disabled={building}
-                className="h-4 w-4 rounded border-border accent-primary"
-              />
-              <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-              {t('privateRepoLabel')}
-            </label>
-            {isPrivate && (
+            {/* Private repo via a manual token — only needed when GitHub isn't
+                connected (e.g. GitLab/Bitbucket, or you'd rather use a token). */}
+            {!gh.connected && (
+              <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
+                <input
+                  type="checkbox"
+                  checked={isPrivate}
+                  onChange={(e) => setIsPrivate(e.target.checked)}
+                  disabled={building}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                {t('privateRepoLabel')}
+              </label>
+            )}
+            {!gh.connected && isPrivate && (
               <div className="-mt-1">
                 <input
                   value={githubToken}

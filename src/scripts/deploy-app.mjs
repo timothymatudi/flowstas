@@ -66,15 +66,37 @@ const work = mkdtempSync(join(tmpdir(), 'flowstas-deploy-'))
 const src = join(work, 'src')
 const branchArg = branch ? `--branch ${branch} ` : ''
 console.log(`\n▶ Cloning ${repo}${branch ? ` (branch ${branch})` : ''}${token ? ' (private)' : ''} → ${src}`)
-if (token) {
-  const user = helperUserFor(repo)
-  const helper = `!f() { echo username=${user}; echo password=$GH_TOKEN; }; f`
-  execSync(`git -c credential.helper='${helper}' clone --depth 1 ${branchArg}${repo} ${src}`, {
-    stdio: 'inherit',
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
-  })
-} else {
-  run(`git clone --depth 1 ${branchArg}${repo} ${src}`)
+// GIT_TERMINAL_PROMPT=0 makes git fail fast instead of hanging on a credential
+// prompt when a private repo has no (or a bad) token — so we can give a clear
+// message rather than a stuck build.
+try {
+  if (token) {
+    const user = helperUserFor(repo)
+    const helper = `!f() { echo username=${user}; echo password=$GH_TOKEN; }; f`
+    execSync(`git -c credential.helper='${helper}' clone --depth 1 ${branchArg}${repo} ${src}`, {
+      stdio: 'inherit',
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+    })
+  } else {
+    execSync(`git clone --depth 1 ${branchArg}${repo} ${src}`, {
+      stdio: 'inherit',
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+    })
+  }
+} catch {
+  // A clone failure on a reachable host is almost always private + no/bad creds.
+  // Turn the raw git error into something the user can act on.
+  console.error('\n✖ Could not clone the repo.')
+  if (!token) {
+    console.error(
+      "If this repo is PRIVATE, Flowstas needs read access to clone it. Tick \"This is a private repo\" on the deploy form (or \"Private repo? Add a clone token\" under My Apps → Retry deploy) and paste a GitHub access token — a fine-grained token with read-only Contents access is enough."
+    )
+  } else {
+    console.error(
+      'The access token was rejected. It may be expired, lack read access to this repo, or be the wrong account. Generate a fresh fine-grained token (read-only Contents) for this repo and try again.'
+    )
+  }
+  process.exit(1)
 }
 
 // Some repos nest the app in a subfolder; pick the dir that has a project file.

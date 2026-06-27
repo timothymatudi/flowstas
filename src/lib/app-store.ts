@@ -1,6 +1,7 @@
 import 'server-only'
 import crypto from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { encryptSecret, decryptSecret } from '@/lib/token-crypto'
 
 // Store for deployed COMPUTE apps (full apps that build + run on Fly), the
 // compute sibling of lib/site-store.ts. The actual build/run lives on Fly,
@@ -36,34 +37,9 @@ function newId() {
 // --- GitHub token at rest (AES-256-GCM) --------------------------------------
 // Private-repo deploys need a GitHub token to clone. We encrypt it at rest so a
 // redeploy (dashboard button or push webhook) can re-clone without re-prompting.
-// The key lives only in the APP_TOKEN_ENC_KEY env var (32 bytes, base64) — never
-// in the DB — so a DB leak alone can't decrypt stored tokens.
-function tokenEncKey(): Buffer {
-  const raw = process.env.APP_TOKEN_ENC_KEY
-  if (!raw) throw new Error('APP_TOKEN_ENC_KEY is not set — cannot encrypt GitHub tokens.')
-  const key = Buffer.from(raw, 'base64')
-  if (key.length !== 32) throw new Error('APP_TOKEN_ENC_KEY must decode to 32 bytes (base64).')
-  return key
-}
-
-// Returns base64(iv[12] | authTag[16] | ciphertext).
-function encryptToken(plain: string): string {
-  const iv = crypto.randomBytes(12)
-  const cipher = crypto.createCipheriv('aes-256-gcm', tokenEncKey(), iv)
-  const ct = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()])
-  const tag = cipher.getAuthTag()
-  return Buffer.concat([iv, tag, ct]).toString('base64')
-}
-
-function decryptToken(stored: string): string {
-  const buf = Buffer.from(stored, 'base64')
-  const iv = buf.subarray(0, 12)
-  const tag = buf.subarray(12, 28)
-  const ct = buf.subarray(28)
-  const decipher = crypto.createDecipheriv('aes-256-gcm', tokenEncKey(), iv)
-  decipher.setAuthTag(tag)
-  return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8')
-}
+// Encryption lives in lib/token-crypto.ts (key in APP_TOKEN_ENC_KEY).
+const encryptToken = encryptSecret
+const decryptToken = decryptSecret
 
 // A Fly app name: lowercase letters/digits/hyphens, globally unique. We prefix
 // "flowstas-" so customer apps are namespaced, add a slug from the name for
@@ -270,13 +246,13 @@ export async function listAllApps(): Promise<Array<AppMeta & { ownerId: string }
 // Find apps deployed from a given repo (any owner). Used by the GitHub webhook
 // to know which app(s) to redeploy when code is pushed. Repo match is
 // case-insensitive and ignores a trailing ".git" or slash.
-export async function listAppsByRepo(repo: string): Promise<AppMeta[]> {
+export async function listAppsByRepo(repo: string): Promise<Array<AppMeta & { ownerId: string }>> {
   const clean = repo.trim().toLowerCase().replace(/\.git$/, '').replace(/\/$/, '')
   if (!clean) return []
   const supabase = createAdminClient()
   const { data } = await supabase.from('apps').select('*')
   return (data ?? [])
-    .map(rowToMeta)
+    .map((row) => ({ ...rowToMeta(row), ownerId: (row.owner_id as string) ?? '' }))
     .filter((a) => a.repo.toLowerCase().replace(/\.git$/, '').replace(/\/$/, '') === clean)
 }
 

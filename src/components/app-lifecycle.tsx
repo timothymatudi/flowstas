@@ -10,6 +10,10 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Optional clone token for redeploying a private repo whose token wasn't stored
+  // (or has expired). Tucked behind a toggle so it doesn't clutter the controls.
+  const [showToken, setShowToken] = useState(false)
+  const [token, setToken] = useState('')
 
   async function lifecycle(action: 'stop' | 'start' | 'restart') {
     setBusy(true)
@@ -34,7 +38,11 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
     setBusy(true)
     setError(null)
     try {
-      const res = await fetch(`/api/apps/${app.id}/redeploy`, { method: 'POST' })
+      const res = await fetch(`/api/apps/${app.id}/redeploy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(token.trim() ? { githubToken: token.trim() } : {}),
+      })
       const data = await res.json()
       // A failed build returns 200 with an { error } message; surface it but
       // still refresh so the dashboard shows the new "error" status and logs.
@@ -145,6 +153,36 @@ export function AppLifecycle({ app }: { app: AppMeta }) {
           Delete app
         </button>
       </div>
+
+      {app.status !== 'building' && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={() => setShowToken((v) => !v)}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground"
+          >
+            {showToken ? 'Hide' : 'Private repo? Add a clone token'}
+          </button>
+          {showToken && (
+            <div className="mt-2">
+              <input
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                type="password"
+                placeholder="ghp_… or github_pat_…"
+                autoComplete="off"
+                spellCheck={false}
+                disabled={busy}
+                className="input-modern font-mono text-sm"
+              />
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                Needed to re-clone a private repo. Stored encrypted, used only for the
+                clone. Use a fine-grained token with read-only Contents access.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {app.status !== 'building' && (
         <p className="mt-2 text-xs text-muted-foreground">
