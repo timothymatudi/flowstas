@@ -2,7 +2,7 @@ import 'server-only'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { addDomainToProject, removeDomainFromProject } from '@/lib/vercel'
+import { addDomainToProject, removeDomainFromProject } from '@/lib/fly-domains'
 
 // Store for published sites + their form submissions, backed by Supabase:
 //   - site files     → Storage bucket "sites", keyed "<id>/<relpath>"

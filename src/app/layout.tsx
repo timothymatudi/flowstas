@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { Toaster } from '@/components/ui/sonner'
 import { localeMeta, ogLocale, type Locale } from '@/i18n/locales'
 import { CurrencyProvider, CURRENCY_COOKIE } from '@/components/currency-provider'
 import { currencyForCountry, isCurrency } from '@/lib/currency'
-import { CookieConsent, CONSENT_COOKIE } from '@/components/cookie-consent'
+import { CookieConsent } from '@/components/cookie-consent'
 import './globals.css'
 
 // Localized SEO: title/description and og:locale follow the visitor's language.
@@ -76,17 +75,11 @@ export default async function RootLayout({
   const locale = (await getLocale()) as Locale
   const dir = localeMeta[locale]?.dir ?? 'ltr'
 
-  // Initial display currency: the visitor's saved choice, else inferred from
-  // their country (geo header), else the default.
-  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()])
+  // Initial display currency: the visitor's saved choice, else the default.
+  const cookieStore = await cookies()
   const savedCurrency = cookieStore.get(CURRENCY_COOKIE)?.value
   const initialCurrency =
-    savedCurrency && isCurrency(savedCurrency)
-      ? savedCurrency
-      : currencyForCountry(headerStore.get('x-vercel-ip-country'))
-
-  // GDPR: only load non-essential analytics once the visitor has accepted.
-  const analyticsAllowed = cookieStore.get(CONSENT_COOKIE)?.value === 'accepted'
+    savedCurrency && isCurrency(savedCurrency) ? savedCurrency : currencyForCountry()
 
   return (
     // suppressHydrationWarning: the bootstrap script mutates <html>'s class
@@ -98,7 +91,6 @@ export default async function RootLayout({
             {children}
             <Toaster />
             <CookieConsent />
-            {analyticsAllowed && <Analytics />}
           </CurrencyProvider>
         </NextIntlClientProvider>
       </body>

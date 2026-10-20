@@ -1,9 +1,13 @@
 // The DNS targets a customer points their own domain at to go live on Flowstas.
-// These are Flowstas-branded on purpose: the customer never sees the hosting
-// provider underneath. For this to work, the flowstas.com DNS zone must have a
-// one-time record:  connect.flowstas.com  CNAME  cname.vercel-dns.com
-// (set up once by us — see the custom-domains note).
+// Flowstas-branded so the customer never sees the hosting provider underneath.
+//
+// Setup (one-time in your DNS zone):
+//   connect.flowstas.com  CNAME  flowstas.fly.dev
+//
+// After running `fly ips allocate-v4 --shared` update DNS_A_RECORD with the
+// IP printed by that command.
 export const DNS_CNAME_TARGET = 'connect.flowstas.com'
 
-// Fallback for apex/root domains that can't take a CNAME. Plain IP, no branding.
-export const DNS_A_RECORD = '76.76.21.21'
+// Fallback for apex/root domains that can't take a CNAME.
+// Replace with your Fly.io dedicated IPv4: `fly ips allocate-v4 --shared`
+export const DNS_A_RECORD = '66.241.124.212'
