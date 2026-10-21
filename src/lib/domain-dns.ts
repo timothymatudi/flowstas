@@ -10,4 +10,4 @@ export const DNS_CNAME_TARGET = 'connect.flowstas.com'
 
 // Fallback for apex/root domains that can't take a CNAME.
 // Replace with your Fly.io dedicated IPv4: `fly ips allocate-v4 --shared`
-export const DNS_A_RECORD = '66.241.124.212'
+export const DNS_A_RECORD = '66.241.125.254'
