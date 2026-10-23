@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     if (event.type === 'customer.subscription.deleted') {
       const sub = event.data.object
-      await supabase
+      await getSupabase()
         .from('subscriptions')
         .update({ status: 'canceled', updated_at: new Date().toISOString() })
         .eq('stripe_subscription_id', sub.id)
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     if (event.type === 'customer.subscription.updated') {
       const sub = event.data.object
       const period = periodFor(sub)
-      await supabase
+      await getSupabase()
         .from('subscriptions')
         .update({
           status: sub.status === 'active' ? 'active' : 'canceled',
