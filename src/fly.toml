@@ -1,5 +1,5 @@
 app = 'flowstas'
-primary_region = 'lhr'
+primary_region = 'ams'
 
 [build]
   # NEXT_PUBLIC_* vars are baked into the client bundle at build time.
