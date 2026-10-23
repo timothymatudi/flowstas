@@ -5,11 +5,12 @@ import { createClient } from '@supabase/supabase-js'
 export const dynamic = 'force-dynamic'
 import type Stripe from 'stripe'
 
-// Service-role client: bypasses RLS so the webhook can write subscriptions.
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // In Stripe API 2025+ the billing period moved onto subscription items.
 function periodFor(subscription: Stripe.Subscription) {
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
       const plan = session.metadata?.plan || 'basic'
       const period = periodFor(subscription)
 
-      await supabase.from('subscriptions').upsert(
+      await getSupabase().from('subscriptions').upsert(
         {
           user_id: userId,
           plan,
