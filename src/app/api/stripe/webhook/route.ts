@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
+
+export const dynamic = 'force-dynamic'
 import type Stripe from 'stripe'
 
 // Service-role client: bypasses RLS so the webhook can write subscriptions.

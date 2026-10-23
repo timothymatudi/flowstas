@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 // Opens the Stripe Customer Portal so a paying user can update their card,
 // download invoices, or cancel their subscription. The portal handles all of
 // that UI; our webhook keeps the subscriptions row in sync afterwards.
