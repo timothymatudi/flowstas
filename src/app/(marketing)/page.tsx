@@ -147,7 +147,7 @@ export default function HomePage() {
                   <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                  <span className="ml-2 text-xs text-muted-foreground">yourname.flowstas.com</span>
+                  <span className="ml-2 text-xs text-muted-foreground">yourname.com</span>
                 </div>
                 <div className="bg-background h-44 p-6 flex flex-col items-center justify-center text-center">
                   <div className="h-3.5 w-40 rounded bg-foreground/80 mb-3" />
@@ -176,7 +176,8 @@ export default function HomePage() {
                   <p><span className="text-green-400">▸</span> Detected Next.js</p>
                   <p><span className="text-green-400">▸</span> Building the container…</p>
                   <p><span className="text-green-400">▸</span> Deploying…</p>
-                  <p className="text-green-400">✓ Live at yourapp.flowstas.com</p>
+                  <p className="text-green-400">✓ Live at yourapp.com</p>
+                  <p className="text-gray-500">  or yourapp.flowstas.com</p>
                 </div>
               </div>
               <h3 className="mt-5 text-xl font-semibold text-foreground">Deploy an app</h3>
