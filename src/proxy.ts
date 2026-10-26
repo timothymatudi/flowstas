@@ -20,7 +20,7 @@ function isSiteHost(host: string): boolean {
   if (!h) return false
   if (h === 'flowstas.com' || h === 'www.flowstas.com') return false
   if (h === 'localhost' || h.startsWith('127.') || h.startsWith('192.168.') || h.endsWith('.local')) return false
-  if (h.endsWith('.vercel.app')) return false
+  if (h.endsWith('.vercel.app') || h.endsWith('.fly.dev')) return false
   if (h.endsWith(SUFFIX)) {
     const label = h.slice(0, -SUFFIX.length)
     return !!label && !label.includes('.') && !RESERVED.has(label)
