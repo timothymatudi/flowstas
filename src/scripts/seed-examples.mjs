@@ -2,7 +2,6 @@
 // the homepage can show real screenshots — honest proof, like Framer's gallery.
 // Usage: node scripts/seed-examples.mjs
 import { readFileSync } from 'node:fs'
-import { Client } from 'pg'
 
 const env = {}
 for (const line of readFileSync('.env.local', 'utf8').split('\n')) {
@@ -11,7 +10,27 @@ for (const line of readFileSync('.env.local', 'utf8').split('\n')) {
 }
 const SUPABASE_URL = env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL
 const KEY = env.SUPABASE_SERVICE_ROLE_KEY
-const conn = (env.POSTGRES_URL_NON_POOLING || '').split('?')[0]
+
+async function storageUpsert(path, body) {
+  // try PUT (update) first, fall back to POST (create)
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${path}`, {
+    method: 'PUT', headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'text/html; charset=utf-8', 'x-upsert': 'true' },
+    body,
+  })
+  return res
+}
+
+async function dbUpsert(row) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/sites`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${KEY}`, apikey: KEY,
+      'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify(row),
+  })
+  return res
+}
 
 const page = ({ font, ink, accent, bg, brand, nav, hero, sub, sections }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${brand}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,22 +95,15 @@ const SITES = [
 ]
 
 const main = async () => {
-  const c = new Client({ connectionString: conn, ssl: { rejectUnauthorized: false } })
-  await c.connect()
   for (const s of SITES) {
-    const id = s.slug // use slug as id for simplicity
-    const up = await fetch(`${SUPABASE_URL}/storage/v1/object/sites/${id}/index.html`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'text/html; charset=utf-8', 'x-upsert': 'true' },
-      body: s.html,
-    })
-    await c.query(
-      `insert into public.sites(id,name,file_count,subdomain) values($1,$2,1,$3)
-       on conflict(id) do update set name=excluded.name, subdomain=excluded.subdomain`,
-      [id, s.name, s.slug]
-    )
-    console.log(`published ${s.slug} -> ${up.status} -> https://${s.slug}.flowstas.com`)
+    const id = s.slug
+    const up = await storageUpsert(`sites/${id}/index.html`, s.html)
+    if (!up.ok) { console.error(`storage error for ${s.slug}: ${up.status} ${await up.text()}`); continue }
+
+    const db = await dbUpsert({ id, name: s.name, file_count: 1, subdomain: s.slug, created_at: new Date().toISOString() })
+    if (!db.ok) { console.error(`db error for ${s.slug}: ${db.status} ${await db.text()}`); continue }
+
+    console.log(`published ${s.slug} -> https://${s.slug}.flowstas.com`)
   }
-  await c.end()
 }
 main().catch((e) => { console.error(e.message); process.exit(1) })

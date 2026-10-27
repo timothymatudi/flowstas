@@ -30,54 +30,40 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   )
 }
 
-const trust = [
-  { icon: ShieldCheck, tint: 'bg-primary/10 text-primary', title: 'Automatic HTTPS', description: 'Every site is served securely over HTTPS at its own address — nothing to configure.' },
-  { icon: Server, tint: 'bg-primary/10 text-primary', title: 'Nothing to manage', description: 'No servers, no DNS, no deploy scripts. You publish; we keep it online.' },
-  { icon: Lock, tint: 'bg-primary/10 text-primary', title: 'Your data stays yours', description: 'Your sites and the messages they collect are private to your account.' },
-  { icon: CalendarX, tint: 'bg-primary/10 text-primary', title: 'No lock-in', description: 'Plans are billed monthly and you can cancel whenever you like.' },
-]
-
-const steps = [
-  { step: '01', title: 'Bring it', description: 'Paste a site, upload files, import a URL, or connect a Git repo.', icon: MousePointerClick },
-  { step: '02', title: 'We put it live', description: 'We host your site or build & run your app — with HTTPS.', icon: Rocket },
-  { step: '03', title: 'Go', description: 'Connect your own domain, or share the free flowstas.com address you get to start.', icon: Globe },
-]
-
-const features = [
-  { icon: Rocket, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Publish in one click', description: 'Paste your HTML or drop a folder/zip. Your site is online in seconds — no servers, no code.' },
-  { icon: Globe, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'A free address to start', description: 'No domain yet? Get a free flowstas.com address to share right away — and connect your own domain anytime, with HTTPS on by default.' },
-  { icon: Link2, href: '/publish', tint: 'bg-primary/10 text-primary', title: 'Use your own domain', description: 'Put your site on your own brand — point yourbusiness.com at it and we handle the HTTPS certificate automatically.' },
-  { icon: MailCheck, href: '/messages', tint: 'bg-primary/10 text-primary', title: 'Capture messages', description: 'Your contact form saves every enquiry to your dashboard and emails you the moment one arrives.' },
-  { icon: BarChart3, href: '/visitors', tint: 'bg-primary/10 text-primary', title: 'See your visitors', description: 'See who looked at your sites — total views, a 7-day trend and a recent-visits log.' },
-  { icon: Lock, href: '/passwords', tint: 'bg-primary/10 text-primary', title: 'Password-protect it', description: 'Put a password on any site for client previews, drafts or private pages.' },
-  { icon: Server, href: '/deploy', tint: 'bg-primary/10 text-primary', title: 'Deploy full apps too', description: 'Connect a GitHub, GitLab or Bitbucket repo — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node or your own Dockerfile — and we build and run it live.' },
-]
-
-const faqs = [
-  {
-    q: 'What kind of website can I publish?',
-    a: 'Any static site. Paste a single HTML page, or upload a whole folder or .zip — HTML, CSS, JavaScript, images and fonts all work.',
-  },
-  {
-    q: 'Can I host a full app, not just a static site?',
-    a: 'Yes. Use “Deploy an app” to connect a GitHub, GitLab or Bitbucket repo and we build and run it for you — Next.js, Astro, SvelteKit, Nuxt, Vite/React, plain Node, or any repo with its own Dockerfile.',
-  },
-  {
-    q: 'Where does my site go live?',
-    a: 'Connect your own domain (like yourbusiness.com) and we serve it over HTTPS automatically — no DNS hassle. Don’t have one yet? You also get a free flowstas.com address to share right away.',
-  },
-  {
-    q: 'What happens to my contact-form messages?',
-    a: 'Every submission is saved and shown in your dashboard, so you never lose an enquiry from a visitor.',
-  },
-  {
-    q: 'Can I cancel anytime?',
-    a: 'Yes. Plans are billed monthly and you can cancel whenever you like — no long-term contract.',
-  },
-]
-
 export default function HomePage() {
   const t = useTranslations('landing')
+
+  const trust = [
+    { icon: ShieldCheck, tint: 'bg-primary/10 text-primary', title: t('trust1Title'), description: t('trust1Desc') },
+    { icon: Server,      tint: 'bg-primary/10 text-primary', title: t('trust2Title'), description: t('trust2Desc') },
+    { icon: Lock,        tint: 'bg-primary/10 text-primary', title: t('trust3Title'), description: t('trust3Desc') },
+    { icon: CalendarX,   tint: 'bg-primary/10 text-primary', title: t('trust4Title'), description: t('trust4Desc') },
+  ]
+
+  const steps = [
+    { step: '01', title: t('step1Title'), description: t('step1Desc'), icon: MousePointerClick },
+    { step: '02', title: t('step2Title'), description: t('step2Desc'), icon: Rocket },
+    { step: '03', title: t('step3Title'), description: t('step3Desc'), icon: Globe },
+  ]
+
+  const features = [
+    { icon: Rocket,     href: '/publish',  tint: 'bg-primary/10 text-primary', title: t('feat1Title'), description: t('feat1Desc') },
+    { icon: Globe,      href: '/publish',  tint: 'bg-primary/10 text-primary', title: t('feat2Title'), description: t('feat2Desc') },
+    { icon: Link2,      href: '/publish',  tint: 'bg-primary/10 text-primary', title: t('feat3Title'), description: t('feat3Desc') },
+    { icon: MailCheck,  href: '/messages', tint: 'bg-primary/10 text-primary', title: t('feat4Title'), description: t('feat4Desc') },
+    { icon: BarChart3,  href: '/visitors', tint: 'bg-primary/10 text-primary', title: t('feat5Title'), description: t('feat5Desc') },
+    { icon: Lock,       href: '/passwords',tint: 'bg-primary/10 text-primary', title: t('feat6Title'), description: t('feat6Desc') },
+    { icon: Server,     href: '/deploy',   tint: 'bg-primary/10 text-primary', title: t('feat7Title'), description: t('feat7Desc') },
+  ]
+
+  const faqs = [
+    { q: t('faq1q'), a: t('faq1a') },
+    { q: t('faq2q'), a: t('faq2a') },
+    { q: t('faq3q'), a: t('faq3a') },
+    { q: t('faq4q'), a: t('faq4a') },
+    { q: t('faq5q'), a: t('faq5a') },
+  ]
+
   return (
     <div className="relative overflow-hidden">
       {/* Hero */}
@@ -99,14 +85,12 @@ export default function HomePage() {
                 <span className="gradient-text">{t('headlineLine2')}</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Bring what you already have — paste a site, drop a zip, import a URL, or point us at a
-                <span className="font-semibold text-foreground"> GitHub, GitLab or Bitbucket</span> repo. We host or
-                build it and put it live with HTTPS at your own address.
+                {t('subheadlineDetail')}
               </p>
               <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2.5 text-sm text-muted-foreground">
-                {['Static or full-stack', 'Automatic HTTPS', 'Free to start'].map((t) => (
-                  <li key={t} className="inline-flex items-center gap-1.5">
-                    <Check className="h-4 w-4 text-green-600" /> {t}
+                {([t('pill1'), t('pill2'), t('pill3')] as string[]).map((pill) => (
+                  <li key={pill} className="inline-flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-green-600" /> {pill}
                   </li>
                 ))}
               </ul>
@@ -118,9 +102,11 @@ export default function HomePage() {
             </div>
           </div>
           <p className="mt-10 text-center text-sm text-muted-foreground">
-            Want to upload a folder, import a URL, or{' '}
-            <Link href="/deploy" className="font-medium text-primary hover:underline">deploy a full app from a repo</Link>?{' '}
-            <Link href="/publish" className="font-medium text-primary hover:underline">Open the publish page</Link>.
+            {t('heroCta')}{' '}
+            <Link href="/deploy" className="font-medium text-primary hover:underline">{t('heroCtaDeployLink')}</Link>
+            {t('heroCtaMid')}
+            <Link href="/publish" className="font-medium text-primary hover:underline">{t('heroCtaPublishLink')}</Link>
+            {t('heroCtaSuffix')}
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
@@ -130,12 +116,12 @@ export default function HomePage() {
       <section className="py-20 border-y border-border bg-secondary/40">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <Eyebrow>What you can ship</Eyebrow>
+            <Eyebrow>{t('twoWaysEyebrow')}</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-4 text-foreground">
-              Two ways to <span className="gradient-text">go live</span>
+              {t('twoWaysTitle1')} <span className="gradient-text">{t('twoWaysTitle2')}</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Host a static site, or deploy a full app from a repo — same one-click feel.
+              {t('twoWaysSubtitle')}
             </p>
           </div>
 
@@ -156,9 +142,9 @@ export default function HomePage() {
                   <div className="h-8 w-28 rounded-lg gradient-primary" />
                 </div>
               </div>
-              <h3 className="mt-5 text-xl font-semibold text-foreground">Host a site</h3>
+              <h3 className="mt-5 text-xl font-semibold text-foreground">{t('siteCardTitle')}</h3>
               <p className="mt-1 text-muted-foreground leading-relaxed">
-                Paste HTML, drop a zip, or import a URL — live at your own address with HTTPS in seconds.
+                {t('siteCardDesc')}
               </p>
             </div>
 
@@ -180,15 +166,15 @@ export default function HomePage() {
                   <p className="text-gray-500">  or yourapp.flowstas.com</p>
                 </div>
               </div>
-              <h3 className="mt-5 text-xl font-semibold text-foreground">Deploy an app</h3>
+              <h3 className="mt-5 text-xl font-semibold text-foreground">{t('appCardTitle')}</h3>
               <p className="mt-1 text-muted-foreground leading-relaxed">
-                Point us at a GitHub, GitLab or Bitbucket repo — we build the container and run it live.
+                {t('appCardDesc')}
               </p>
             </div>
           </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Real sites running on Flowstas:{' '}
+            {t('realSites')}{' '}
             {examples.map((e, i) => (
               <span key={e.host}>
                 <a href={`https://${e.host}`} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
@@ -205,9 +191,9 @@ export default function HomePage() {
       <section className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <Eyebrow>How it works</Eyebrow>
+            <Eyebrow>{t('howEyebrow')}</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
-              Live in <span className="gradient-text">3 simple steps</span>
+              {t('howTitle1')} <span className="gradient-text">{t('howTitle2')}</span>
             </h2>
             <p className="text-lg text-muted-foreground">{t('subheadline')}</p>
           </div>
@@ -232,11 +218,11 @@ export default function HomePage() {
       <section id="features" className="py-24 bg-radial-bottom">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <Eyebrow>Features</Eyebrow>
+            <Eyebrow>{t('featEyebrow')}</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
-              Everything you need to <span className="gradient-text">go live</span>
+              {t('featTitle1')} <span className="gradient-text">{t('featTitle2')}</span>
             </h2>
-            <p className="text-lg text-muted-foreground">No code, no servers — just the essentials, done well.</p>
+            <p className="text-lg text-muted-foreground">{t('featSubtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
@@ -260,9 +246,9 @@ export default function HomePage() {
       <section className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <Eyebrow>Why Flowstas</Eyebrow>
+            <Eyebrow>{t('trustEyebrow')}</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
-              Built to be <span className="gradient-text">dependable</span>
+              {t('trustTitle1')} <span className="gradient-text">{t('trustTitle2')}</span>
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -283,9 +269,9 @@ export default function HomePage() {
       <section id="faq" className="py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <Eyebrow>FAQ</Eyebrow>
+            <Eyebrow>{t('faqEyebrow')}</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl mb-5 text-foreground">
-              Questions, <span className="gradient-text">answered</span>
+              {t('faqTitle1')} <span className="gradient-text">{t('faqTitle2')}</span>
             </h2>
           </div>
           <div className="max-w-3xl mx-auto grid gap-4">
@@ -311,27 +297,27 @@ export default function HomePage() {
             <div className="absolute inset-x-0 top-0 h-px bg-white/25" />
             <div className="relative px-8 py-16 md:py-20 text-center">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold uppercase tracking-wider mb-7">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" /> Live in under a minute
+                <span className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" /> {t('ctaBadge')}
               </span>
               <h2 className="font-display text-4xl md:text-6xl mb-5 text-white tracking-tight leading-[1.0]">
-                Put it online today
+                {t('ctaTitle')}
               </h2>
               <p className="text-lg md:text-xl text-white/75 mb-10 max-w-2xl mx-auto">
-                Bring your site or your repo — share a live link in under a minute.
+                {t('ctaSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/publish"
                   className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 font-semibold text-[#16207a] shadow-[0_10px_30px_-6px_rgba(255,255,255,0.45)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_44px_-6px_rgba(255,255,255,0.65)]"
                 >
-                  Publish a site
+                  {t('ctaPublishBtn')}
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <Link
                   href="/deploy"
                   className="rounded-xl border border-white/25 bg-white/10 px-8 py-4 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/20"
                 >
-                  Deploy an app
+                  {t('ctaDeployBtn')}
                 </Link>
               </div>
             </div>

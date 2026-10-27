@@ -4,7 +4,7 @@
 //
 // `rate` = units of this currency per 1 GBP. These are APPROXIMATE — refresh
 // periodically or wire to a live FX API. `decimals` = the currency's minor-unit
-// digits (JPY has none).
+// digits (JPY/KRW/VND have none).
 export interface CurrencyInfo {
   code: string
   label: string
@@ -14,18 +14,25 @@ export interface CurrencyInfo {
 }
 
 export const CURRENCIES = {
-  GBP: { code: 'GBP', label: 'GBP £', locale: 'en-GB', decimals: 2, rate: 1 },
-  USD: { code: 'USD', label: 'USD $', locale: 'en-US', decimals: 2, rate: 1.27 },
-  EUR: { code: 'EUR', label: 'EUR €', locale: 'de-DE', decimals: 2, rate: 1.17 },
-  INR: { code: 'INR', label: 'INR ₹', locale: 'en-IN', decimals: 2, rate: 106 },
-  BRL: { code: 'BRL', label: 'BRL R$', locale: 'pt-BR', decimals: 2, rate: 6.4 },
-  CAD: { code: 'CAD', label: 'CAD $', locale: 'en-CA', decimals: 2, rate: 1.73 },
-  AUD: { code: 'AUD', label: 'AUD $', locale: 'en-AU', decimals: 2, rate: 1.93 },
-  JPY: { code: 'JPY', label: 'JPY ¥', locale: 'ja-JP', decimals: 0, rate: 192 },
-  CNY: { code: 'CNY', label: 'CNY ¥', locale: 'zh-CN', decimals: 2, rate: 9.1 },
+  GBP: { code: 'GBP', label: 'GBP £',   locale: 'en-GB', decimals: 2, rate: 1 },
+  USD: { code: 'USD', label: 'USD $',    locale: 'en-US', decimals: 2, rate: 1.27 },
+  EUR: { code: 'EUR', label: 'EUR €',    locale: 'de-DE', decimals: 2, rate: 1.17 },
+  INR: { code: 'INR', label: 'INR ₹',   locale: 'en-IN', decimals: 2, rate: 106 },
+  BRL: { code: 'BRL', label: 'BRL R$',  locale: 'pt-BR', decimals: 2, rate: 6.4 },
+  CAD: { code: 'CAD', label: 'CAD $',   locale: 'en-CA', decimals: 2, rate: 1.73 },
+  AUD: { code: 'AUD', label: 'AUD $',   locale: 'en-AU', decimals: 2, rate: 1.93 },
+  JPY: { code: 'JPY', label: 'JPY ¥',   locale: 'ja-JP', decimals: 0, rate: 192 },
+  CNY: { code: 'CNY', label: 'CNY ¥',   locale: 'zh-CN', decimals: 2, rate: 9.1 },
   AED: { code: 'AED', label: 'AED د.إ', locale: 'ar-AE', decimals: 2, rate: 4.66 },
-  NGN: { code: 'NGN', label: 'NGN ₦', locale: 'en-NG', decimals: 2, rate: 1950 },
-  ZAR: { code: 'ZAR', label: 'ZAR R', locale: 'en-ZA', decimals: 2, rate: 23.5 },
+  NGN: { code: 'NGN', label: 'NGN ₦',   locale: 'en-NG', decimals: 2, rate: 1950 },
+  ZAR: { code: 'ZAR', label: 'ZAR R',   locale: 'en-ZA', decimals: 2, rate: 23.5 },
+  KRW: { code: 'KRW', label: 'KRW ₩',   locale: 'ko-KR', decimals: 0, rate: 1680 },
+  VND: { code: 'VND', label: 'VND ₫',   locale: 'vi-VN', decimals: 0, rate: 32000 },
+  KES: { code: 'KES', label: 'KES KSh', locale: 'sw-KE', decimals: 2, rate: 164 },
+  IDR: { code: 'IDR', label: 'IDR Rp',  locale: 'id-ID', decimals: 0, rate: 20400 },
+  BDT: { code: 'BDT', label: 'BDT ৳',  locale: 'bn-BD', decimals: 2, rate: 140 },
+  RUB: { code: 'RUB', label: 'RUB ₽',   locale: 'ru-RU', decimals: 2, rate: 115 },
+  MXN: { code: 'MXN', label: 'MXN $',   locale: 'es-MX', decimals: 2, rate: 21.5 },
 } satisfies Record<string, CurrencyInfo>
 
 export type CurrencyCode = keyof typeof CURRENCIES
@@ -39,6 +46,8 @@ export function isCurrency(value: string): value is CurrencyCode {
 const COUNTRY_CURRENCY: Record<string, CurrencyCode> = {
   GB: 'GBP', US: 'USD', CA: 'CAD', AU: 'AUD', JP: 'JPY', CN: 'CNY', IN: 'INR',
   BR: 'BRL', NG: 'NGN', ZA: 'ZAR', AE: 'AED',
+  KR: 'KRW', VN: 'VND', KE: 'KES', TZ: 'KES', UG: 'KES',
+  ID: 'IDR', BD: 'BDT', RU: 'RUB', MX: 'MXN',
   DE: 'EUR', FR: 'EUR', ES: 'EUR', IT: 'EUR', NL: 'EUR', IE: 'EUR', PT: 'EUR',
   AT: 'EUR', BE: 'EUR', FI: 'EUR', GR: 'EUR',
 }

@@ -2,6 +2,7 @@
 // matching messages/<code>.json file. Everything else is automatic.
 export const locales = [
   'en', 'es', 'zh', 'hi', 'ar', 'pt', 'fr', 'de', 'ja', 'ru', 'id', 'bn',
+  'sw', 'ko', 'vi',
 ] as const
 
 export type Locale = (typeof locales)[number]
@@ -22,6 +23,9 @@ export const localeMeta: Record<Locale, { label: string; dir: 'ltr' | 'rtl' }> =
   ru: { label: 'Русский', dir: 'ltr' },
   id: { label: 'Bahasa Indonesia', dir: 'ltr' },
   bn: { label: 'বাংলা', dir: 'ltr' },
+  sw: { label: 'Kiswahili', dir: 'ltr' },
+  ko: { label: '한국어', dir: 'ltr' },
+  vi: { label: 'Tiếng Việt', dir: 'ltr' },
 }
 
 export function isLocale(value: string): value is Locale {
@@ -32,4 +36,5 @@ export function isLocale(value: string): value is Locale {
 export const ogLocale: Record<Locale, string> = {
   en: 'en_US', es: 'es_ES', zh: 'zh_CN', hi: 'hi_IN', ar: 'ar_AR', pt: 'pt_BR',
   fr: 'fr_FR', de: 'de_DE', ja: 'ja_JP', ru: 'ru_RU', id: 'id_ID', bn: 'bn_BD',
+  sw: 'sw_KE', ko: 'ko_KR', vi: 'vi_VN',
 }
