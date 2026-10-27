@@ -1,25 +1,28 @@
 import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
-
-const footerLinks = {
-  product: [
-    { href: '/publish', label: 'Publish a site' },
-    { href: '/#features', label: 'Features' },
-    { href: '/pricing', label: 'Pricing' },
-  ],
-  company: [
-    { href: '/about', label: 'About Us' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/privacy', label: 'Privacy Policy' },
-    { href: '/terms', label: 'Terms of Service' },
-  ],
-  resources: [
-    { href: '/contact', label: 'Support' },
-    { href: '/#faq', label: 'FAQ' },
-  ],
-}
+import { useTranslations } from 'next-intl'
 
 export default function Footer() {
+  const t = useTranslations('footer')
+
+  const footerLinks = {
+    product: [
+      { href: '/publish', label: t('publishSite') },
+      { href: '/#features', label: t('features') },
+      { href: '/pricing', label: t('pricing') },
+    ],
+    company: [
+      { href: '/about', label: t('aboutUs') },
+      { href: '/contact', label: t('contact') },
+      { href: '/privacy', label: t('privacyPolicy') },
+      { href: '/terms', label: t('termsOfService') },
+    ],
+    resources: [
+      { href: '/contact', label: t('support') },
+      { href: '/#faq', label: t('faq') },
+    ],
+  }
+
   return (
     <footer className="border-t border-border glass">
       <div className="container mx-auto px-4 py-16 lg:px-8 lg:py-20">
@@ -33,14 +36,13 @@ export default function Footer() {
               <span className="font-display text-2xl gradient-text">Flowstas</span>
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Publish your website in seconds — it goes live at its own address like
-              yoursite.flowstas.com, with a contact form that captures every message.
+              {t('tagline')}
             </p>
           </div>
 
           {/* Product Links */}
           <div>
-            <h4 className="mb-5 text-sm font-semibold text-foreground">Product</h4>
+            <h4 className="mb-5 text-sm font-semibold text-foreground">{t('productCol')}</h4>
             <ul className="space-y-3.5">
               {footerLinks.product.map((link) => (
                 <li key={link.href + link.label}>
@@ -57,7 +59,7 @@ export default function Footer() {
 
           {/* Company Links */}
           <div>
-            <h4 className="mb-5 text-sm font-semibold text-foreground">Company</h4>
+            <h4 className="mb-5 text-sm font-semibold text-foreground">{t('companyCol')}</h4>
             <ul className="space-y-3.5">
               {footerLinks.company.map((link) => (
                 <li key={link.href + link.label}>
@@ -74,7 +76,7 @@ export default function Footer() {
 
           {/* Resources Links */}
           <div>
-            <h4 className="mb-5 text-sm font-semibold text-foreground">Support</h4>
+            <h4 className="mb-5 text-sm font-semibold text-foreground">{t('supportCol')}</h4>
             <ul className="space-y-3.5">
               {footerLinks.resources.map((link) => (
                 <li key={link.href + link.label}>
@@ -93,17 +95,17 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Flowstas. All rights reserved.
+            &copy; {new Date().getFullYear()} Flowstas. {t('copyright')}
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-primary">
-              Privacy
+              {t('privacy')}
             </Link>
             <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-primary">
-              Terms
+              {t('terms')}
             </Link>
             <Link href="/contact" className="text-sm text-muted-foreground transition-colors hover:text-primary">
-              Contact
+              {t('contact')}
             </Link>
           </div>
         </div>
