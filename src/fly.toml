@@ -2,9 +2,10 @@ app = 'flowstas'
 primary_region = 'ams'
 
 [build]
-  # NEXT_PUBLIC_* vars are baked into the client bundle at build time.
-  # Set these as GitHub Actions secrets and pass via --build-arg in the workflow,
-  # OR run: fly deploy --build-arg NEXT_PUBLIC_SUPABASE_URL=... etc.
+  [build.args]
+    NEXT_PUBLIC_SUPABASE_URL = "https://iryspofjbqfzwvmkkvvd.supabase.co"
+    NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyeXNwb2ZqYnFmend2bWtrdnZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NDcyODMsImV4cCI6MjA5MDQyMzI4M30.ov3sZSBdZJK8NrjoS5ktvTm_AZri01UA8l8KVtw4IPM"
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_live_51TIgPnFx9EjYgmZMH3AtotJDDx8oVTLYPtOmyC9F4xAw5UcD1aypWupNlRx8cm3TwFKxz011CdducuxDex6WC9RK00U6f7rZVY"
 
 [http_service]
   internal_port = 3000
