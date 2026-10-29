@@ -79,17 +79,25 @@ function PricingCard({
         ))}
       </ul>
 
-      <button
-        onClick={onSelect}
-        className={`w-full rounded-xl py-4 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
-          isPopular
-            ? 'btn-primary'
-            : 'btn-secondary'
-        }`}
-      >
-        {isPopular ? 'Get Started' : 'Choose Plan'}
-        <ArrowRight className="h-4 w-4" />
-      </button>
+      {product.id === 'enterprise' ? (
+        <a
+          href="mailto:hello@flowstas.com"
+          className="w-full rounded-xl py-4 text-sm font-semibold transition-all flex items-center justify-center gap-2 btn-secondary"
+        >
+          Contact Us
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      ) : (
+        <button
+          onClick={onSelect}
+          className={`w-full rounded-xl py-4 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+            isPopular ? 'btn-primary' : 'btn-secondary'
+          }`}
+        >
+          {isPopular ? 'Get Started' : 'Choose Plan'}
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      )}
     </div>
   )
 }
