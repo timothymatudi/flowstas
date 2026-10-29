@@ -52,6 +52,16 @@ export function isTrialActive(sub?: SubscriptionRow | null): boolean {
   )
 }
 
+// Has the trial ended without a paid subscription following it?
+export function isTrialExpired(sub?: SubscriptionRow | null): boolean {
+  return (
+    !!sub &&
+    sub.status === 'trialing' &&
+    !!sub.trial_ends_at &&
+    new Date(sub.trial_ends_at).getTime() <= Date.now()
+  )
+}
+
 // The plan whose limits actually apply to a user right now. Resolves trials and
 // expiry so callers never have to special-case them:
 //   - paid & active           -> the paid plan

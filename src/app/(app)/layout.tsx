@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard-nav'
-import { isTrialActive } from '@/lib/plan-limits'
+import { isTrialActive, isTrialExpired } from '@/lib/plan-limits'
 import { isAdminEmail } from '@/lib/admin'
+import { TrialExpiredGate } from '@/components/trial-expired-gate'
 
 // Shell for all logged-in product pages: /dashboard, /publish, /sites,
 // /deploy, /apps, /assistant (and nested billing/settings). Requires auth and
@@ -42,6 +43,8 @@ export default async function AppLayout({
     navSubscription = { plan: 'Trial', status: 'trialing' }
   }
 
+  const trialExpired = isTrialExpired(subscription) && !isAdminEmail(user.email)
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav
@@ -52,7 +55,9 @@ export default async function AppLayout({
       />
       <main className="lg:pl-64">
         <div className="container mx-auto px-4 py-8">
-          {children}
+          <TrialExpiredGate trialExpired={trialExpired}>
+            {children}
+          </TrialExpiredGate>
         </div>
       </main>
     </div>
